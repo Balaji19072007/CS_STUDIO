@@ -10,7 +10,6 @@ const QuizView = ({ topic, onComplete }) => {
     const [warningCount, setWarningCount] = useState(0);
 
     // Timing
-    const [startTime, setStartTime] = useState(null);
     const [questionTimes, setQuestionTimes] = useState({}); // { questionIndex: timeInSeconds }
     const [currentQStartTime, setCurrentQStartTime] = useState(null);
 
@@ -79,7 +78,6 @@ const QuizView = ({ topic, onComplete }) => {
             console.error("Fullscreen denied:", err);
         }
         setGameState('playing');
-        setStartTime(Date.now());
         setWarningCount(0);
         setAnswers({});
         setCurrentQuestionIndex(0);

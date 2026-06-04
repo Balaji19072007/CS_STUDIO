@@ -14,15 +14,9 @@ class SocketService {
 
   connect(token) {
     // Prevent multiple connections
-    if (this.socket && this.isConnected) {
-      console.log('🔌 Socket already connected');
-      return;
-    }
-
-    // Clear any existing socket
     if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
+      console.log('🔌 Socket already initialized or connecting');
+      return;
     }
 
     // Clear any pending reconnect
@@ -259,12 +253,13 @@ class SocketService {
     this.socket.off('waiting-for-input');
   }
 
-  executeCode(code, language, input = '') {
+  executeCode(code, language, input = '', args = '') {
     if (this.socket && this.isConnected) {
       this.socket.emit('execute-code', { 
         code, 
         language: language.toLowerCase(),
-        input
+        input,
+        args
       });
     } else {
       throw new Error('Compiler socket is not connected.');

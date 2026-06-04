@@ -5,8 +5,6 @@ import * as feather from 'feather-icons';
 import { fetchAllProblems } from '../api/problemApi.js';
 import { ProblemManager } from '../utils/problemManager.js';
 import ProblemCard from '../components/problems/ProblemCard.jsx';
-import Loader from '../components/common/Loader.jsx';
-import SearchBar from '../components/common/SearchBar.jsx';
 import { ProblemsSkeleton } from '../components/common/SkeletonLoader';
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -27,7 +25,7 @@ const Problems = () => {
     const [filteredProblems, setFilteredProblems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [progress, setProgress] = useState(ProblemManager.getGlobalProgress());
+    const [, setProgress] = useState(ProblemManager.getGlobalProgress());
 
     const [filters, setFilters] = useState({
         difficulty: 'All',
@@ -176,15 +174,6 @@ const Problems = () => {
     };
 
     // --- Progress Display Calculation (Keep logic for filtering/sorting if needed later) ---
-    const solvedEasy = progress.problemsByDifficulty.Easy.solved;
-    const totalEasy = progress.problemsByDifficulty.Easy.total;
-    const solvedMedium = progress.problemsByDifficulty.Medium.solved;
-    const totalMedium = progress.problemsByDifficulty.Medium.total;
-    const solvedHard = progress.problemsByDifficulty.Hard.solved;
-    const totalHard = progress.problemsByDifficulty.Hard.total;
-    const totalSolved = solvedEasy + solvedMedium + solvedHard;
-    const totalTotal = totalEasy + totalMedium + totalHard;
-
     // Final feather-icons rendering
     useEffect(() => {
         feather.replace();

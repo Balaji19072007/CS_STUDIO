@@ -816,11 +816,11 @@ const SolveProblem = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className={`p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border-l-4 border-blue-500`}>
                         <h3 className="font-bold text-sm mb-1 text-blue-600 dark:text-blue-400">Input Format</h3>
-                        <div className="text-sm" dangerouslySetInnerHTML={{ __html: problem.inputFormat }} />
+                        <div className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: problem.inputFormat }} />
                       </div>
                       <div className={`p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border-l-4 border-purple-500`}>
                         <h3 className="font-bold text-sm mb-1 text-purple-600 dark:text-purple-400">Output Format</h3>
-                        <div className="text-sm" dangerouslySetInnerHTML={{ __html: problem.outputFormat }} />
+                        <div className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: problem.outputFormat }} />
                       </div>
                     </div>
 

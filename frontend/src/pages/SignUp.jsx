@@ -120,7 +120,7 @@ const SignUp = () => {
     setMessage({ type: null, text: '' });
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           queryParams: {

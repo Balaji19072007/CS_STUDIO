@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
     Trophy, Flame, Target, BookOpen, Clock, ArrowRight,
     Activity, Star, Zap, ChevronRight, PlayCircle, BarChart2, Compass, CheckCircle, Check, Play
@@ -200,7 +200,9 @@ const UserHomePage = () => {
                 try {
                     rData = await fetchUserRank();
                     setRankData(rData);
-                } catch (e) { }
+                } catch {
+                    setRankData(null);
+                }
 
                 let sData = null;
                 if (token) {
@@ -220,8 +222,8 @@ const UserHomePage = () => {
                 }
 
                 const [daily, recommended, historyRes] = await Promise.all([
-                    fetchDailyProblem().catch(e => null),
-                    fetchRecommendedProblems().catch(e => []),
+                    fetchDailyProblem().catch(() => null),
+                    fetchRecommendedProblems().catch(() => []),
                     token ? fetch('/api/progress/history', { headers }) : Promise.resolve(null)
                 ]);
 

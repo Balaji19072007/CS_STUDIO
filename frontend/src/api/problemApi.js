@@ -149,8 +149,8 @@ export const setupCompilerSocket = (onOutputCallback) => {
 /**
  * Send code for real-time execution via socket
  */
-export const sendCodeForExecution = (code, language, input = '') => {
-    socketService.executeCode(code, language, input);
+export const sendCodeForExecution = (code, language, input = '', args = '') => {
+    socketService.executeCode(code, language, input, args);
 };
 
 /**

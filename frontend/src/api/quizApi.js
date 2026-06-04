@@ -7,6 +7,8 @@ import { supabase } from '../config/supabase';
 // Get quizzes for a phase
 export const getQuizzes = async (phaseId) => {
     try {
+        // Fetch quizzes from Supabase for all phases
+
         const { data, error } = await supabase
             .from('quizzes')
             .select('*')

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchProblemById, submitSolution, runTestCases } from '../api/problemApi.js';
+import { getPracticeProblemById, runPracticeProblem, submitPracticeProblem } from '../api/courseApi.js';
 import Loader from '../components/common/Loader.jsx';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
-import { useAuth } from '../hooks/useAuth.jsx';
 import { ProblemManager } from '../utils/problemManager.js';
 import * as feather from 'feather-icons';
 
@@ -20,7 +19,6 @@ const Icon = ({ name, className = '' }) => {
 const CourseChallenge = () => {
     const { problemId } = useParams();
     const navigate = useNavigate();
-    const { isLoggedIn } = useAuth();
     const editorRef = useRef(null);
 
     // Data State
@@ -51,16 +49,15 @@ const CourseChallenge = () => {
         const loadProblem = async () => {
             if (!problemId) return;
             try {
-                const numericId = parseInt(problemId);
-                const data = await fetchProblemById(numericId);
+                const data = await getPracticeProblemById(problemId);
                 setProblem(data);
 
-                // Setup Code - FORCE C Check
-                const savedCode = ProblemManager.getUserCode(numericId);
+                const progress = ProblemManager.initializeProblemData(problemId);
+                const savedCode = progress.userCode;
                 const cBoilerplate = `#include <stdio.h>\n\nint main() {\n    // Write your solution here\n    printf("Hello World");\n    return 0;\n}`;
 
                 // Detection: If saved code looks like Java (which was the bug), ignore it.
-                let initialCode = cBoilerplate;
+                let initialCode = data.starter_code || cBoilerplate;
                 if (savedCode) {
                     const isJava = savedCode.includes('public class') || savedCode.includes('System.out.println');
                     if (!isJava) {
@@ -70,8 +67,7 @@ const CourseChallenge = () => {
 
                 setCode(initialCode);
 
-                // Check if already solved (from backend)
-                if (data.solved || data.isSolved) {
+                if (progress.solved) {
                     setIsSolved(true);
                     setIsSolutionUnlocked(true);
                     setTimeLeft(0);
@@ -123,29 +119,14 @@ const CourseChallenge = () => {
 
         try {
             const currentCode = editorRef.current.getCode();
-            // Force C language for execution
-            const result = await runTestCases(parseInt(problemId), currentCode, 'C');
+            const result = await runPracticeProblem(problemId, currentCode, problem?.language || 'C');
 
-            if (result.error) {
-                setConsoleOutput({ type: 'error', text: result.error });
+            if (!result.success) {
+                setConsoleOutput({ type: 'error', text: result.error || result.message || 'Execution failed.' });
             } else {
-                // Robust Output Check - Try all possible fields
-                const firstResult = result.results?.[0];
-                // Backend 'results' objects have an 'output' property (see problemController.js)
-                // We check firstResult.output first.
-                const rawOutput = firstResult?.output || result.output || result.stdout || result.userOutput || "";
-
-                const outputText = rawOutput ? rawOutput.toString() : "No output returned.";
-
-
-                // Additional status info - REMOVED per user request
-                // const passedCount = result.results?.filter(r => r.passed).length || 0;
-                // const totalCount = result.results?.length || 0;
-                // const statusLine = `\n\n--- Execution Stats ---\nTest Cases Passed: ${passedCount}/${totalCount}`;
-
                 setConsoleOutput({
-                    type: result.success ? 'success' : 'warning',
-                    text: outputText // + statusLine 
+                    type: 'success',
+                    text: result.output ? result.output.toString() : 'No output returned.'
                 });
             }
         } catch (e) {
@@ -162,28 +143,20 @@ const CourseChallenge = () => {
 
         try {
             const currentCode = editorRef.current.getCode();
-            const numericId = parseInt(problemId);
-            // Calculate time spent based on remaining
-            const timeSpentMs = (CHALLENGE_DURATION_SECONDS - timeLeft) * 1000;
-
-            const result = await submitSolution(numericId, currentCode, 'C', timeSpentMs);
+            const result = await submitPracticeProblem(problemId, currentCode, problem?.language || 'C');
 
             if (result.isSolved) {
                 setIsSolved(true);
                 setIsSolutionUnlocked(true);
-                ProblemManager.markAsSolved(numericId);
+                ProblemManager.markAsSolved(problemId);
                 // Invalidate dashboard cache so UserHomePage re-fetches stats
                 sessionStorage.setItem('invalidate_dashboard_cache', 'true');
                 setConsoleOutput({ type: 'success', text: '🎉 Correct Answer! Challenge Completed!\nYou can now view the Solution tab.' });
             } else {
                 let errorMsg = '❌ Wrong Answer.';
-                if (result.failureDetails) {
-                    errorMsg += `\n\nDifference: ${result.failureDetails.difference}`;
-                    // Optional: Show Expected/Actual if difference is vague
-                    if (result.failureDetails.expected && result.failureDetails.actual) {
-                        errorMsg += `\nExpected: [${result.failureDetails.expected}]\nActual:   [${result.failureDetails.actual}]`;
-                    }
-                } else {
+                if (result.failureDetails && result.failureDetails.expected && result.failureDetails.actual) {
+                    errorMsg += `\nExpected: [${result.failureDetails.expected}]\nActual:   [${result.failureDetails.actual}]`;
+                } else if (!result.error) {
                     errorMsg += ' Please check your logic and try again.';
                 }
                 setConsoleOutput({ type: 'error', text: errorMsg });
@@ -205,13 +178,14 @@ const CourseChallenge = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium"
+                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-gray-700/50"
                     >
                         <Icon name="arrow-left" className="w-4 h-4" />
                         Back
                     </button>
-                    <div className="h-5 w-px bg-gray-700"></div>
-                    <h1 className="font-semibold text-white tracking-wide text-sm sm:text-base">
+                    <div className="h-6 w-px bg-gray-700"></div>
+                    <h1 className="font-semibold text-white tracking-wide text-sm sm:text-base flex items-center gap-2">
+                        <Icon name="code" className="w-4 h-4 text-blue-400" />
                         {problem.title}
                     </h1>
                 </div>
@@ -233,9 +207,9 @@ const CourseChallenge = () => {
                     <div className="flex border-b border-gray-700 bg-[#1E293B]">
                         <button
                             onClick={() => setActiveTab('problem')}
-                            className={`flex-1 py-3 text-sm font-medium transition-all relative ${activeTab === 'problem'
-                                ? 'text-white'
-                                : 'text-gray-500 hover:text-gray-300'
+                            className={`flex-1 py-4 text-sm font-medium transition-all relative ${activeTab === 'problem'
+                                ? 'text-blue-400'
+                                : 'text-gray-400 hover:text-gray-200'
                                 }`}
                         >
                             Problem Statement
@@ -246,10 +220,10 @@ const CourseChallenge = () => {
                         <button
                             onClick={() => isSolutionUnlocked && setActiveTab('solution')}
                             disabled={!isSolutionUnlocked}
-                            className={`flex-1 py-3 text-sm font-medium transition-all relative flex items-center justify-center gap-2 ${activeTab === 'solution'
-                                ? 'text-white'
+                            className={`flex-1 py-4 text-sm font-medium transition-all relative flex items-center justify-center gap-2 ${activeTab === 'solution'
+                                ? 'text-green-400'
                                 : isSolutionUnlocked
-                                    ? 'text-gray-500 hover:text-gray-300'
+                                    ? 'text-gray-400 hover:text-gray-200'
                                     : 'text-gray-600 cursor-not-allowed opacity-50'
                                 }`}
                         >
@@ -268,19 +242,30 @@ const CourseChallenge = () => {
                                 <div>
                                     <h2 className="text-xl font-bold text-white mb-4 text-center">{problem.title}</h2>
                                     <div className="prose prose-invert max-w-none text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                                        {problem.problemStatement}
+                                        {problem.description /* DB col is description, not problemStatement */}
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
                                     <div className="bg-[#1E293B] border border-gray-700 rounded-lg p-4 text-left">
                                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Input Format</h3>
-                                        <code className="text-sm text-blue-300 font-mono block whitespace-pre-wrap">{problem.inputFormat}</code>
+                                        <code className="text-sm text-blue-300 font-mono block whitespace-pre-wrap">{problem.input_format || "None"}</code>
                                     </div>
                                     <div className="bg-[#1E293B] border border-gray-700 rounded-lg p-4 text-left">
                                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Output Format</h3>
-                                        <code className="text-sm text-green-300 font-mono block whitespace-pre-wrap">{problem.outputFormat}</code>
+                                        <code className="text-sm text-green-300 font-mono block whitespace-pre-wrap">{problem.output_format || "Standard Output"}</code>
                                     </div>
+                                    {problem.hints && problem.hints.length > 0 && (
+                                        <div className="bg-[#1E293B] border border-gray-700 rounded-lg p-4 text-left">
+                                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Hints</h3>
+                                            <ul className="list-disc list-inside text-sm text-yellow-300 space-y-1">
+                                                {Array.isArray(problem.hints)
+                                                    ? problem.hints.map((h, i) => <li key={i}>{h}</li>)
+                                                    : <li>{problem.hints}</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ) : (
@@ -290,7 +275,9 @@ const CourseChallenge = () => {
                                         <Icon name="check-circle" className="w-5 h-5" />
                                         Detailed Explanation
                                     </h3>
-                                    <p className="text-gray-300 leading-relaxed text-sm">{problem.solution?.explanation || "No explanation provided for this problem."}</p>
+                                    <p className="text-gray-300 leading-relaxed text-sm">
+                                        {problem.description || "Review the reference solution below."}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -300,7 +287,7 @@ const CourseChallenge = () => {
                                     </h3>
                                     <div className="relative group">
                                         <pre className="bg-[#0b1120] p-4 rounded-lg border border-gray-700 overflow-x-auto text-sm font-mono text-blue-100 shadow-inner text-left">
-                                            <code>{problem.solution?.code || "// Code not available"}</code>
+                                            <code>{problem.solution_code || "// Solution code not available yet."}</code>
                                         </pre>
                                     </div>
                                 </div>
@@ -323,7 +310,7 @@ const CourseChallenge = () => {
                     </div>
 
                     {/* ACTION BAR (Fixed between Editor and Console) */}
-                    <div className="h-14 flex items-center justify-between px-6 bg-[#1E293B] border-t border-gray-700 shrink-0 select-none">
+                    <div className="h-16 flex items-center justify-between px-6 bg-[#1E293B] border-t border-gray-700 shrink-0 select-none shadow-lg z-10">
                         <div className="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
                             <Icon name="terminal" className="w-3.5 h-3.5" />
                             {consoleOutput ? 'Console Output' : 'Console Ready'}
@@ -332,7 +319,7 @@ const CourseChallenge = () => {
                             <button
                                 onClick={handleRun}
                                 disabled={isRunning}
-                                className="px-5 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium text-sm transition-all flex items-center gap-2 disabled:opacity-50 hover:shadow-lg focus:ring-2 focus:ring-gray-500/50"
+                                className="px-5 py-2.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium text-sm transition-all flex items-center gap-2 disabled:opacity-50 hover:shadow-lg focus:ring-2 focus:ring-gray-500/50"
                             >
                                 {isRunning ? <Icon name="loader" className="w-4 h-4 animate-spin" /> : <Icon name="play" className="w-4 h-4" />}
                                 Run Code
@@ -340,7 +327,7 @@ const CourseChallenge = () => {
                             <button
                                 onClick={handleSubmit}
                                 disabled={isRunning || isSubmitting}
-                                className={`px-5 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 hover:shadow-xl focus:ring-2 ${isSolved
+                                className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 hover:shadow-xl focus:ring-2 transform active:scale-95 ${isSolved
                                     ? 'bg-green-600 hover:bg-green-500 shadow-green-500/20 focus:ring-green-500/50'
                                     : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 focus:ring-blue-500/50'
                                     }`}

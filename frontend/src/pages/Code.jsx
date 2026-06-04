@@ -61,8 +61,8 @@ const Code = () => {
 
     // Initialize socket service when component mounts
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token && !socketService.isConnected) {
+        const token = localStorage.getItem('token') || 'anonymous';
+        if (!socketService.isConnected) {
             console.log('🔌 Initializing socket service for freeform playground...');
             socketService.connect(token);
         }

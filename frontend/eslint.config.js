@@ -28,6 +28,13 @@ export default defineConfig([
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'no-undef': 'error',
+      'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
+    },
+  },
+  {
+    files: ['src/contexts/*.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

@@ -15,7 +15,7 @@ export class ProblemManager {
         const user = JSON.parse(userData);
         userId = user.id || user.userId || 'guest';
       }
-    } catch (e) {
+    } catch {
       // Ignore error
     }
     return `user_${userId}_problem_${problemId}_${suffix}`;

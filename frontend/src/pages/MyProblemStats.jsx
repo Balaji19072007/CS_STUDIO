@@ -4,7 +4,7 @@ import * as feather from 'feather-icons';
 import { useAuth } from '../hooks/useAuth.jsx';
 
 const MyProblemStats = () => {
-    const { isLoggedIn, user, loading: authLoading } = useAuth();
+    const { isLoggedIn, loading: authLoading } = useAuth();
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // all, solved, attempted

@@ -1,37 +1,8 @@
-const axios = require('axios');
-
-const testData = {
-    code: 'console.log("Hello, JavaScript!");',
-    language: 'JavaScript'
-};
-
-// Get a valid token from localStorage (you'll need to replace this)
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test'; // Replace with actual token
-
-console.log('Testing API endpoint...');
-console.log('URL: http://localhost:5000/api/problems/201/run-tests');
-console.log('Data:', testData);
-
-axios.post('http://localhost:5000/api/problems/201/run-tests', testData, {
-    headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token
-    },
-    timeout: 10000
-})
-    .then(response => {
-        console.log('✅ API call successful!');
-        console.log('Response:', response.data);
-    })
-    .catch(error => {
-        console.error('❌ API call failed!');
-        if (error.response) {
-            console.error('Status:', error.response.status);
-            console.error('Data:', error.response.data);
-        } else if (error.request) {
-            console.error('No response received');
-            console.error('Request:', error.request._header);
-        } else {
-            console.error('Error:', error.message);
-        }
-    });
+const jwt = require('jsonwebtoken');
+const token = jwt.sign({ id: 'test_user_123' }, '6a2583cd2558f98527dc2eecdbec41b00e89aa9f7e66444aea5883dfad0f8a41');
+const code = `#include <stdio.h>\nint main() { int num; printf("Enter a number: "); scanf("%d", &num); printf("You entered: %d\\n", num); return 0; }`;
+fetch('http://localhost:5000/api/course-challenges/189138/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ code: code, language: 'C' })
+}).then(res => res.json()).then(console.log);

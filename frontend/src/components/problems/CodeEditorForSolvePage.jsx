@@ -1,7 +1,6 @@
 // src/components/problems/CodeEditorForSolvePage.jsx
 import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import Editor from '@monaco-editor/react';
-import { API_CONFIG } from '../../config/api.js';
 import { sendInputToProgram, setupCompilerSocket, sendCodeForExecution, stopCodeExecution } from '../../api/problemApi.js';
 import socketService from '../../services/socketService.js';
 
@@ -47,7 +46,6 @@ const CodeEditorForSolvePage = forwardRef(({
 
   const [isWaitingForInput, setIsWaitingForInput] = useState(false);
 
-  const socketRef = useRef(null);
   const editorRef = useRef(null);
   const inputBufferRef = useRef('');
   // parent's console DOM node (passed via setTerminalRef)
@@ -62,20 +60,25 @@ const CodeEditorForSolvePage = forwardRef(({
   // --- Socket.IO Initialization and Listeners (FIXED) ---
   useEffect(() => {
     // Initialize socket service if not already connected
-    const token = localStorage.getItem('token');
-    if (token && !socketService.isConnected) {
+    const token = localStorage.getItem('token') || 'anonymous';
+    if (!socketService.isConnected) {
       console.log('🔌 Initializing socket service for compiler...');
       socketService.connect(token);
     }
 
     // Set up compiler socket with the centralized service
     setupCompilerSocket((output, isError, isRunningState, isWaitingInput) => {
+      let currentWaitingState = isWaitingInput;
       if (isWaitingInput !== undefined) {
         setIsWaitingForInput(isWaitingInput);
       }
+      if (isRunningState === false) {
+        setIsWaitingForInput(false);
+        currentWaitingState = false;
+      }
       if (onOutputReceived) {
         // Pass all state info (including isWaitingInput) to parent
-        onOutputReceived(output, isError, isRunningState, isWaitingInput);
+        onOutputReceived(output, isError, isRunningState, currentWaitingState);
       }
     });
 

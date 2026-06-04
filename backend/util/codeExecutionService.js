@@ -78,13 +78,35 @@ class CodeExecutionService {
    */
   async executeC(code, input, sessionId) {
     return new Promise((resolve) => {
-      const sourceFile = path.join(this.tempDir, `${sessionId}.c`);
-      const executable = path.join(this.tempDir, `${sessionId}${process.platform === 'win32' ? '.exe' : ''}`);
+      const executableName = `${sessionId}${process.platform === 'win32' ? '.exe' : ''}`;
+      const executable = path.join(this.tempDir, executableName);
 
-      fs.writeFileSync(sourceFile, code);
+      let cFiles = [];
+      let filesToCleanup = [];
+
+      const cFileBlocks = code.split(/\/\/\s*File:\s*([a-zA-Z0-9_\-\.]+)/i);
+      if (cFileBlocks.length > 1) {
+          for (let i = 1; i < cFileBlocks.length; i += 2) {
+              const filename = cFileBlocks[i];
+              const content = cFileBlocks[i+1];
+              const filePath = path.join(this.tempDir, `${sessionId}_${filename}`);
+              fs.writeFileSync(filePath, content);
+              filesToCleanup.push(filePath);
+              if (filename.endsWith('.c')) {
+                  cFiles.push(`${sessionId}_${filename}`);
+              }
+          }
+      } else {
+          const sourceFileName = `${sessionId}.c`;
+          const sourceFile = path.join(this.tempDir, sourceFileName);
+          fs.writeFileSync(sourceFile, code);
+          cFiles.push(sourceFileName);
+          filesToCleanup.push(sourceFile);
+      }
 
       // Compile C code
-      const compileProcess = spawn('gcc', [sourceFile, '-o', executable], {
+      const compileProcess = spawn('gcc', [...cFiles, '-o', executableName], {
+        cwd: this.tempDir,
         timeout: 15000
       });
 
@@ -96,7 +118,7 @@ class CodeExecutionService {
 
       compileProcess.on('close', (exitCode) => {
         if (exitCode !== 0) {
-          this.cleanupFiles([sourceFile]);
+          this.cleanupFiles(filesToCleanup);
           return resolve({
             success: false,
             output: '',
@@ -107,11 +129,11 @@ class CodeExecutionService {
 
         // Execute compiled program
         const cProcess = spawn(executable, [], { timeout: 10000 });
-        this.handleProcessExecution(cProcess, input, sessionId, [sourceFile, executable], resolve);
+        this.handleProcessExecution(cProcess, input, sessionId, [...filesToCleanup, executable], resolve);
       });
 
       compileProcess.on('error', (err) => {
-        this.cleanupFiles([sourceFile]);
+        this.cleanupFiles(filesToCleanup);
         resolve({
           success: false,
           output: '',
@@ -127,13 +149,35 @@ class CodeExecutionService {
    */
   async executeCpp(code, input, sessionId) {
     return new Promise((resolve) => {
-      const sourceFile = path.join(this.tempDir, `${sessionId}.cpp`);
-      const executable = path.join(this.tempDir, `${sessionId}${process.platform === 'win32' ? '.exe' : ''}`);
+      const executableName = `${sessionId}${process.platform === 'win32' ? '.exe' : ''}`;
+      const executable = path.join(this.tempDir, executableName);
 
-      fs.writeFileSync(sourceFile, code);
+      let cppFiles = [];
+      let filesToCleanup = [];
+
+      const cppFileBlocks = code.split(/\/\/\s*File:\s*([a-zA-Z0-9_\-\.]+)/i);
+      if (cppFileBlocks.length > 1) {
+          for (let i = 1; i < cppFileBlocks.length; i += 2) {
+              const filename = cppFileBlocks[i];
+              const content = cppFileBlocks[i+1];
+              const filePath = path.join(this.tempDir, `${sessionId}_${filename}`);
+              fs.writeFileSync(filePath, content);
+              filesToCleanup.push(filePath);
+              if (filename.endsWith('.cpp') || filename.endsWith('.c++')) {
+                  cppFiles.push(`${sessionId}_${filename}`);
+              }
+          }
+      } else {
+          const sourceFileName = `${sessionId}.cpp`;
+          const sourceFile = path.join(this.tempDir, sourceFileName);
+          fs.writeFileSync(sourceFile, code);
+          cppFiles.push(sourceFileName);
+          filesToCleanup.push(sourceFile);
+      }
 
       // Compile C++ code
-      const compileProcess = spawn('g++', [sourceFile, '-o', executable], {
+      const compileProcess = spawn('g++', [...cppFiles, '-o', executableName], {
+        cwd: this.tempDir,
         timeout: 15000
       });
 
@@ -145,7 +189,7 @@ class CodeExecutionService {
 
       compileProcess.on('close', (exitCode) => {
         if (exitCode !== 0) {
-          this.cleanupFiles([sourceFile]);
+          this.cleanupFiles(filesToCleanup);
           return resolve({
             success: false,
             output: '',
@@ -156,11 +200,11 @@ class CodeExecutionService {
 
         // Execute compiled program
         const cppProcess = spawn(executable, [], { timeout: 10000 });
-        this.handleProcessExecution(cppProcess, input, sessionId, [sourceFile, executable], resolve);
+        this.handleProcessExecution(cppProcess, input, sessionId, [...filesToCleanup, executable], resolve);
       });
 
       compileProcess.on('error', (err) => {
-        this.cleanupFiles([sourceFile]);
+        this.cleanupFiles(filesToCleanup);
         resolve({
           success: false,
           output: '',

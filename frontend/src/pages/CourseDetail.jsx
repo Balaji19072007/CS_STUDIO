@@ -1,292 +1,302 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getCourse, getPhases } from '../api/courseApi';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCourse, getPhases, getTopics } from '../api/courseApi';
+import { getCourseOverview } from '../data/courseOverviewData.js';
+import { getCoursePresentation } from '../data/coursePresentation.js';
+
+const getCourseIcon = (title) => {
+  const lowerTitle = title?.toLowerCase() || '';
+  if (lowerTitle.includes('c programming') || lowerTitle.includes('c language')) return 'C';
+  if (lowerTitle.includes('python')) return 'Py';
+  if (lowerTitle.includes('java')) return 'Jv';
+  if (lowerTitle.includes('c++')) return 'C++';
+  if (lowerTitle.includes('c#')) return 'C#';
+  if (lowerTitle.includes('frontend') || lowerTitle.includes('web')) return 'UI';
+  if (lowerTitle.includes('backend') || lowerTitle.includes('api')) return 'BE';
+  if (lowerTitle.includes('data')) return 'DS';
+  if (lowerTitle.includes('machine') || lowerTitle.includes('ai')) return 'ML';
+  if (lowerTitle.includes('security') || lowerTitle.includes('cyber')) return 'SEC';
+  if (lowerTitle.includes('devops') || lowerTitle.includes('cloud') || lowerTitle.includes('docker')) return 'OPS';
+  if (lowerTitle.includes('mobile') || lowerTitle.includes('android') || lowerTitle.includes('ios')) return 'APP';
+  return 'CS';
+};
 
 const CourseDetail = () => {
-    const { courseId } = useParams();
-    const navigate = useNavigate();
-    const [course, setCourse] = useState(null);
-    const [phasesCount, setPhasesCount] = useState(0);
-    const [loading, setLoading] = useState(true);
+  const { courseId } = useParams();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchCourseData = async () => {
-            try {
-                // Fetch from Supabase (all courses are there now)
-                const courseData = await getCourse(courseId);
-                if (courseData) {
-                    setCourse(courseData);
+  const [course, setCourse] = useState(null);
+  const [phases, setPhases] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-                    // Get phases count
-                    const phases = await getPhases(courseId);
-                    setPhasesCount(phases.length);
-                }
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching course:', error);
-                setLoading(false);
-            }
-        };
-
-        fetchCourseData();
-    }, [courseId]);
-
-    // Get course icon
-    const getCourseIcon = (title) => {
-        const lowerTitle = title?.toLowerCase() || '';
-        if (lowerTitle.includes('c programming') || lowerTitle.includes('c language')) return '📘';
-        if (lowerTitle.includes('python')) return '🐍';
-        if (lowerTitle.includes('java')) return '☕';
-        if (lowerTitle.includes('javascript')) return '⚡';
-        if (lowerTitle.includes('web')) return '🌐';
-        if (lowerTitle.includes('data')) return '📊';
-        return '📚';
-    };
-
-    // Get course-specific content
-    const getCourseContent = (title) => {
-        const lowerTitle = title?.toLowerCase() || '';
-
-        if (lowerTitle.includes('c programming') || lowerTitle.includes('c language')) {
-            return {
-                what: "C is a powerful, general-purpose programming language that provides low-level access to memory and efficient execution. Developed in the early 1970s, it has become one of the most widely used programming languages, forming the foundation for many modern languages and operating systems.",
-                why: [
-                    "Foundation of modern programming - Understanding C helps you grasp how computers work at a fundamental level",
-                    "High performance - C programs are fast and efficient, making them ideal for system programming",
-                    "Portability - C code can run on various platforms with minimal modification",
-                    "Career opportunities - Widely used in embedded systems, operating systems, and game development",
-                    "Learn other languages easily - Once you know C, learning languages like C++, Java, and Python becomes much easier"
-                ],
-                features: [
-                    "Simple and efficient syntax",
-                    "Powerful set of built-in operators",
-                    "Low-level memory manipulation with pointers",
-                    "Rich library of built-in functions",
-                    "Modular programming with functions",
-                    "Structured programming approach"
-                ],
-                prerequisites: [
-                    "Basic computer knowledge",
-                    "Understanding of basic mathematics",
-                    "Logical thinking ability",
-                    "No prior programming experience required"
-                ]
-            };
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const courseData = await getCourse(courseId);
+        if (!courseData) {
+          setLoading(false);
+          return;
         }
 
-        // Default content
-        return {
-            what: `${title} is a comprehensive programming course designed to help you master essential concepts and build real-world applications. This course covers everything from basics to advanced topics with hands-on examples and projects.`,
-            why: [
-                "Build a strong foundation in programming",
-                "Learn industry-standard best practices",
-                "Work on real-world projects",
-                "Enhance your career opportunities",
-                "Join a community of learners"
-            ],
-            features: [
-                "Comprehensive curriculum",
-                "Interactive examples",
-                "Self-paced learning",
-                "Practice exercises",
-                "Project-based learning"
-            ],
-            prerequisites: [
-                "Basic computer knowledge",
-                "Willingness to learn",
-                "No prior experience required"
-            ]
-        };
+        setCourse(courseData);
+
+        const phasesData = await getPhases(courseId);
+        const phasesWithCounts = await Promise.all(
+          phasesData.map(async (phase) => {
+            try {
+              const topics = await getTopics(phase.id);
+              return {
+                ...phase,
+                topicsCount: topics.length,
+                previewTopics: topics.slice(0, 4).map((topic) => topic.title),
+              };
+            } catch (error) {
+              console.error(`Error loading topics for phase ${phase.id}:`, error);
+              return {
+                ...phase,
+                topicsCount: 0,
+                previewTopics: [],
+              };
+            }
+          })
+        );
+
+        setPhases(phasesWithCounts);
+      } catch (error) {
+        console.error('Error fetching course:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
-                <div className="text-center">
-                    <div className="inline-block w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <div className="text-xl font-semibold text-gray-300">Loading course...</div>
-                </div>
-            </div>
-        );
-    }
+    fetchCourseData();
+  }, [courseId]);
 
-    if (!course) {
-        return (
-            <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
-                <div className="text-center">
-                    <div className="text-6xl mb-4">❌</div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Course not found</h2>
-                    <button
-                        onClick={() => navigate('/courses')}
-                        className="mt-4 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-                    >
-                        Back to Courses
-                    </button>
-                </div>
-            </div>
-        );
-    }
+  const totalTopics = useMemo(
+    () => phases.reduce((sum, phase) => sum + (phase.topicsCount || 0), 0),
+    [phases]
+  );
 
-    const content = getCourseContent(course.title);
+  const totalEstimatedHours = useMemo(
+    () => phases.reduce((sum, phase) => sum + (phase.estimated_hours || 0), 0),
+    [phases]
+  );
 
+  if (loading) {
     return (
-        <div className="min-h-screen dark-gradient-secondary">
-            {/* Main Container - Increased width to max-w-7xl */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-                {/* Top Navigation */}
-                <div className="mb-8 flex justify-start">
-                    <button
-                        onClick={() => navigate('/courses')}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 hover:text-white rounded-lg border border-gray-700 hover:border-gray-500 transition-all group font-medium"
-                    >
-                        <svg className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span>Back to Courses</span>
-                    </button>
-                </div>
-
-                {/* Course Header - Centered with Icon side-by-side */}
-                <div className="flex flex-col items-center text-center gap-6 mb-12">
-                    {/* Icon & Title Row */}
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                        {/* Icon */}
-                        <div className="flex-shrink-0">
-                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-800/50 rounded-2xl flex items-center justify-center border border-gray-700 shadow-xl">
-                                <span className="text-5xl sm:text-6xl">{getCourseIcon(course.title)}</span>
-                            </div>
-                        </div>
-
-                        {/* Title */}
-                        <h1 className="text-4xl sm:text-5xl font-bold text-white">
-                            {course.title}
-                        </h1>
-                    </div>
-
-                    {/* Info (Description & Stats & Button) */}
-                    <div className="max-w-4xl w-full">
-                        <p className="text-xl text-gray-400 mb-6 leading-relaxed">
-                            {course.description}
-                        </p>
-
-                        {/* Stats Badges */}
-                        <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-                            <div className="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700">
-                                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                                </svg>
-                                <span className="text-white font-medium text-sm">{phasesCount} Phases</span>
-                            </div>
-                            <div className="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700">
-                                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-white font-medium text-sm">Self-paced</span>
-                            </div>
-                            {course.level && (
-                                <div className="px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                                    <span className="text-white font-medium text-sm">{course.level}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Start Course Button */}
-                        <div className="flex justify-center">
-                            <button
-                                onClick={() => navigate(`/courses/${courseId}/learn`)}
-                                className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-300 font-semibold text-lg shadow-lg shadow-primary-500/30"
-                            >
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                </svg>
-                                Start Course
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content - Left Aligned & Grid Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column - Main Info */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* What is Section */}
-                        <section className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-8">
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-2xl">📚</span>
-                                </div>
-                                <h2 className="text-2xl font-bold text-white">What is {course.title}?</h2>
-                            </div>
-                            <p className="text-gray-300 leading-relaxed text-lg">
-                                {content.what}
-                            </p>
-                        </section>
-
-                        {/* Why Learn Section */}
-                        <section className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-8">
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-2xl">🎯</span>
-                                </div>
-                                <h2 className="text-2xl font-bold text-white">Why Learn {course.title}?</h2>
-                            </div>
-                            <ul className="space-y-4">
-                                {content.why.map((reason, index) => (
-                                    <li key={index} className="flex items-start gap-3">
-                                        <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                        </svg>
-                                        <span className="text-gray-300 text-lg">{reason}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    </div>
-
-                    {/* Right Column - Features & Prereqs */}
-                    <div className="space-y-8">
-                        {/* Key Features Section */}
-                        <section className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-2xl">✨</span>
-                                </div>
-                                <h2 className="text-xl font-bold text-white">Key Features</h2>
-                            </div>
-                            <ul className="space-y-3">
-                                {content.features.map((feature, index) => (
-                                    <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-900/50 border border-gray-700/30">
-                                        <div className="w-2 h-2 mt-2 bg-pink-400 rounded-full flex-shrink-0"></div>
-                                        <span className="text-gray-300 from-neutral-300">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-
-                        {/* Prerequisites Section */}
-                        <section className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-2xl">📋</span>
-                                </div>
-                                <h2 className="text-xl font-bold text-white">Prerequisites</h2>
-                            </div>
-                            <ul className="space-y-3">
-                                {content.prerequisites.map((prereq, index) => (
-                                    <li key={index} className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full flex-shrink-0"></div>
-                                        <span className="text-gray-300">{prereq}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    </div>
-                </div>
-            </div>
+      <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
+        <div className="text-center">
+          <div className="inline-block w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <div className="text-xl font-semibold text-gray-300">Loading course...</div>
         </div>
+      </div>
     );
+  }
+
+  if (!course) {
+    return (
+      <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
+        <div className="text-center">
+          <div className="text-6xl mb-4">X</div>
+          <h2 className="text-2xl font-bold text-white mb-2">Course not found</h2>
+          <button
+            onClick={() => navigate('/courses')}
+            className="mt-4 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+          >
+            Back to Courses
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const overview = getCourseOverview(course.title);
+  const presentation = getCoursePresentation(course.title);
+  const phasePreview = phases.slice(0, 4);
+
+  return (
+    <div className="min-h-screen dark-gradient-secondary">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-8 flex justify-start">
+          <button
+            onClick={() => navigate('/courses')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 hover:text-white rounded-lg border border-gray-700 hover:border-gray-500 transition-all group font-medium"
+          >
+            <svg className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back to Courses</span>
+          </button>
+        </div>
+
+        <section className="rounded-[2rem] border border-gray-800 bg-[#111827]/90 shadow-2xl overflow-hidden relative">
+          <div className={`absolute inset-x-0 top-0 h-40 bg-gradient-to-r ${presentation.heroGradient}`} />
+          <div className="grid lg:grid-cols-[1.25fr_0.75fr] gap-0">
+            <div className="p-8 sm:p-10 lg:p-12 relative">
+              <div className="flex items-center gap-4 mb-6">
+                <div className={`w-20 h-20 rounded-2xl border ${presentation.badgeClass} flex items-center justify-center text-2xl font-bold tracking-wide shadow-lg`}>
+                  {presentation.badge || getCourseIcon(course.title)}
+                </div>
+                <div>
+                  <p className={`text-sm uppercase tracking-[0.3em] ${presentation.accentTextClass}`}>{presentation.trackLabel}</p>
+                  <h1 className="text-4xl sm:text-5xl font-bold text-white mt-2">{course.title}</h1>
+                  <p className="text-sm text-gray-400 mt-3 max-w-2xl">{presentation.strapline}</p>
+                </div>
+              </div>
+
+              <p className="text-lg text-gray-300 leading-relaxed max-w-3xl">
+                {overview.summary}
+              </p>
+
+              <div className="flex flex-wrap gap-3 mt-8">
+                <div className="px-4 py-2 rounded-xl bg-slate-900/70 border border-gray-800 text-sm text-gray-200">
+                  {phases.length} phases
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-slate-900/70 border border-gray-800 text-sm text-gray-200">
+                  {totalTopics} topics
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-slate-900/70 border border-gray-800 text-sm text-gray-200">
+                  {totalEstimatedHours || course.estimated_hours || 'Self-paced'} study hours
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-slate-900/70 border border-gray-800 text-sm text-gray-200">
+                  {course.level || course.difficulty || 'Guided learning'}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 mt-8">
+                {presentation.focusAreas.map((item) => (
+                  <div key={item} className={`rounded-2xl border ${presentation.accentBorderClass} ${presentation.accentSoftClass} px-4 py-4`}>
+                    <p className={`text-xs uppercase tracking-[0.24em] ${presentation.accentTextClass}`}>Focus Area</p>
+                    <p className="text-sm text-white mt-2 leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-4 mt-10">
+                <button
+                  onClick={() => navigate(`/courses/${courseId}/learn`)}
+                  className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg ${presentation.buttonClass}`}
+                >
+                  Start Learning
+                  <span aria-hidden="true">→</span>
+                </button>
+                <button
+                  onClick={() => navigate('/certificates')}
+                  className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-xl transition-colors font-semibold border ${presentation.ghostButtonClass}`}
+                >
+                  View Certificates
+                </button>
+              </div>
+            </div>
+
+            <div className="border-t lg:border-t-0 lg:border-l border-gray-800 bg-black/20 p-8 sm:p-10">
+              <h2 className="text-xl font-semibold text-white mb-5">How You Will Learn</h2>
+              <div className={`rounded-2xl border ${presentation.accentBorderClass} ${presentation.accentSoftClass} p-5 mb-5`}>
+                <p className={`text-xs uppercase tracking-[0.24em] ${presentation.accentTextClass}`}>Study Approach</p>
+                <p className="text-sm text-gray-200 mt-3 leading-relaxed">
+                  {presentation.learningStyle}
+                </p>
+              </div>
+              <div className="space-y-4">
+                {overview.whyLearn.map((item) => (
+                  <div key={item} className="rounded-2xl border border-gray-800 bg-slate-900/60 p-4">
+                    <p className="text-gray-300 leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 mt-10">
+          <section className="rounded-3xl border border-gray-800 bg-[#111827]/90 p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">What you will be able to do</h2>
+            <div className="space-y-4">
+              {overview.outcomes.map((outcome) => (
+                <div key={outcome} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-gray-800">
+                  <div className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-400 flex-shrink-0" />
+                  <p className="text-gray-300 leading-relaxed">{outcome}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-gray-800 bg-[#111827]/90 p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Before you start</h2>
+            <div className="space-y-3">
+              {overview.prerequisites.map((item) => (
+                <div key={item} className="rounded-2xl bg-slate-900/60 border border-gray-800 px-4 py-3 text-gray-300">
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
+              <h3 className="text-lg font-semibold text-amber-200 mb-2">Completion certificate</h3>
+              <p className="text-sm leading-relaxed text-amber-100/90">
+                {overview.certificate}
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <section className="rounded-3xl border border-gray-800 bg-[#111827]/90 p-8 mt-10">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Curriculum Snapshot</h2>
+              <p className="text-gray-400 mt-2">
+                Browse the first phases to understand how the course builds skill step by step.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/courses/${courseId}/learn`)}
+              className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors ${presentation.buttonClass}`}
+            >
+              Open Learning Path
+            </button>
+          </div>
+
+          {phasePreview.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {phasePreview.map((phase, index) => (
+                <div key={phase.id} className="rounded-2xl border border-gray-800 bg-slate-900/60 p-5">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <span className={`text-xs uppercase tracking-[0.25em] ${presentation.accentTextClass}`}>
+                      Phase {index + 1}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {phase.topicsCount || 0} topics
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{phase.title}</h3>
+                  <p className="text-gray-400 mt-2 leading-relaxed">
+                    {phase.description || 'Focused lesson sequence for this stage of the course.'}
+                  </p>
+                  {phase.previewTopics?.length ? (
+                    <div className="mt-4 space-y-2">
+                      {phase.previewTopics.map((topic) => (
+                        <div key={topic} className="flex items-start gap-2 text-sm text-gray-300">
+                          <span className={`mt-1 h-1.5 w-1.5 rounded-full ${presentation.accentSoftClass}`} />
+                          <span>{topic}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {phase.estimated_hours ? (
+                    <p className="text-sm text-gray-500 mt-3">{phase.estimated_hours} study hours</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-gray-800 bg-slate-900/60 p-6 text-gray-400">
+              Curriculum details will appear here once phases are available for this course.
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
 };
 
 export default CourseDetail;

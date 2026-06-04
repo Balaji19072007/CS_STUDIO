@@ -107,9 +107,6 @@ html:not(.dark-theme):not(.light-theme) body {
 }
 
 /* Remove any default dark theme settings that might be interfering */
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
 
 /* ============================================ */
 /* PREVENT THEME FLASH */
@@ -125,9 +122,16 @@ body.dark-theme {
   visibility: visible;
 }
 
-/* Ensure smooth transitions */
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* Ensure smooth transitions globally for theme colors */
+*, ::before, ::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Exempt elements that need specific all-property transitions (like hover scales) */
+.transition-all, .card-hover, .nav-link, button, a {
+  transition-property: all !important;
 }
 
 /* Tailwind Customizations using CSS Variables for Dynamic Theme Switching */
@@ -415,7 +419,11 @@ body.light-theme .filter-dropdown option {
 }
 
 .dark-btn {
-  @apply btn-primary;
+  background: var(--color-primary-500);
+  color: white !important;
+  border: 1px solid var(--color-primary-500);
+  transition: all 0.3s;
+  border-radius: 0.5rem;
 }
 
 .light-btn-primary {

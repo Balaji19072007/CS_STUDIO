@@ -1,9 +1,13 @@
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 
 export const AuthContext = createContext();
+
+export const useAuth = () => {
+  return React.useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
   // Initialize from localStorage if available
@@ -123,15 +127,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-// Custom hook
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
 
 export default AuthContext;

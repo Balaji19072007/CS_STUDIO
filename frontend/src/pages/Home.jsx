@@ -1,5 +1,5 @@
 // frontend/src/pages/Home.jsx
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';

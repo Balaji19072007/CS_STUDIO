@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { statsAPI } from '../../config/api';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
@@ -17,7 +17,7 @@ const RatingPopup = () => {
   // Derived theme for CSS
   const currentTheme = isDark ? 'dark' : 'light';
 
-  const startUsageTracking = async () => {
+  const startUsageTracking = useCallback(async () => {
     if (!isLoggedIn) return;
 
     try {
@@ -25,9 +25,9 @@ const RatingPopup = () => {
     } catch (error) {
       console.error('Error starting usage tracking:', error);
     }
-  };
+  }, [isLoggedIn]);
 
-  const stopUsageTracking = async () => {
+  const stopUsageTracking = useCallback(async () => {
     if (!isLoggedIn) return;
 
     try {
@@ -35,9 +35,24 @@ const RatingPopup = () => {
     } catch (error) {
       console.error('Error stopping usage tracking:', error);
     }
-  };
+  }, [isLoggedIn]);
 
-  const checkRatingStatus = async () => {
+  const markRatingAsShown = useCallback(async () => {
+    if (!isLoggedIn) return;
+
+    try {
+      await statsAPI.markRatingShown();
+    } catch (error) {
+      console.error('Error marking rating as shown:', error);
+    }
+  }, [isLoggedIn]);
+
+  const showRatingPopup = useCallback(() => {
+    setShowPopup(true);
+    markRatingAsShown();
+  }, [markRatingAsShown]);
+
+  const checkRatingStatus = useCallback(async () => {
     if (!isLoggedIn) return;
 
     try {
@@ -49,24 +64,9 @@ const RatingPopup = () => {
     } catch (error) {
       console.error('Error checking rating status:', error);
     }
-  };
+  }, [isLoggedIn, showPopup, showRatingPopup]);
 
-  const showRatingPopup = () => {
-    setShowPopup(true);
-    markRatingAsShown();
-  };
-
-  const markRatingAsShown = async () => {
-    if (!isLoggedIn) return;
-
-    try {
-      await statsAPI.markRatingShown();
-    } catch (error) {
-      console.error('Error marking rating as shown:', error);
-    }
-  };
-
-  const initializeRatingSystem = async () => {
+  const initializeRatingSystem = useCallback(async () => {
     if (!isLoggedIn) return;
 
     try {
@@ -75,7 +75,7 @@ const RatingPopup = () => {
     } catch (error) {
       console.error('Error initializing rating system:', error);
     }
-  };
+  }, [isLoggedIn, startUsageTracking, checkRatingStatus]);
 
   const initializedRef = React.useRef(false);
 
@@ -104,7 +104,7 @@ const RatingPopup = () => {
       stopUsageTracking();
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, checkRatingStatus, initializeRatingSystem, stopUsageTracking]);
 
   // Event Listener Effect - Separate to handle 'open-rating-popup' reliably
   useEffect(() => {

@@ -7,7 +7,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { QuizSkeleton } from '../components/common/SkeletonLoader';
 
-const QuizPage = ({ embedded = false, quizId = null }) => {
+const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst, isLast }) => {
     const { courseId, quizId: paramQuizId } = useParams();
     const { user } = useAuth();
     const resolvedQuizId = quizId || paramQuizId;
@@ -25,6 +25,7 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
     const [showAnswers, setShowAnswers] = useState(false); // Toggle review mode
     const [warnings, setWarnings] = useState(0);
     const [violationMsg, setViolationMsg] = useState(null);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     // Initial Data Fetch
     useEffect(() => {
@@ -118,6 +119,7 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
         setResults(null);
         setShowAnswers(false);
         setWarnings(0);
+        setCurrentQuestionIndex(0);
 
         // Enter Fullscreen
         try {
@@ -178,6 +180,14 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
             const attempts = await getUserQuizAttempts(user.id, resolvedQuizId);
             setHistory(attempts);
 
+            if (passed) {
+                window.dispatchEvent(
+                    new CustomEvent('course-progress-updated', {
+                        detail: { courseId }
+                    })
+                );
+            }
+
             setResults({
                 score, pass_percentage: quiz.pass_percentage || 60, passed,
                 correct: correctCount, incorrect: questions.length - correctCount,
@@ -199,21 +209,21 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
     // --- RENDERERS ---
 
     const renderStartScreen = () => (
-        <div className="max-w-3xl mx-auto px-4 py-8 text-center">
-            <h1 className="text-4xl font-bold text-white mb-6">{quiz?.title}</h1>
+        <div className="max-w-7xl mx-auto px-4 py-8 text-left md:px-8 lg:px-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 transition-colors">{quiz?.title}</h1>
 
             {violationMsg && (
-                <div className="bg-red-500/10 border border-red-500 text-red-200 p-4 rounded-lg mb-8 animate-pulse">
+                <div className="bg-red-500/10 border border-red-500 text-red-700 dark:text-red-200 p-4 rounded-lg mb-8 animate-pulse">
                     ⚠️ {violationMsg}
                 </div>
             )}
 
-            <div className="bg-[#1E293B] rounded-xl p-8 border border-gray-700 shadow-xl mb-10 text-left">
-                <h3 className="text-xl font-bold text-yellow-400 mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-[#1E293B] rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-xl mb-10 text-left transition-colors">
+                <h3 className="text-xl font-bold text-amber-600 dark:text-yellow-400 mb-4 flex items-center gap-2">
                     ⚠️ Strict Quiz Rules
                 </h3>
-                <ul className="space-y-3 text-gray-300">
-                    <li className="flex items-start gap-2">🔹 Quiz will launch in <strong>Fullscreen Mode</strong>.</li>
+                <ul className="space-y-3 text-gray-700 dark:text-gray-300 transition-colors">
+                    <li className="flex items-start gap-2">🔹 Quiz will launch in <strong className="text-gray-900 dark:text-white">Fullscreen Mode</strong>.</li>
                     <li className="flex items-start gap-2">🔹 <strong>Do NOT switch tabs</strong> or separate windows.</li>
                     <li className="flex items-start gap-2">🔹 <strong>Do NOT exit fullscreen</strong> until finished.</li>
                     <li className="flex items-start gap-2">🔹 Copying, pasting, and text selection are <strong>Disabled</strong>.</li>
@@ -231,15 +241,15 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
             {/* History Section */}
             {history.length > 0 && (
                 <div className="mt-12 text-left">
-                    <h3 className="text-lg font-bold text-gray-400 mb-4">📜 Past Attempts</h3>
-                    <div className="bg-[#1E293B] rounded-xl overflow-hidden border border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-600 dark:text-gray-400 mb-4 transition-colors">📜 Past Attempts</h3>
+                    <div className="bg-white dark:bg-[#1E293B] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-colors">
                         {history.map((attempt, i) => (
-                            <div key={attempt.id} className="flex items-center justify-between p-4 border-b border-gray-700 last:border-0 hover:bg-gray-800/50">
+                            <div key={attempt.id} className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                 <div>
-                                    <span className="text-gray-400 text-sm">Attempt {history.length - i}</span>
+                                    <span className="text-gray-600 dark:text-gray-400 text-sm">Attempt {history.length - i}</span>
                                     <div className="text-xs text-gray-500">{new Date(attempt.completed_at).toLocaleString()}</div>
                                 </div>
-                                <div className={`px-3 py-1 rounded-full text-sm font-bold ${attempt.passed ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                <div className={`px-3 py-1 rounded-full text-sm font-bold ${attempt.passed ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
                                     {attempt.score}% {attempt.passed ? 'PASS' : 'FAIL'}
                                 </div>
                             </div>
@@ -247,95 +257,143 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
                     </div>
                 </div>
             )}
+
+            {/* Embedded Navigation */}
+            {embedded && (
+                <div className="mt-12 flex items-center justify-between border-t border-gray-800 pt-8">
+                    <button
+                        onClick={onPrevious}
+                        disabled={isFirst}
+                        className={`rounded-xl px-6 py-3 font-bold transition-all ${isFirst ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
+                    >
+                        Previous
+                    </button>
+
+                    <button
+                        onClick={onNext}
+                        disabled={isLast}
+                        className={`rounded-xl px-8 py-3 font-bold transition-all ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500'}`}
+                    >
+                        Skip Quiz / Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 
-    const renderActiveQuiz = () => (
-        <div className="max-w-4xl mx-auto px-4 py-8 select-none"> {/* Disable selection via CSS class too */}
-            <div className="flex justify-between items-center mb-8 sticky top-0 bg-[#0F172A] z-20 py-4 border-b border-gray-800">
-                <h2 className="text-xl font-bold text-white max-w-[70%] truncate">{quiz.title}</h2>
-                <div className="flex flex-col items-end">
-                    <div className="text-gray-400 font-mono">
-                        {Object.keys(answers).length} / {questions.length} Answered
-                    </div>
-                    {warnings > 0 && (
-                        <div className="text-red-400 text-sm font-bold animate-pulse mt-1">
-                            ⚠️ {3 - warnings} Warnings Left
+    const renderActiveQuiz = () => {
+        const q = questions[currentQuestionIndex];
+        const isLastQuestion = currentQuestionIndex === questions.length - 1;
+        const isFirstQuestion = currentQuestionIndex === 0;
+
+        if (!q) return null; // Safety check
+
+        return (
+            <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0F172A] select-none text-left">
+                <div className="bg-gray-50/90 dark:bg-[#0F172A]/90 backdrop-blur-md px-6 py-4 border-b border-gray-200 dark:border-gray-800 transition-colors flex justify-between items-center shrink-0 z-40">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white max-w-[70%] truncate transition-colors">{quiz.title}</h2>
+                    <div className="flex flex-col items-end">
+                        <div className="text-gray-500 dark:text-gray-400 font-mono font-semibold">
+                            Question {currentQuestionIndex + 1} of {questions.length}
                         </div>
-                    )}
+                        {warnings > 0 && (
+                            <div className="text-red-500 text-sm font-bold animate-pulse mt-1">
+                                ⚠️ {3 - warnings} Warnings Left
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 flex flex-col items-center">
+                    <div className="w-full max-w-4xl bg-white dark:bg-[#1E293B] rounded-xl p-8 md:p-12 border border-gray-200 dark:border-gray-700 shadow-xl transition-colors">
+                        <h3 className="text-2xl font-medium text-gray-900 dark:text-white mb-8">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold mr-3">Q{currentQuestionIndex + 1}.</span>
+                            {q.question_text}
+                        </h3>
+
+                        {q.code_snippet && (
+                            <SyntaxHighlighter language="c" style={vscDarkPlus} className="rounded-lg mb-8 text-base">
+                                {q.code_snippet}
+                            </SyntaxHighlighter>
+                        )}
+
+                        <div className="space-y-4">
+                            {q.question_type === 'true_false' ? (
+                                ['true', 'false'].map(opt => (
+                                    <label key={opt} className={`flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all ${answers[q.id] === opt ? 'bg-blue-50 dark:bg-blue-600/20 border-blue-500 text-blue-700 dark:text-blue-300 shadow-md' : 'bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                                        <input type="radio" name={q.id} value={opt} checked={answers[q.id] === opt} onChange={() => handleAnswerChange(q.id, opt)} className="w-5 h-5 text-blue-600 focus:ring-blue-500" />
+                                        <span className="ml-4 capitalize font-semibold text-lg">{opt}</span>
+                                    </label>
+                                ))
+                            ) : (
+                                q.options.map((opt, i) => (
+                                    <label key={opt.id} className={`flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all ${answers[q.id] === String(i) ? 'bg-blue-50 dark:bg-blue-600/20 border-blue-500 text-blue-700 dark:text-blue-300 shadow-md' : 'bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                                        <input type="radio" name={q.id} value={i} checked={answers[q.id] === String(i)} onChange={() => handleAnswerChange(q.id, String(i))} className="w-5 h-5 text-blue-600 focus:ring-blue-500" />
+                                        <span className="ml-4 font-semibold text-lg">{opt.option_text}</span>
+                                    </label>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#1E293B] border-t border-gray-200 dark:border-gray-700 p-6 flex justify-between items-center shrink-0 z-30 transition-colors shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                    <button
+                        onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                        disabled={isFirstQuestion}
+                        className={`px-8 py-3 font-bold rounded-lg transition-all ${isFirstQuestion ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600' : 'bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white'}`}
+                    >
+                        Previous
+                    </button>
+                    
+                    <div className="flex gap-4">
+                        {!isLastQuestion ? (
+                            <button
+                                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                            >
+                                Next
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleSubmit}
+                                disabled={submitting}
+                                className="px-8 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg shadow-lg disabled:opacity-50"
+                            >
+                                {submitting ? 'Submitting...' : 'Submit Quiz'}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
-
-            <div className="space-y-8 pb-20">
-                {questions.map((q, idx) => (
-                    <div key={q.id} className="bg-[#1E293B] rounded-xl p-6 border border-gray-700">
-                        <div className="flex gap-4">
-                            <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-700 text-gray-300 font-bold text-sm">
-                                {idx + 1}
-                            </span>
-                            <div className="flex-1">
-                                <p className="text-lg text-white mb-4">{q.question_text}</p>
-
-                                {q.question_type === 'code_output' && q.code_snippet && (
-                                    <SyntaxHighlighter language="c" style={vscDarkPlus} className="rounded-lg mb-4 text-sm">
-                                        {q.code_snippet}
-                                    </SyntaxHighlighter>
-                                )}
-
-                                <div className="space-y-2 mt-4">
-                                    {q.question_type === 'true_false' ? (
-                                        ['true', 'false'].map(val => (
-                                            <label key={val} className={`block cursor-pointer p-4 rounded-lg border-2 transition-all ${answers[q.id] === val ? 'border-blue-500 bg-blue-500/10' : 'border-gray-600 hover:border-gray-500'}`}>
-                                                <input type="radio" name={q.question_id} value={val} checked={answers[q.id] === val} onChange={() => handleAnswerChange(q.id, val)} className="hidden" />
-                                                <span className="capitalize text-gray-300">{val}</span>
-                                            </label>
-                                        ))
-                                    ) : (
-                                        q.options.map((opt, i) => (
-                                            <label key={opt.id} className={`block cursor-pointer p-4 rounded-lg border-2 transition-all ${answers[q.id] === String(i) ? 'border-blue-500 bg-blue-500/10' : 'border-gray-600 hover:border-gray-500'}`}>
-                                                <input type="radio" name={q.question_id} value={i} checked={answers[q.id] === String(i)} onChange={() => handleAnswerChange(q.id, String(i))} className="hidden" />
-                                                <span className="text-gray-300">{opt.option_text}</span>
-                                            </label>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#1E293B] border-t border-gray-700 flex justify-center z-30">
-                <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    className="px-8 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg shadow-lg disabled:opacity-50"
-                >
-                    {submitting ? 'Submitting...' : 'Submit Quiz'}
-                </button>
-            </div>
-        </div>
-    );
+        );
+    };
 
     const renderResults = () => (
-        <div className="max-w-3xl mx-auto px-4 py-8">
-            <div className={`text-center p-8 rounded-2xl border-2 mb-8 ${results.passed ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
+        <div className="max-w-7xl mx-auto px-4 py-8 text-left md:px-8 lg:px-12">
+            <div className={`text-center p-8 rounded-2xl border-2 mb-8 transition-colors ${results.passed ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : 'bg-red-50 dark:bg-red-900/20 border-red-500'}`}>
                 <div className="text-6xl mb-4">{results.passed ? '🏆' : '💔'}</div>
-                <h2 className="text-3xl font-bold text-white mb-2">{results.passed ? 'Great Job!' : 'Quiz Failed'}</h2>
-                <div className="text-5xl font-black text-white my-4">{results.score}%</div>
-                <p className="text-gray-400">Pass Mark: {results.pass_percentage}%</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">{results.passed ? 'Great Job!' : 'Quiz Failed'}</h2>
+                <div className="text-5xl font-black text-gray-900 dark:text-white my-4 transition-colors">{results.score}%</div>
+                <p className="text-gray-600 dark:text-gray-400 transition-colors">Pass Mark: {results.pass_percentage}%</p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
-                    <div className="bg-gray-800/50 p-3 rounded-lg"><div className="text-2xl font-bold text-white">{results.total}</div><div className="text-xs text-gray-400">Total</div></div>
-                    <div className="bg-green-500/10 p-3 rounded-lg"><div className="text-2xl font-bold text-green-400">{results.correct}</div><div className="text-xs text-green-300">Correct</div></div>
-                    <div className="bg-red-500/10 p-3 rounded-lg"><div className="text-2xl font-bold text-red-400">{results.incorrect}</div><div className="text-xs text-red-300">Incorrect</div></div>
-                    <div className="bg-gray-800/50 p-3 rounded-lg"><div className="text-2xl font-bold text-blue-400">0</div><div className="text-xs text-blue-300">Skipped</div></div>
+                    <div className="bg-gray-100 dark:bg-gray-800/50 p-3 rounded-lg transition-colors"><div className="text-2xl font-bold text-gray-900 dark:text-white">{results.total}</div><div className="text-xs text-gray-500 dark:text-gray-400">Total</div></div>
+                    <div className="bg-green-50 dark:bg-green-500/10 p-3 rounded-lg transition-colors"><div className="text-2xl font-bold text-green-600 dark:text-green-400">{results.correct}</div><div className="text-xs text-green-600 dark:text-green-300">Correct</div></div>
+                    <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg transition-colors"><div className="text-2xl font-bold text-red-600 dark:text-red-400">{results.incorrect}</div><div className="text-xs text-red-600 dark:text-red-300">Incorrect</div></div>
+                    <div className="bg-blue-50 dark:bg-gray-800/50 p-3 rounded-lg transition-colors"><div className="text-2xl font-bold text-blue-600 dark:text-blue-400">0</div><div className="text-xs text-blue-600 dark:text-blue-300">Skipped</div></div>
                 </div>
             </div>
 
-            <div className="flex gap-4 justify-center mb-10">
-                <button onClick={() => setGameState('IDLE')} className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg">Back to Menu</button>
-                <button onClick={() => setShowAnswers(!showAnswers)} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg">
+            <div className="flex flex-wrap gap-4 justify-center mb-10">
+                {!embedded ? (
+                    <button onClick={() => setGameState('IDLE')} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-xl font-bold transition-colors">Back to Menu</button>
+                ) : (
+                    <button onClick={onNext} disabled={isLast} className={`px-8 py-3 rounded-xl font-bold transition-all shadow-sm ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 shadow-lg'}`}>
+                        Continue to Next Lesson
+                    </button>
+                )}
+                <button onClick={() => setShowAnswers(!showAnswers)} className="px-6 py-3 border-2 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold rounded-xl transition-colors">
                     {showAnswers ? 'Hide Answers' : 'View Answers'}
                 </button>
             </div>
@@ -347,23 +405,23 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
                         const isCorr = detail?.isCorrect;
 
                         return (
-                            <div key={q.id} className={`p-6 rounded-xl border ${isCorr ? 'border-green-500/30 bg-green-500/5' : 'border-red-500/30 bg-red-500/5'}`}>
+                            <div key={q.id} className={`p-6 rounded-xl border transition-colors ${isCorr ? 'border-green-500/30 bg-green-50 dark:bg-green-500/5' : 'border-red-500/30 bg-red-50 dark:bg-red-500/5'}`}>
                                 <div className="flex gap-3">
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isCorr ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${isCorr ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
                                         {isCorr ? '✓' : '✗'}
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-white font-medium mb-2">{q.question_text}</p>
-                                        <p className="text-sm text-gray-400 mb-1">Your Answer: <span className={isCorr ? 'text-green-400' : 'text-red-400'}>
+                                        <p className="text-gray-900 dark:text-white font-medium mb-2 transition-colors">{q.question_text}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 transition-colors">Your Answer: <span className={isCorr ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                                             {q.question_type === 'true_false' ? detail?.selectedAnswer : q.options[detail?.selectedAnswer]?.option_text || 'None'}
                                         </span></p>
                                         {!isCorr && (
-                                            <p className="text-sm text-green-400">Correct Answer: <span>
+                                            <p className="text-sm text-green-600 dark:text-green-400 transition-colors">Correct Answer: <span>
                                                 {q.question_type === 'true_false' ? q.correct_answer : q.options.find(o => o.is_correct)?.option_text}
                                             </span></p>
                                         )}
                                         {q.explanation && (
-                                            <div className="mt-2 p-3 bg-gray-800 rounded text-xs text-blue-200">
+                                            <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded text-xs text-blue-800 dark:text-blue-200 transition-colors">
                                                 <strong>ℹ️ Explanation:</strong> {q.explanation}
                                             </div>
                                         )}
@@ -380,16 +438,16 @@ const QuizPage = ({ embedded = false, quizId = null }) => {
     if (loading) return <QuizSkeleton />;
 
     return (
-        <div className={`min-h-screen bg-[#0F172A] ${gameState === 'RUNNING' ? 'fixed inset-0 z-50 overflow-y-auto' : ''}`}>
+        <div className={`min-h-screen bg-gray-50 dark:bg-[#0F172A] transition-colors ${gameState === 'RUNNING' ? 'fixed inset-0 z-50 overflow-y-auto' : ''}`}>
             <style>{`
                 .select-none { user-select: none; -webkit-user-select: none; }
             `}</style>
 
             {/* Nav (Only visible if NOT running) */}
             {gameState !== 'RUNNING' && !embedded && (
-                <header className="bg-[#1E293B] border-b border-gray-700/50 px-4 py-3 flex items-center gap-4">
-                    <button onClick={() => navigate(`/courses/${courseId}/learn`)} className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-white">←</button>
-                    <span className="font-bold text-white">Exit Quiz</span>
+                <header className="bg-white dark:bg-[#1E293B] border-b border-gray-200 dark:border-gray-700/50 px-4 py-3 flex items-center gap-4 transition-colors">
+                    <button onClick={() => navigate(`/courses/${courseId}/learn`)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-colors">←</button>
+                    <span className="font-bold text-gray-900 dark:text-white transition-colors">Exit Quiz</span>
                 </header>
             )}
 

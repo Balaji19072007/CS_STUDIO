@@ -19,7 +19,7 @@ module.exports = (io) => {
             console.log(`User ${userId} joined notification room`);
         });
 
-        socket.on('execute-code', async ({ code, language, input }) => {
+        socket.on('execute-code', async ({ code, language, input, args: cmdArgsStr }) => {
             if (!code) {
                 socket.emit('execution-output', { output: 'No code provided.\n', isError: true });
                 return;
@@ -57,7 +57,10 @@ module.exports = (io) => {
 
                 // For Java, we need to run from the java directory
                 const execCwd = language.toLowerCase() === 'java' ? path.dirname(srcFile) : TEMP_DIR;
-                const child = spawn(cmd, args, { cwd: execCwd });
+                
+                const additionalArgs = cmdArgsStr ? cmdArgsStr.split(/\s+/).filter(Boolean) : [];
+                const finalArgs = [...args, ...additionalArgs];
+                const child = spawn(cmd, finalArgs, { cwd: execCwd });
 
                 // Store process for input/stop handling
                 activeExecutions.set(socket.id, { process: child, tempFiles });
@@ -142,45 +145,83 @@ function prepareExecution(language, code, sessionId) {
             break;
 
         case 'c':
-            srcFile = path.join(TEMP_DIR, `${sessionId}.c`);
+            let cFiles = [];
             exe = path.join(TEMP_DIR, `${sessionId}.exe`);
 
-            // Ensure stdio.h is present for setvbuf
-            if (!cleanedCode.includes('<stdio.h>')) {
-                cleanedCode = '#include <stdio.h>\n' + cleanedCode;
+            // Check for multi-file format: // File: filename.c
+            const cFileBlocks = cleanedCode.split(/\/\/\s*File:\s*([a-zA-Z0-9_\-\.]+)/i);
+            if (cFileBlocks.length > 1) {
+                for (let i = 1; i < cFileBlocks.length; i += 2) {
+                    const filename = cFileBlocks[i];
+                    let content = cFileBlocks[i+1];
+                    
+                    if (filename.endsWith('.c') && !content.includes('setvbuf') && /((?:int|void)\s+main\s*\([^)]*\)\s*\{)/.test(content)) {
+                        content = content.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
+                    }
+                    
+                    const filePath = path.join(TEMP_DIR, `${sessionId}_${filename}`);
+                    fs.writeFileSync(filePath, content);
+                    files.push(filePath);
+                    if (filename.endsWith('.c')) {
+                        cFiles.push(filePath);
+                    }
+                }
+                srcFile = cFiles;
+            } else {
+                srcFile = path.join(TEMP_DIR, `${sessionId}.c`);
+                if (!cleanedCode.includes('<stdio.h>')) {
+                    cleanedCode = '#include <stdio.h>\n' + cleanedCode;
+                }
+                if (!cleanedCode.includes('setvbuf')) {
+                    cleanedCode = cleanedCode.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
+                }
+                fs.writeFileSync(srcFile, cleanedCode);
+                files.push(srcFile);
             }
-
-            // Inject setvbuf to disable output buffering for interactive terminal feel
-            // Supports int main() and void main()
-            if (!cleanedCode.includes('setvbuf')) {
-                cleanedCode = cleanedCode.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
-            }
-
-            fs.writeFileSync(srcFile, cleanedCode);
+            
             cmd = exe;
             args = [];
-            files.push(srcFile, exe);
+            files.push(exe);
             break;
 
         case 'cpp':
         case 'c++':
-            srcFile = path.join(TEMP_DIR, `${sessionId}.cpp`);
+            let cppFiles = [];
             exe = path.join(TEMP_DIR, `${sessionId}.exe`);
 
-            // Ensure stdio.h or iostream is present
-            if (!cleanedCode.includes('<stdio.h>') && !cleanedCode.includes('<iostream>')) {
-                cleanedCode = '#include <iostream>\n' + cleanedCode;
+            const cppFileBlocks = cleanedCode.split(/\/\/\s*File:\s*([a-zA-Z0-9_\-\.]+)/i);
+            if (cppFileBlocks.length > 1) {
+                for (let i = 1; i < cppFileBlocks.length; i += 2) {
+                    const filename = cppFileBlocks[i];
+                    let content = cppFileBlocks[i+1];
+                    
+                    if ((filename.endsWith('.cpp') || filename.endsWith('.c++')) && !content.includes('setvbuf') && /((?:int|void)\s+main\s*\([^)]*\)\s*\{)/.test(content)) {
+                        content = content.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
+                    }
+                    
+                    const filePath = path.join(TEMP_DIR, `${sessionId}_${filename}`);
+                    fs.writeFileSync(filePath, content);
+                    files.push(filePath);
+                    if (filename.endsWith('.cpp') || filename.endsWith('.c++')) {
+                        cppFiles.push(filePath);
+                    }
+                }
+                srcFile = cppFiles;
+            } else {
+                srcFile = path.join(TEMP_DIR, `${sessionId}.cpp`);
+                if (!cleanedCode.includes('<stdio.h>') && !cleanedCode.includes('<iostream>')) {
+                    cleanedCode = '#include <iostream>\n' + cleanedCode;
+                }
+                if (!cleanedCode.includes('setvbuf')) {
+                    cleanedCode = cleanedCode.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
+                }
+                fs.writeFileSync(srcFile, cleanedCode);
+                files.push(srcFile);
             }
-
-            // Inject setvbuf to disable output buffering
-            if (!cleanedCode.includes('setvbuf')) {
-                cleanedCode = cleanedCode.replace(/((?:int|void)\s+main\s*\([^)]*\)\s*\{)/, '$1 setvbuf(stdout, NULL, _IONBF, 0);');
-            }
-
-            fs.writeFileSync(srcFile, cleanedCode);
+            
             cmd = exe;
             args = [];
-            files.push(srcFile, exe);
+            files.push(exe);
             break;
 
         case 'java':
@@ -219,20 +260,23 @@ function prepareExecution(language, code, sessionId) {
 function compileCode(language, srcFile, exe) {
     return new Promise((resolve, reject) => {
         let compileCmd, compileArgs;
+        
+        const filesArray = Array.isArray(srcFile) ? srcFile : [srcFile];
+        const basenames = filesArray.map(f => path.basename(f));
 
         if (language === 'c') {
             compileCmd = 'gcc';
-            compileArgs = [srcFile, '-o', exe];
+            compileArgs = [...basenames, '-o', path.basename(exe)];
         } else if (language === 'cpp' || language === 'c++') {
             compileCmd = 'g++';
-            compileArgs = [srcFile, '-o', exe];
+            compileArgs = [...basenames, '-o', path.basename(exe)];
         } else if (language === 'java') {
             compileCmd = 'javac';
-            compileArgs = [srcFile];
+            compileArgs = [...basenames];
         }
 
         // For Java, CWD should be the file's directory
-        const cwd = language === 'java' ? path.dirname(srcFile) : TEMP_DIR;
+        const cwd = language === 'java' ? path.dirname(filesArray[0]) : TEMP_DIR;
 
         const proc = spawn(compileCmd, compileArgs, { cwd });
         let stderr = '';

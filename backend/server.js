@@ -38,6 +38,8 @@ const certificateRoutes = require('./routes/certificateRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const practiceProblemRoutes = require('./routes/practiceProblemRoutes');
 
 // Enable CORS
 app.use(cors({
@@ -87,12 +89,13 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/stats', statsRoutes);
-app.use('/api/notifications', (req, res) => res.json([]));
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/course-challenges', require('./routes/courseChallengeRoutes'));
+app.use('/api/practice-problems', practiceProblemRoutes);
 
 // --- Socket.IO Setup ---
 const io = new Server(server, {
@@ -122,3 +125,4 @@ server.listen(PORT, () => {
   console.log(`✅ Database: Supabase PostgreSQL`);
 });
 // Trigger restart for new routes
+module.exports = { app, server, io };

@@ -11,7 +11,6 @@ import SearchBar from './SearchBar.jsx';
 const PRIMARY_NAV_ITEMS = [
     { name: 'Home', path: '/', icon: 'home' },
     { name: 'Courses', path: '/courses', icon: 'book' },
-    { name: 'Roadmap', path: '/roadmaps', icon: 'map' },
     { name: 'Problems', path: '/problems', icon: 'target' },
 ];
 
@@ -535,7 +534,9 @@ const Navbar = () => {
                                 }`}
                             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         >
-                            <i data-feather={themeIcon} className="w-5 h-5"></i>
+                            <span key={themeIcon} className="flex items-center justify-center">
+                                <i data-feather={themeIcon} className="w-5 h-5"></i>
+                            </span>
                         </button>
 
                         {/* Notifications */}
@@ -570,8 +571,8 @@ const Navbar = () => {
                                             <div
                                                 ref={dropdownRef}
                                                 className={`absolute right-0 top-14 mt-1 w-64 rounded-2xl shadow-2xl ring-1 ring-black/5 z-50 transform opacity-100 scale-100 transition-all duration-200 origin-top-right overflow-hidden ${isDark
-                                                        ? 'bg-gray-900/95 border border-gray-700/50 backdrop-blur-xl'
-                                                        : 'bg-white/95 border border-gray-100 backdrop-blur-xl'
+                                                    ? 'bg-gray-900/95 border border-gray-700/50 backdrop-blur-xl'
+                                                    : 'bg-white/95 border border-gray-100 backdrop-blur-xl'
                                                     }`}
                                             >
                                                 {user && (
@@ -603,13 +604,15 @@ const Navbar = () => {
                                                                     handleThemeToggle();
                                                                 }}
                                                                 className={`lg:hidden w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                                                     }`}
                                                             >
                                                                 <div className={`mr-3 p-1.5 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-yellow-400 group-hover:bg-gray-700' : 'bg-gray-100 text-yellow-600 group-hover:bg-gray-200'
                                                                     }`}>
-                                                                    <i data-feather={isDark ? 'sun' : 'moon'} className="w-4 h-4"></i>
+                                                                    <span key={isDark ? 'sun' : 'moon'} className="flex items-center justify-center">
+                                                                        <i data-feather={isDark ? 'sun' : 'moon'} className="w-4 h-4"></i>
+                                                                    </span>
                                                                 </div>
                                                                 {isDark ? 'Light Mode' : 'Dark Mode'}
                                                             </button>
@@ -617,8 +620,8 @@ const Navbar = () => {
                                                             <Link
                                                                 to="/my-progress"
                                                                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                                                     }`}
                                                                 onClick={handleDropdownItemClick}
                                                             >
@@ -632,8 +635,8 @@ const Navbar = () => {
                                                             <Link
                                                                 to="/settings"
                                                                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                                                     }`}
                                                                 onClick={handleDropdownItemClick}
                                                             >
@@ -649,8 +652,8 @@ const Navbar = () => {
                                                             <button
                                                                 onClick={handleLogout}
                                                                 className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                        ? 'text-red-400 hover:text-red-300 hover:bg-red-500/10'
-                                                                        : 'text-red-600 hover:text-red-700 hover:bg-red-50'
+                                                                    ? 'text-red-400 hover:text-red-300 hover:bg-red-500/10'
+                                                                    : 'text-red-600 hover:text-red-700 hover:bg-red-50'
                                                                     }`}
                                                             >
                                                                 <div className={`mr-3 p-1.5 rounded-lg transition-colors ${isDark ? 'bg-red-500/10 text-red-400 group-hover:bg-red-500/20' : 'bg-red-50 text-red-600 group-hover:bg-red-100'
@@ -758,7 +761,9 @@ const Navbar = () => {
                                                         }}
                                                         className={`p-1.5 rounded-lg transition-all active:scale-95 flex-shrink-0 ${isDark ? 'bg-gray-800 text-yellow-400' : 'bg-gray-100 text-gray-500'}`}
                                                     >
-                                                        <i data-feather={isDark ? 'sun' : 'moon'} className="w-4 h-4"></i>
+                                                        <span key={isDark ? 'sun' : 'moon'} className="flex items-center justify-center">
+                                                            <i data-feather={isDark ? 'sun' : 'moon'} className="w-4 h-4"></i>
+                                                        </span>
                                                     </button>
                                                     <div className="min-w-0">
                                                         <p className={`text-base font-semibold truncate ${mobileTextClass}`}>{user.name}</p>

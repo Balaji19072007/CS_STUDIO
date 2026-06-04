@@ -1,12 +1,14 @@
 // frontend/src/pages/Community.jsx
-import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import * as feather from 'feather-icons';
 import { communityAPI } from '../api/communityApi';
 import { useAuth } from '../hooks/useAuth';
 
 
-// Helper to get display name
+// ─────────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────────
 const getUserDisplayName = (userObj) => {
     if (!userObj) return 'Unknown User';
     if (userObj.firstName && userObj.lastName) {
@@ -15,7 +17,6 @@ const getUserDisplayName = (userObj) => {
     return userObj.username || 'Unknown User';
 };
 
-// Helper to get initials
 const getUserInitials = (userObj) => {
     if (!userObj) return 'U';
     if (userObj.firstName && userObj.lastName) {
@@ -24,7 +25,9 @@ const getUserInitials = (userObj) => {
     return (userObj.username || 'U').charAt(0).toUpperCase();
 };
 
-// User Avatar Component
+// ─────────────────────────────────────────────
+//  UserAvatar
+// ─────────────────────────────────────────────
 const UserAvatar = ({ user, size = 'md' }) => {
     const [imgError, setImgError] = React.useState(false);
 
@@ -53,12 +56,196 @@ const UserAvatar = ({ user, size = 'md' }) => {
     );
 };
 
+// ─────────────────────────────────────────────
+//  parseContent – renders @mentions and #problems as inline elements
+// ─────────────────────────────────────────────
+const parseContent = (text, onProblemClick) => {
+    if (!text) return null;
+    // Split on @username or #number tokens
+    const parts = text.split(/(@[\w.]+|#\d+)/g);
+    return parts.map((part, i) => {
+        if (/^@[\w.]+$/.test(part)) {
+            return (
+                <span
+                    key={i}
+                    className="inline-flex items-center gap-0.5 text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 dark:hover:text-primary-300 cursor-pointer transition-colors"
+                    title={`User: ${part.slice(1)}`}
+                >
+                    {part}
+                </span>
+            );
+        }
+        if (/^#\d+$/.test(part)) {
+            const problemId = part.slice(1);
+            return (
+                <span
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); onProblemClick(problemId); }}
+                    className="inline-flex items-center gap-0.5 text-amber-600 dark:text-amber-400 font-semibold hover:text-amber-700 dark:hover:text-amber-300 cursor-pointer underline underline-offset-2 decoration-dotted transition-colors"
+                    title={`Open Problem #${problemId}`}
+                >
+                    {part}
+                </span>
+            );
+        }
+        return <span key={i}>{part}</span>;
+    });
+};
+
+// ─────────────────────────────────────────────
+//  MentionTextarea – textarea with @/# autocomplete
+// ─────────────────────────────────────────────
+const MentionTextarea = ({ value, onChange, placeholder, rows = 4, allUsers = [], className = '' }) => {
+    const [dropdown, setDropdown] = useState({ show: false, type: null, query: '', pos: 0 });
+    const textareaRef = useRef(null);
+
+    const handleKeyUp = (e) => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+
+        const cursor = ta.selectionStart;
+        const textBefore = value.slice(0, cursor);
+
+        // Look for @ or # trigger
+        const atMatch = textBefore.match(/@([\w.]*)$/);
+        const hashMatch = textBefore.match(/#(\d*)$/);
+
+        if (atMatch) {
+            setDropdown({ show: true, type: '@', query: atMatch[1], pos: cursor - atMatch[0].length });
+        } else if (hashMatch) {
+            setDropdown({ show: true, type: '#', query: hashMatch[1], pos: cursor - hashMatch[0].length });
+        } else {
+            setDropdown({ show: false, type: null, query: '', pos: 0 });
+        }
+    };
+
+    const insertMention = (replacement) => {
+        const ta = textareaRef.current;
+        const cursor = ta.selectionStart;
+        const before = value.slice(0, dropdown.pos);
+        const after = value.slice(cursor);
+        const newVal = before + replacement + ' ' + after;
+        onChange({ target: { value: newVal } });
+        setDropdown({ show: false, type: null, query: '', pos: 0 });
+        // Restore focus
+        setTimeout(() => {
+            ta.focus();
+            const newPos = before.length + replacement.length + 1;
+            ta.setSelectionRange(newPos, newPos);
+        }, 0);
+    };
+
+    // Filter users for @ dropdown
+    const userSuggestions = allUsers
+        .filter(u => u.username && u.username.toLowerCase().includes(dropdown.query.toLowerCase()))
+        .slice(0, 6);
+
+    // Suggest problem numbers for # dropdown (1-50 shown as hints)
+    const problemSuggestions = dropdown.query
+        ? [dropdown.query].filter(n => n.length > 0)
+        : ['1', '2', '3', '4', '5'];
+
+    return (
+        <div className="relative">
+            <textarea
+                ref={textareaRef}
+                rows={rows}
+                className={`w-full bg-gray-800 border border-gray-700 rounded-lg p-4 text-white focus:border-primary-500 focus:outline-none resize-none transition-colors ${className}`}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                onKeyUp={handleKeyUp}
+                onClick={handleKeyUp}
+            />
+
+            {/* Dropdown */}
+            {dropdown.show && (
+                <div className="absolute z-50 bottom-full mb-1 left-0 w-64 bg-gray-800 border border-gray-600 rounded-xl shadow-2xl overflow-hidden">
+                    {dropdown.type === '@' && (
+                        <>
+                            <div className="px-3 py-1.5 text-xs text-gray-400 border-b border-gray-700 flex items-center gap-1">
+                                <span className="text-primary-600 dark:text-primary-400 font-bold text-sm">@</span> Mention a user
+                            </div>
+                            {userSuggestions.length === 0 ? (
+                                <div className="px-3 py-2 text-xs text-gray-500">No users found</div>
+                            ) : (
+                                userSuggestions.map((u, i) => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onMouseDown={(e) => { e.preventDefault(); insertMention(`@${u.username}`); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-700 transition-colors text-left"
+                                    >
+                                        <UserAvatar user={u} size="sm" />
+                                        <div>
+                                            <div className="text-sm text-white font-medium">@{u.username}</div>
+                                            {(u.firstName || u.lastName) && (
+                                                <div className="text-xs text-gray-400">{u.firstName} {u.lastName}</div>
+                                            )}
+                                        </div>
+                                    </button>
+                                ))
+                            )}
+                        </>
+                    )}
+                    {dropdown.type === '#' && (
+                        <>
+                            <div className="px-3 py-1.5 text-xs text-gray-400 border-b border-gray-700 flex items-center gap-1">
+                                <span className="text-amber-600 dark:text-amber-400 font-bold text-sm">#</span> Link a problem
+                            </div>
+                            {dropdown.query ? (
+                                <button
+                                    type="button"
+                                    onMouseDown={(e) => { e.preventDefault(); insertMention(`#${dropdown.query}`); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-700 transition-colors text-left"
+                                >
+                                    <span className="text-amber-600 dark:text-amber-400 font-bold text-base">#</span>
+                                    <span className="text-white text-sm">Problem <span className="text-amber-400 font-semibold">#{dropdown.query}</span></span>
+                                </button>
+                            ) : (
+                                problemSuggestions.map((n, i) => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onMouseDown={(e) => { e.preventDefault(); insertMention(`#${n}`); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-700 transition-colors text-left"
+                                    >
+                                        <span className="text-amber-600 dark:text-amber-400 font-bold">#</span>
+                                        <span className="text-white text-sm">Problem #{n}</span>
+                                    </button>
+                                ))
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
+
+            {/* Hint row */}
+            <div className="mt-1 flex items-center gap-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                    <span className="text-primary-600 dark:text-primary-400 font-semibold">@</span>mention a user
+                </span>
+                <span className="flex items-center gap-1">
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">#</span>link a problem (e.g. #42)
+                </span>
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────
+//  Community Component
+// ─────────────────────────────────────────────
 const Community = () => {
     const { isLoggedIn, user } = useAuth();
+    const navigate = useNavigate();
     const [discussions, setDiscussions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
+
+    // All unique users extracted from discussions (for @ autocomplete)
+    const [allUsers, setAllUsers] = useState([]);
 
     // Create Modal State
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -74,12 +261,31 @@ const Community = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [discussionToDelete, setDiscussionToDelete] = useState(null);
 
+    // Navigate to a problem page
+    const openProblem = (problemId) => {
+        navigate(`/solve?problemId=${problemId}`);
+    };
+
     // Fetch Discussions
     const fetchDiscussions = useCallback(async () => {
         try {
             setLoading(true);
             const response = await communityAPI.getAllDiscussions();
             setDiscussions(response.data);
+
+            // Collect unique users from all authors & comment authors for mentions
+            const usersMap = new Map();
+            response.data.forEach(d => {
+                if (d.author && d.author.username) {
+                    usersMap.set(d.author.username, d.author);
+                }
+                (d.comments || []).forEach(c => {
+                    if (c.author && c.author.username) {
+                        usersMap.set(c.author.username, c.author);
+                    }
+                });
+            });
+            setAllUsers(Array.from(usersMap.values()));
             setError(null);
         } catch (err) {
             console.error(err);
@@ -124,8 +330,8 @@ const Community = () => {
 
             setShowCreateModal(false);
             setNewPost({ title: '', content: '', tags: '' });
-            fetchDiscussions(); // Refresh list
-        } catch (err) {
+            fetchDiscussions();
+        } catch {
             alert('Failed to create post. Please try again.');
         } finally {
             setCreating(false);
@@ -137,7 +343,6 @@ const Community = () => {
         try {
             const response = await communityAPI.getDiscussionById(id);
             setSelectedDiscussion(response.data);
-            // Update view count in list locally if needed, but fetchDiscussions refreshes it
         } catch (err) {
             console.error(err);
         }
@@ -151,13 +356,11 @@ const Community = () => {
 
         try {
             setCommenting(true);
-            const response = await communityAPI.addComment(selectedDiscussion.id, commentContent);
-
-            // Allow immediate UI update
+            await communityAPI.addComment(selectedDiscussion.id, commentContent);
             const updatedDiscussion = await communityAPI.getDiscussionById(selectedDiscussion.id);
             setSelectedDiscussion(updatedDiscussion.data);
             setCommentContent('');
-        } catch (err) {
+        } catch {
             alert('Failed to post comment.');
         } finally {
             setCommenting(false);
@@ -171,7 +374,6 @@ const Community = () => {
 
         try {
             await communityAPI.toggleLike(id);
-            // Refresh specific discussion in list or view
             if (selectedDiscussion && selectedDiscussion.id === id) {
                 const updated = await communityAPI.getDiscussionById(id);
                 setSelectedDiscussion(updated.data);
@@ -209,15 +411,26 @@ const Community = () => {
 
     return (
         <div className="min-h-screen bg-[#f9fafb] dark:dark-gradient-secondary font-sans text-gray-900 dark:text-gray-100">
-            {/* Hero Section - Minimal */}
+            {/* Hero Section */}
             <div className="pt-24 pb-10 relative z-10 px-4">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="text-4xl font-bold tracking-tight text-white mb-4 sm:mb-6">
+                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-4 sm:mb-6">
                         Join Our <span className="text-primary-500">Community</span>
                     </h1>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+                    <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-3">
                         Connect, share, and grow with fellow developers. Discuss problems, share solutions, and get help.
                     </p>
+                    {/* Hints for mentions */}
+                    <div className="flex items-center justify-center gap-4 mb-6 text-sm">
+                        <span className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/60 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300">
+                            <span className="text-primary-600 dark:text-primary-400 font-bold text-base">@</span>
+                            mention users
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/60 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300">
+                            <span className="text-amber-600 dark:text-amber-400 font-bold text-base">#</span>
+                            link problems
+                        </span>
+                    </div>
 
                     <button
                         onClick={() => isLoggedIn ? setShowCreateModal(true) : alert('Please login to start a discussion')}
@@ -253,6 +466,9 @@ const Community = () => {
                                             <UserAvatar user={discussion.author} size="md" />
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-gray-900 dark:text-white text-sm">{getUserDisplayName(discussion.author)}</span>
+                                                {discussion.author?.username && (
+                                                    <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">@{discussion.author.username}</span>
+                                                )}
                                                 <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(discussion.createdAt).toLocaleDateString()}</span>
                                             </div>
                                         </div>
@@ -279,12 +495,12 @@ const Community = () => {
                                     </h3>
 
                                     <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 text-sm text-left">
-                                        {discussion.content}
+                                        {parseContent(discussion.content, openProblem)}
                                     </p>
 
                                     {/* Footer */}
                                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/30">
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 flex-wrap">
                                             {discussion.tags.map((tag, idx) => (
                                                 <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-700">
                                                     #{tag}
@@ -337,14 +553,13 @@ const Community = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Content</label>
-                                <textarea
-                                    required
-                                    rows="6"
-                                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 text-gray-900 dark:text-white focus:border-primary-500 focus:outline-none resize-none"
-                                    placeholder="Describe your question or topic in detail..."
+                                <MentionTextarea
+                                    rows={6}
+                                    placeholder="Describe your question or topic... Use @username to mention someone or #42 to link a problem."
                                     value={newPost.content}
                                     onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                                ></textarea>
+                                    allUsers={allUsers}
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">Tags (comma separated)</label>
@@ -383,17 +598,20 @@ const Community = () => {
                     <div className="bg-gray-900 rounded-2xl w-full max-w-4xl border border-gray-700 shadow-2xl my-8 flex flex-col max-h-[90vh]">
                         {/* Header */}
                         <div className="p-4 md:p-6 border-b border-gray-800 flex justify-between items-start sticky top-0 bg-gray-900 z-10 rounded-t-2xl">
-                            <div>
-                                <div className="flex items-center gap-3 mb-4">
+                            <div className="flex-1 min-w-0 pr-4">
+                                <div className="flex items-center gap-3 mb-3">
                                     <UserAvatar user={selectedDiscussion.author} size="md" />
                                     <div className="flex flex-col">
                                         <span className="text-white font-bold text-base">{getUserDisplayName(selectedDiscussion.author)}</span>
+                                        {selectedDiscussion.author?.username && (
+                                            <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">@{selectedDiscussion.author.username}</span>
+                                        )}
                                         <span className="text-sm text-gray-400">{new Date(selectedDiscussion.createdAt).toLocaleDateString()}</span>
                                     </div>
                                 </div>
                                 <h2 className="text-xl md:text-3xl font-bold text-white mb-2 text-left">{selectedDiscussion.title}</h2>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                                 {user && selectedDiscussion.author && user.id === selectedDiscussion.author._id && (
                                     <button
                                         onClick={(e) => requestDelete(e, selectedDiscussion.id)}
@@ -411,11 +629,12 @@ const Community = () => {
 
                         {/* Content Scrollable Area */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                            {/* Parsed content with @mentions and #problems */}
                             <div className="prose prose-invert max-w-none mb-8 text-gray-300 whitespace-pre-wrap leading-relaxed text-left">
-                                {selectedDiscussion.content}
+                                {parseContent(selectedDiscussion.content, openProblem)}
                             </div>
 
-                            <div className="flex gap-2 mb-8">
+                            <div className="flex gap-2 mb-8 flex-wrap">
                                 {selectedDiscussion.tags.map((tag, idx) => (
                                     <span key={idx} className="px-3 py-1 bg-gray-800 text-sm text-primary-400 rounded-full border border-gray-700">
                                         #{tag}
@@ -446,23 +665,31 @@ const Community = () => {
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex items-center gap-2">
                                                 <UserAvatar user={comment.author} size="sm" />
-                                                <span className="font-bold text-white">{getUserDisplayName(comment.author)}</span>
-                                                <span className="text-xs text-gray-500">• {new Date(comment.createdAt).toLocaleDateString()}</span>
+                                                <div>
+                                                    <span className="font-bold text-white text-sm">{getUserDisplayName(comment.author)}</span>
+                                                    {comment.author?.username && (
+                                                        <span className="ml-1.5 text-xs text-primary-600 dark:text-primary-400">@{comment.author.username}</span>
+                                                    )}
+                                                    <span className="ml-1.5 text-xs text-gray-500">• {new Date(comment.createdAt).toLocaleDateString()}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <p className="text-gray-300 pl-8">{comment.content}</p>
+                                        {/* Parsed comment with @mentions and #problems */}
+                                        <p className="text-gray-300 pl-8 whitespace-pre-wrap">
+                                            {parseContent(comment.content, openProblem)}
+                                        </p>
                                     </div>
                                 ))}
 
                                 {/* Add Comment Form */}
                                 <form onSubmit={handleAddComment} className="mt-8">
-                                    <textarea
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg p-4 text-white focus:border-primary-500 focus:outline-none resize-none"
-                                        rows="3"
-                                        placeholder="Add to the discussion..."
+                                    <MentionTextarea
+                                        rows={3}
+                                        placeholder="Add to the discussion... Use @username to mention or #42 to link a problem."
                                         value={commentContent}
                                         onChange={(e) => setCommentContent(e.target.value)}
-                                    ></textarea>
+                                        allUsers={allUsers}
+                                    />
                                     <div className="mt-2 flex justify-end">
                                         <button
                                             type="submit"

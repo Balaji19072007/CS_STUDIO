@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, List, BookOpen, Users, User, Grid } from 'lucide-react';
+import { Home, List, BookOpen, Users, Trophy } from 'lucide-react';
 
 const MobileBottomNav = () => {
     const navItems = [
@@ -8,7 +8,7 @@ const MobileBottomNav = () => {
         { path: '/problems', icon: List, label: 'Problems' },
         { path: '/courses', icon: BookOpen, label: 'Courses' },
         { path: '/community', icon: Users, label: 'Community' },
-        { path: '/roadmaps', icon: Grid, label: 'Roadmaps' },
+        { path: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
         // Profile is in top bar as per request
     ];
 

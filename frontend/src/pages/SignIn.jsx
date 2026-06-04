@@ -44,12 +44,6 @@ const SignIn = () => {
   };
 
   // --- Password Reset ---
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    // Handled by ForgotPassword page usually
-    navigate('/forgot-password');
-  };
-
   // --- Core Authentication Handlers ---
 
   const handleEmailSignIn = async (e) => {
@@ -66,7 +60,7 @@ const SignIn = () => {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -93,7 +87,7 @@ const SignIn = () => {
     setMessage({ type: null, text: '' });
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           queryParams: {

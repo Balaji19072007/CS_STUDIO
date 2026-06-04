@@ -9,9 +9,10 @@ const os = require('os');
  * @param {string} language - Code language.
  * @param {string} code - Code content.
  * @param {string} input - The standard input for the test case.
+ * @param {string[]} testArgs - The command line arguments for the test case.
  * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>}
  */
-async function runCodeTest(language, code, input) {
+async function runCodeTest(language, code, input, testArgs = []) {
   // Reduced timeout to 5 seconds for better user experience
   const TIMEOUT_MS = 5000;
   // Use local temp dir to avoid system temp strictness and ensure compatibility with project structure
@@ -28,6 +29,12 @@ async function runCodeTest(language, code, input) {
 
   try {
     const cleanedCode = code.replace(/^-\s+/gm, '');
+
+    // Pre-create dummy files for File Handling challenges (Phase 15)
+    try {
+      require('fs').writeFileSync(require('path').join(tempDir, 'data.txt'), 'Welcome to File Handling');
+      require('fs').writeFileSync(require('path').join(tempDir, 'sample.txt'), 'Sample file content');
+    } catch (e) {}
 
     switch (language.toLowerCase()) {
       case 'python':
@@ -170,7 +177,7 @@ async function runCodeTest(language, code, input) {
     }
 
     // Execution
-    const childProcess = spawn(runCommand, runArgs, {
+    const childProcess = spawn(runCommand, [...runArgs, ...testArgs], {
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: TIMEOUT_MS,
       cwd: execCwd,

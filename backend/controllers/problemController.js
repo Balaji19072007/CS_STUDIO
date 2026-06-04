@@ -1,7 +1,7 @@
-// controllers/problemController.js
 const { supabase } = require('../config/supabase');
 const { runCodeTest } = require('../util/codeRunner'); // Keep existing code runner
 const TestEvaluationService = require('../util/testEvaluationService');
+const TestInputCleaner = require('../util/testInputCleaner');
 
 // @route   GET /api/problems
 exports.getProblems = async (req, res) => {
@@ -113,7 +113,10 @@ exports.runTestCases = async (req, res) => {
 
         for (const test of problem.test_cases) {
             try {
-                const result = await runCodeTest(language, code, test.input);
+                // Clean the input to extract only actual values
+                const cleanedInput = TestInputCleaner.cleanTestInput(test.input, language);
+
+                const result = await runCodeTest(language, code, cleanedInput);
                 const cleanedOutput = evaluationService.cleanOutput(result.stdout);
                 const comparison = evaluationService.compareOutputs(cleanedOutput, test.expected, language);
 
@@ -193,7 +196,10 @@ exports.submitProblem = async (req, res) => {
         let firstFailure = null;
 
         for (const test of problem.test_cases) {
-            const result = await runCodeTest(language, code, test.input);
+            // Clean the input to extract only actual values
+            const cleanedInput = TestInputCleaner.cleanTestInput(test.input, language);
+
+            const result = await runCodeTest(language, code, cleanedInput);
             const cleanedOutput = evaluationService.cleanOutput(result.stdout);
             const comparison = evaluationService.compareOutputs(cleanedOutput, test.expected, language);
             if (comparison.passed) passedCount++;

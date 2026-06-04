@@ -1,10 +1,10 @@
-
 // src/App.jsx
 
-import React, { useState } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
+import { useAuth } from './hooks/useAuth.jsx';
 import { useTheme } from './hooks/useTheme.jsx';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
 import Navbar from './components/common/Navbar.jsx';
@@ -27,7 +27,6 @@ import CourseLearning from './pages/CourseLearning.jsx';
 import PhaseTopics from './pages/PhaseTopics.jsx';
 import TopicContent from './pages/TopicContent.jsx';
 import QuizPage from './pages/QuizPage.jsx';
-import Roadmaps from './pages/Roadmaps.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Community from './pages/Community.jsx';
 import Settings from './pages/Settings.jsx';
@@ -36,52 +35,20 @@ import CodeVerification from './pages/CodeVerification.jsx';
 import SolveProblem from './pages/SolveProblem.jsx';
 import CourseChallenge from './pages/CourseChallenge.jsx';
 import CourseChallengePage from './pages/CourseChallengePage.jsx';
+import ProjectEditorPage from './pages/ProjectEditorPage.jsx';
 import MyProgress from './pages/MyProgress.jsx';
 import MyProblemStats from './pages/MyProblemStats.jsx';
 import Notifications from './pages/Notifications.jsx';
-// REMOVED: import CProgramming from './pages/learningPage/CProgramming.jsx';
-import CProgrammingRoadmap from './pages/roadmaps/CProgrammingRoadmap.jsx';
-import PythonProgrammingRoadmap from './pages/roadmaps/PythonProgrammingRoadmap.jsx';
-import JavaProgrammingRoadmap from './pages/roadmaps/JavaProgrammingRoadmap.jsx';
-import FrontendDevelopmentRoadmap from './pages/roadmaps/FrontendDevelopmentRoadmap.jsx';
-import BackendDevelopmentRoadmap from './pages/roadmaps/BackendDevelopmentRoadmap.jsx';
-import DataModelingRoadmap from './pages/roadmaps/DataModelingRoadmap.jsx';
-import DeploymentDevOpsRoadmap from './pages/roadmaps/DeploymentDevOpsRoadmap.jsx';
-import FullStackIntegrationRoadmap from './pages/roadmaps/FullStackIntegrationRoadmap.jsx';
-import NativeAndroidDevelopmentRoadmap from './pages/roadmaps/NativeAndroidDevelopmentRoadmap.jsx';
-import NativeIOSDevelopmentRoadmap from './pages/roadmaps/NativeIOSDevelopmentRoadmap.jsx';
-import CrossPlatformMobileDevelopmentRoadmap from "./pages/roadmaps/CrossPlatformMobileDevelopmentRoadmap.jsx";
-import BackendAPIsForMobileDevelopmentRoadmap from "./pages/roadmaps/BackendAPIsForMobileDevelopmentRoadmap.jsx";
-import MobileAppPublishingMaintenanceRoadmap from "./pages/roadmaps/MobileAppPublishingMaintenanceRoadmap.jsx";
-import CyberSecurityFoundationsRoadmap from "./pages/roadmaps/CyberSecurityFoundationsRoadmap.jsx";
-import DefensiveSecurityRoadmap from "./pages/roadmaps/DefensiveSecurityRoadmap.jsx";
-import WebAppSecurityRoadmap from "./pages/roadmaps/WebAppSecurityRoadmap.jsx";
-import OffensiveSecurityRoadmap from "./pages/roadmaps/OffensiveSecurityRoadmap.jsx";
-import ForensicsIncidentResponseRoadmap from "./pages/roadmaps/ForensicsIncidentResponseRoadmap.jsx";
-import DevOpsCICDRoadmap from "./pages/roadmaps/DevOpsCICDRoadmap.jsx";
-import ContainerizationRoadmap from "./pages/roadmaps/ContainerizationRoadmap.jsx";
-import OrchestrationInfrastructureRoadmap from "./pages/roadmaps/OrchestrationInfrastructureRoadmap.jsx";
-import ObservabilityReliabilityRoadmap from "./pages/roadmaps/ObservabilityReliabilityRoadmap.jsx";
-import AIMathFundamentalsRoadmap from "./pages/roadmaps/AIMathFundamentalsRoadmap.jsx";
-import CoreMLAlgorithmsRoadmap from "./pages/roadmaps/CoreMLAlgorithmsRoadmap.jsx";
-import DeepLearningRoadmap from "./pages/roadmaps/DeepLearningRoadmap.jsx";
-import ProductionMLOpsRoadmap from "./pages/roadmaps/ProductionMLOpsRoadmap.jsx";
-import DataSciencePythonStatsRoadmap from "./pages/roadmaps/DataSciencePythonStatsRoadmap.jsx";
-import DataWranglingRoadmap from "./pages/roadmaps/DataWranglingRoadmap.jsx";
-import DataScienceModelingRoadmap from "./pages/roadmaps/DataScienceModelingRoadmap.jsx";
-import DataScienceRoadmap from "./pages/roadmaps/DataScienceRoadmap.jsx";
+import MyCertificates from './pages/MyCertificates.jsx';
+import VerifyCertificate from './pages/VerifyCertificate.jsx';
 import RatingPopup from './components/common/RatingPopup.jsx';
 import CodeEditorFloatingIcon from './components/common/CodeEditorFloatingIcon.jsx';
 import './App.css';
-
-
 
 // Custom hook to use the auth context
 import FullPageLoader from './components/common/FullPageLoader.jsx';
 
 function App() {
-
-
   return (
     <ErrorBoundary>
       <Router
@@ -115,16 +82,16 @@ function AppContent() {
   // Page refresh handling is now done in index.html for better reliability
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
 
       {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve page */}
-      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && <MobileTopBar />}
+      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
       <Navbar />
 
       <main
-        className={`flex-grow ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') ? 'pt-0 lg:pt-16' : 'pt-16'} pb-20 sm:pb-0`}
+        className={`flex-grow ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') ? 'pt-0 lg:pt-16' : 'pt-16'} pb-20 sm:pb-0`}
         style={{ minHeight: '60vh' }}
       >
 
@@ -136,7 +103,7 @@ function AppContent() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/problems" element={<Problems />} />
           <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/:courseId" element={<CourseDetail />} />
+          <Route path="/courses/:courseId" element={<Navigate to="learn" replace />} />
           <Route path="/courses/:courseId/learn" element={<CourseLearning />} />
           <Route path="/courses/:courseId/learn/topic/:topicId" element={<CourseLearning />} />
           <Route path="/courses/:courseId/learn/quiz/:quizId" element={<CourseLearning />} />
@@ -147,48 +114,21 @@ function AppContent() {
           {/* Legacy routes - kept for backward compatibility */}
           <Route path="/courses/:courseId/phases/:phaseId" element={<PhaseTopics />} />
           <Route path="/courses/:courseId/phases/:phaseId/topics/:topicId" element={<TopicContent />} />
-          <Route path="/roadmaps" element={<Roadmaps />} />
-          <Route path="/roadmaps/c-programming" element={<CProgrammingRoadmap />} />
-          <Route path="/roadmaps/python-programming" element={<PythonProgrammingRoadmap />} />
-          <Route path="/roadmaps/java-programming" element={<JavaProgrammingRoadmap />} />
-          <Route path="/roadmaps/frontend-development" element={<FrontendDevelopmentRoadmap />} />
-          <Route path="/roadmaps/backend-development" element={<BackendDevelopmentRoadmap />} />
-          <Route path="/roadmaps/database-development" element={<DataModelingRoadmap />} />
-          <Route path="/roadmaps/deployment-development" element={<DeploymentDevOpsRoadmap />} />
-          <Route path="/roadmaps/fullstack-development" element={<FullStackIntegrationRoadmap />} />
-          <Route path="/roadmaps/android-development" element={<NativeAndroidDevelopmentRoadmap />} />
-          <Route path="/roadmaps/ios-development" element={<NativeIOSDevelopmentRoadmap />} />
-          <Route path="/roadmaps/cross-development" element={<CrossPlatformMobileDevelopmentRoadmap />} />
-          <Route path="/roadmaps/backend-apis-mobile-development" element={<BackendAPIsForMobileDevelopmentRoadmap />} />
-          <Route path="/roadmaps/publishing-mobile-development" element={<MobileAppPublishingMaintenanceRoadmap />} />
-          <Route path="/roadmaps/cyber-security-foundations" element={<CyberSecurityFoundationsRoadmap />} />
-          <Route path="/roadmaps/cyber-security-defensive" element={<DefensiveSecurityRoadmap />} />
-          <Route path="/roadmaps/cyber-security-webapp" element={<WebAppSecurityRoadmap />} />
-          <Route path="/roadmaps/cyber-security-offensive" element={<OffensiveSecurityRoadmap />} />
-          <Route path="/roadmaps/cyber-security-forensics" element={<ForensicsIncidentResponseRoadmap />} />
-          <Route path="/roadmaps/devops-fundamentals" element={<DevOpsCICDRoadmap />} />
-          <Route path="/roadmaps/devops-container" element={<ContainerizationRoadmap />} />
-          <Route path="/roadmaps/devops-orchestration" element={<OrchestrationInfrastructureRoadmap />} />
-          <Route path="/roadmaps/devops-observability" element={<ObservabilityReliabilityRoadmap />} />
-          <Route path="/roadmaps/ai-ml-math" element={<AIMathFundamentalsRoadmap />} />
-          <Route path="/roadmaps/ai-ml-core" element={<CoreMLAlgorithmsRoadmap />} />
-          <Route path="/roadmaps/ai-ml-deeplearning" element={<DeepLearningRoadmap />} />
-          <Route path="/roadmaps/ai-ml-production" element={<ProductionMLOpsRoadmap />} />
-          <Route path="/roadmaps/data-science-python" element={<DataSciencePythonStatsRoadmap />} />
-          <Route path="/roadmaps/data-science-wrangling" element={<DataWranglingRoadmap />} />
-          <Route path="/roadmaps/data-science-modeling" element={<DataScienceModelingRoadmap />} />
-          <Route path="/roadmaps/data-science-bigdata" element={<DataScienceRoadmap />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/community" element={<Community />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/solve" element={<ProtectedRoute><SolveProblem /></ProtectedRoute>} />
           <Route path="/challenge/:problemId" element={<ProtectedRoute><CourseChallenge /></ProtectedRoute>} />
           <Route path="/course-challenge/:challengeId" element={<ProtectedRoute><CourseChallengePage /></ProtectedRoute>} />
+          <Route path="/course-project/:projectId" element={<ProtectedRoute><ProjectEditorPage /></ProtectedRoute>} />
           <Route path="/code" element={<ProtectedRoute><Code /></ProtectedRoute>} />
           <Route path="/code-verification" element={<ProtectedRoute><CodeVerification /></ProtectedRoute>} />
           <Route path="/my-progress" element={<ProtectedRoute><MyProgress /></ProtectedRoute>} />
           <Route path="/problem-stats" element={<ProtectedRoute><MyProblemStats /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/certificates" element={<ProtectedRoute><MyCertificates /></ProtectedRoute>} />
+          <Route path="/certificates/verify/:certificateId" element={<VerifyCertificate />} />
+          <Route path="/verify-certificate" element={<VerifyCertificate />} />
 
           {/* Catch-all route - 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -198,7 +138,11 @@ function AppContent() {
       <RatingPopup />
       {!location.pathname.startsWith('/solve') &&
         !location.pathname.startsWith('/challenge') &&
+        !location.pathname.startsWith('/course-challenge') &&
+        !location.pathname.startsWith('/course-project') &&
         !location.pathname.startsWith('/courses/') &&
+        !location.pathname.startsWith('/certificates') &&
+        !location.pathname.startsWith('/verify-certificate') &&
         location.pathname !== '/signin' &&
         location.pathname !== '/signup' &&
         location.pathname !== '/code' &&
@@ -209,16 +153,14 @@ function AppContent() {
         !(location.pathname === '/' && !isLoggedIn) &&
         <CodeEditorFloatingIcon />}
 
-      {!location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/courses/') && <Footer />}
+      {!location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
 
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
-      {isLoggedIn && !location.pathname.startsWith('/challenge') && <MobileBottomNav />}
+      {isLoggedIn && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
     </div>
-
   );
 }
 
-// Protected Route Component using useAuth hook
 // Protected Route Component using useAuth hook
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn, loading } = useAuth();

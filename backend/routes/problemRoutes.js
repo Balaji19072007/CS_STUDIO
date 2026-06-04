@@ -3,72 +3,20 @@ const express = require('express');
 const router = express.Router();
 const problemController = require('../controllers/problemController');
 const authMiddleware = require('../middleware/authMiddleware'); // NEW: Import auth middleware
-
-const jwt = require('jsonwebtoken'); // NEW: Import jwt for manual verification
+const optionalAuthMiddleware = require('../middleware/optionalAuthMiddleware');
 
 // @route   GET /api/problems
 // Use optional auth to populate req.user if token exists
-router.get('/', async (req, res, next) => {
-    // Optional Auth Logic using Supabase
-    const token = req.header('x-auth-token') ||
-        req.header('Authorization')?.replace('Bearer ', '') ||
-        req.query.token;
-
-    if (token) {
-        try {
-            const { supabase } = require('../config/supabase');
-            const { data: { user }, error } = await supabase.auth.getUser(token);
-
-            if (user && !error) {
-                req.user = {
-                    id: user.id,
-                    email: user.email,
-                    role: user.role
-                };
-            } else {
-                // Token invalid - proceed as guest
-                console.log('Optional auth failed (Supabase error, proceeding as guest):', error?.message);
-                req.user = null;
-            }
-        } catch (err) {
-            console.log('Optional auth failed (proceeding as guest):', err.message);
-            req.user = null;
-        }
-    } else {
-        req.user = null;
-    }
-    next();
-}, problemController.getProblems);
+router.get('/', optionalAuthMiddleware, problemController.getProblems);
 
 // @route   GET /api/problems/daily
-router.get('/daily', async (req, res, next) => {
-    // Optional Auth Logic
-    const token = req.header('x-auth-token') ||
-        req.header('Authorization')?.replace('Bearer ', '') ||
-        req.query.token;
-
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            if (decoded.user) {
-                req.user = decoded.user;
-            }
-        } catch (err) {
-            // Token invalid/expired - proceed as guest
-            console.log('Optional auth failed (proceeding as guest):', err.message);
-            req.user = null;
-        }
-    } else {
-        req.user = null;
-    }
-    next();
-}, problemController.getDailyProblem);
+router.get('/daily', optionalAuthMiddleware, problemController.getDailyProblem);
 
 // @route   GET /api/problems/recommended
 router.get('/recommended', authMiddleware, problemController.getRecommendedProblems);
 
 // @route   GET /api/problems/:id
-router.get('/:id', problemController.getProblemById);
+router.get('/:id', optionalAuthMiddleware, problemController.getProblemById);
 
 // @route   GET /api/problems/:id/test-cases
 router.get('/:id/test-cases', problemController.getProblemTestCases);

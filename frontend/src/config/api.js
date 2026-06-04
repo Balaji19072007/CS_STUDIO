@@ -5,6 +5,18 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+const redirectToSignIn = () => {
+  if (window.location.hash !== '#/signin') {
+    window.location.assign('/#/signin');
+  }
+};
+
+export const buildApiUrl = (path = '') => {
+  if (!path) return API_BASE_URL;
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -42,9 +54,7 @@ api.interceptors.response.use(
       localStorage.removeItem('userData');
 
       // Redirect to login page if not already there
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
+      redirectToSignIn();
     }
 
     // Handle network errors

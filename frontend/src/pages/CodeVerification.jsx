@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { API_CONFIG } from '../config/api.js';
+import { buildApiUrl } from '../config/api.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useTheme } from '../hooks/useTheme.jsx';
 import { runTestCases, submitSolution } from '../api/problemApi.js';
@@ -46,7 +46,7 @@ const CodeVerification = () => {
         setIsLoadingProblem(true);
         setProblemError(null);
 
-        const response = await fetch(`${API_CONFIG.BASE_URL}/problems/${problemId}`);
+        const response = await fetch(buildApiUrl(`/api/problems/${problemId}`));
         if (!response.ok) {
           throw new Error('Failed to load problem');
         }

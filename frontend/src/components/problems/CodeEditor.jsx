@@ -45,6 +45,7 @@ const CodeEditor = forwardRef(({
   const [theme, setTheme] = useState(propTheme);
 
   // State for real-time input handling
+  const [cmdArgs, setCmdArgs] = useState('');
   const [output, setOutput] = useState('Output will appear here.');
   const [isRunning, setIsRunning] = useState(false);
   const [isWaitingForInput, setIsWaitingForInput] = useState(false);
@@ -99,17 +100,22 @@ const CodeEditor = forwardRef(({
   // --- Socket.IO Initialization and Listeners (FIXED) ---
   useEffect(() => {
     // Initialize socket service if not already connected
-    const token = localStorage.getItem('token');
-    if (token && !socketService.isConnected) {
+    const token = localStorage.getItem('token') || 'anonymous';
+    if (!socketService.isConnected) {
       console.log('🔌 Initializing socket service for freeform editor...');
       socketService.connect(token);
     }
 
     // Set up compiler socket with the centralized service
-    socketRef.current = setupCompilerSocket((output, isError, isRunningState, isWaitingInput) => {
+    setupCompilerSocket((output, isError, isRunningState, isWaitingInput) => {
       if (isWaitingInput !== undefined) {
         setIsWaitingForInput(isWaitingInput);
         isInputActiveRef.current = isWaitingInput;
+      }
+
+      if (isRunningState === false) {
+        setIsWaitingForInput(false);
+        isInputActiveRef.current = false;
       }
 
       if (isError) {
@@ -128,12 +134,11 @@ const CodeEditor = forwardRef(({
 
     return () => {
       // Remove compiler-specific event listeners
-      if (socketRef.current) {
-        socketRef.current.off('execution-result');
-        socketRef.current.off('execution-output');
-        socketRef.current.off('waiting-for-input');
-        socketRef.current.off('connect_error');
-        socketRef.current.off('disconnect');
+      socketService.removeCompilerListeners();
+      const socket = socketService.socket;
+      if (socket) {
+        socket.off('connect_error');
+        socket.off('disconnect');
       }
     };
   }, []);
@@ -150,8 +155,8 @@ const CodeEditor = forwardRef(({
         e.preventDefault();
         // Send the input buffer
         if (inputBufferRef.current.trim() !== '') {
-          if (socketRef.current && socketService.isConnected) {
-            sendInputToProgram(socketRef.current, inputBufferRef.current);
+          if (socketService.isConnected) {
+            sendInputToProgram(inputBufferRef.current);
             // Add the input to output with a newline
             setOutput(prev => prev + inputBufferRef.current + '\n');
             inputBufferRef.current = '';
@@ -201,7 +206,7 @@ const CodeEditor = forwardRef(({
 
   // Use proper execution language mapping
   const handleRunCode = useCallback((codeToRun) => {
-    if (!socketRef.current || !socketService.isConnected) {
+    if (!socketService.isConnected) {
       setOutput('Compiler service is disconnected. Check network.');
       return;
     }
@@ -217,7 +222,7 @@ const CodeEditor = forwardRef(({
     const executionLanguage = EXECUTION_LANGUAGE_MAP[language] || language.toLowerCase();
 
     try {
-      sendCodeForExecution(socketRef.current, codeToRun, executionLanguage);
+      sendCodeForExecution(codeToRun, executionLanguage, '', cmdArgs);
     } catch (error) {
       setOutput(`Execution Error: ${error.message}`);
       setIsRunning(false);
@@ -226,8 +231,8 @@ const CodeEditor = forwardRef(({
 
   // Stop execution
   const handleStopExecution = useCallback(() => {
-    if (socketRef.current && socketService.isConnected) {
-      stopCodeExecution(socketRef.current);
+    if (socketService.isConnected) {
+      stopCodeExecution();
     }
     setIsRunning(false);
     setIsWaitingForInput(false);
@@ -334,6 +339,17 @@ const CodeEditor = forwardRef(({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
+            <div className={`hidden md:flex items-center px-2 py-1.5 border rounded-md ${borderClass} ${ioBodyBg} focus-within:ring-2 focus-within:ring-blue-500 transition-shadow`}>
+              <span className={`text-xs mr-2 font-medium opacity-70 ${textMain}`}>Args:</span>
+              <input 
+                type="text" 
+                placeholder="arg1 arg2..."
+                className={`bg-transparent text-sm font-mono w-32 focus:outline-none ${textMain} placeholder-gray-400`}
+                value={cmdArgs}
+                onChange={(e) => setCmdArgs(e.target.value)}
+                disabled={isRunning}
+              />
+            </div>
             <button
               onClick={handleCopyCode}
               className={`px-3 py-2 ${toolbarBg} hover:${ioHeaderBg} ${textSecondary} rounded-md text-sm transition-colors border ${borderClass}`}
@@ -382,19 +398,32 @@ const CodeEditor = forwardRef(({
                 Output
               </button>
             </div>
-            <button
-              onClick={handleInternalRunCode}
-              className={`w-10 h-8 flex items-center justify-center rounded transition-colors ${isRunning
-                ? 'bg-red-600 text-white'
-                : 'bg-green-600 text-white'
-                }`}
-            >
-              {isRunning ? (
-                <div className="w-3 h-3 bg-white rounded-sm" />
-              ) : (
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8 5v14l11-7z" /></svg>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <div className={`flex items-center px-1.5 py-1 border rounded-md ${borderClass} ${ioBodyBg} focus-within:ring-1 focus-within:ring-blue-500`}>
+                <span className={`text-[10px] mr-1 font-medium opacity-70 ${textMain}`}>Args:</span>
+                <input 
+                  type="text" 
+                  placeholder="args..."
+                  className={`bg-transparent text-xs font-mono w-16 focus:outline-none ${textMain} placeholder-gray-400`}
+                  value={cmdArgs}
+                  onChange={(e) => setCmdArgs(e.target.value)}
+                  disabled={isRunning}
+                />
+              </div>
+              <button
+                onClick={handleInternalRunCode}
+                className={`w-10 h-8 flex items-center justify-center rounded transition-colors ${isRunning
+                  ? 'bg-red-600 text-white'
+                  : 'bg-green-600 text-white'
+                  }`}
+              >
+                {isRunning ? (
+                  <div className="w-3 h-3 bg-white rounded-sm" />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8 5v14l11-7z" /></svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Row 2: Controls (Language, Copy, Reset) - Only visible in Editor Tab */}

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import { Link } from 'react-router-dom';
 
 const MyProgress = () => {
-  const { user, isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuth();
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,7 @@ const MyProgress = () => {
         const dateKey = `${year}-${month}-${day}`;
 
         counts[dateKey] = (counts[dateKey] || 0) + 1;
-      } catch (e) {
+      } catch {
         console.warn("Skipping invalid date in heatmap:", dateVal);
       }
     });
@@ -118,15 +118,8 @@ const MyProgress = () => {
     );
   }
 
-  const { userStats, progressStats, difficultyBreakdown } = stats;
+  const { userStats, difficultyBreakdown } = stats;
   const yearDays = generateYearDays();
-  const totalSolved = progressStats.solved;
-
-  // Calculate detailed "XP" equivalent or logic based on mock for now if not in DB
-  // Level calc: sqrt(points) * constant roughly
-  const level = Math.floor(Math.sqrt((userStats.totalPoints || 0) / 10)) || 1;
-  const progressToNextLevel = ((userStats.totalPoints || 0) % 100);
-
   return (
     <div className="min-h-screen bg-gray-50 dark:dark-gradient-secondary pt-6 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">

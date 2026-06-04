@@ -1,10 +1,11 @@
 // frontend/src/components/common/CodeEditorFloatingIcon.jsx
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import * as feather from 'feather-icons';
 
 const CodeEditorFloatingIcon = () => {
     const [isMobile, setIsMobile] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -19,6 +20,11 @@ const CodeEditorFloatingIcon = () => {
     useEffect(() => {
         feather.replace();
     }, [isMobile]); // Re-run feather when visibility changes
+
+    // Hide on quiz and courses pages
+    if (location.pathname.includes('/courses') || location.pathname.includes('/quiz')) {
+        return null;
+    }
 
     // Mobile background should be transparent as per user request
     const mobileClasses = isMobile ? 'bg-transparent shadow-none' : 'dark-gradient-accent shadow-lg';

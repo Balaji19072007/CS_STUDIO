@@ -3,15 +3,53 @@ const { supabase } = require('../config/supabase');
 class Notification {
   constructor(data) {
     this.id = data.id || null;
+    this._id = this.id;
     this.userId = data.user_id || data.user || data.userId;
+    this.user = this.userId;
     this.title = data.title;
     this.message = data.message;
     this.type = data.type || 'system';
     this.link = data.link || '';
     this.isRead = data.is_read !== undefined ? data.is_read : (data.read || false);
+    this.read = this.isRead;
     this.important = data.important || false;
     this.data = data.data || {};
     this.createdAt = data.created_at || data.createdAt || new Date().toISOString();
+    this.created_at = this.createdAt;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      _id: this.id,
+      userId: this.userId,
+      user: this.userId,
+      title: this.title,
+      message: this.message,
+      type: this.type,
+      link: this.link,
+      read: this.isRead,
+      isRead: this.isRead,
+      important: this.important,
+      data: this.data,
+      createdAt: this.createdAt,
+      created_at: this.createdAt,
+    };
+  }
+
+  static normalizeUpdate(update = {}) {
+    const normalized = {};
+
+    if (update.read !== undefined) normalized.is_read = update.read;
+    if (update.is_read !== undefined) normalized.is_read = update.is_read;
+    if (update.title !== undefined) normalized.title = update.title;
+    if (update.message !== undefined) normalized.message = update.message;
+    if (update.type !== undefined) normalized.type = update.type;
+    if (update.link !== undefined) normalized.link = update.link;
+    if (update.important !== undefined) normalized.important = update.important;
+    if (update.data !== undefined) normalized.data = update.data;
+
+    return normalized;
   }
 
   static async getNotifications(userId, options = {}) {
@@ -35,9 +73,8 @@ class Notification {
       const { data, count, error } = await query;
       if (error) throw error;
 
-      const notifications = (data || []).map(d => new Notification(d));
+      const notifications = (data || []).map((row) => new Notification(row));
       return { notifications, total: count || 0 };
-
     } catch (error) {
       console.error('getNotifications error:', error);
       return { notifications: [], total: 0 };
@@ -46,7 +83,10 @@ class Notification {
 
   static async countDocuments(criteria) {
     try {
-      let query = supabase.from('notifications').select('*', { count: 'exact', head: true });
+      let query = supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true });
+
       if (criteria.user) query = query.eq('user_id', criteria.user);
       if (criteria.read !== undefined) query = query.eq('is_read', criteria.read);
 
@@ -70,24 +110,34 @@ class Notification {
         is_read: this.isRead,
         important: this.important,
         data: this.data,
-        created_at: this.createdAt
+        created_at: this.createdAt,
       };
 
       if (this.id) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('notifications')
           .update(dbData)
-          .eq('id', this.id);
+          .eq('id', this.id)
+          .select()
+          .single();
+
         if (error) throw error;
+        if (data) {
+          Object.assign(this, new Notification(data));
+        }
       } else {
         const { data, error } = await supabase
           .from('notifications')
           .insert([dbData])
           .select()
           .single();
+
         if (error) throw error;
-        if (data) this.id = data.id;
+        if (data) {
+          Object.assign(this, new Notification(data));
+        }
       }
+
       return this;
     } catch (error) {
       console.error('Notification.save error:', error);
@@ -95,9 +145,32 @@ class Notification {
     }
   }
 
+  static async findOneAndUpdate(criteria, update) {
+    try {
+      let query = supabase
+        .from('notifications')
+        .update(this.normalizeUpdate(update))
+        .select()
+        .limit(1);
+
+      if (criteria.user) query = query.eq('user_id', criteria.user);
+      if (criteria._id) query = query.eq('id', criteria._id);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data && data.length ? new Notification(data[0]) : null;
+    } catch (error) {
+      console.error('findOneAndUpdate error:', error);
+      return null;
+    }
+  }
+
   static async updateMany(criteria, update) {
     try {
-      let query = supabase.from('notifications').update(update);
+      let query = supabase
+        .from('notifications')
+        .update(this.normalizeUpdate(update));
+
       if (criteria.user) query = query.eq('user_id', criteria.user);
       if (criteria.read !== undefined) query = query.eq('is_read', criteria.read);
 
@@ -138,18 +211,19 @@ class Notification {
       return { deletedCount: 0 };
     }
   }
+
   static async insertMany(notifications) {
     try {
-      const dbData = notifications.map(n => ({
-        user_id: n.userId || n.user,
-        title: n.title,
-        message: n.message,
-        type: n.type || 'system',
-        link: n.link || '',
-        is_read: n.isRead !== undefined ? n.is_read : (n.read || false),
-        important: n.important || false,
-        data: n.data || {},
-        created_at: n.createdAt || new Date().toISOString()
+      const dbData = notifications.map((notification) => ({
+        user_id: notification.userId || notification.user,
+        title: notification.title,
+        message: notification.message,
+        type: notification.type || 'system',
+        link: notification.link || '',
+        is_read: notification.isRead !== undefined ? notification.isRead : (notification.read || false),
+        important: notification.important || false,
+        data: notification.data || {},
+        created_at: notification.createdAt || new Date().toISOString(),
       }));
 
       const { data, error } = await supabase
@@ -158,7 +232,7 @@ class Notification {
         .select();
 
       if (error) throw error;
-      return (data || []).map(d => new Notification(d));
+      return (data || []).map((row) => new Notification(row));
     } catch (error) {
       console.error('Notification.insertMany error:', error);
       throw error;
@@ -167,4 +241,3 @@ class Notification {
 }
 
 module.exports = Notification;
-

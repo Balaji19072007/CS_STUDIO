@@ -101,6 +101,15 @@ export default {
       boxShadow: {
         'premium': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         'premium-lg': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+      },
+      keyframes: {
+        blink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        }
+      },
+      animation: {
+        blink: 'blink 1s step-end infinite',
       }
     },
   },

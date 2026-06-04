@@ -1,5 +1,5 @@
 // frontend/src/pages/Leaderboard.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import * as feather from 'feather-icons';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -57,10 +57,6 @@ const PodiumCard = ({ user, rank }) => {
         return rank === 1
             ? 'text-xs sm:text-lg md:text-xl'
             : 'text-[10px] sm:text-base md:text-lg';
-    };
-
-    const getPointsColor = (rank) => {
-        return rank === 1 ? 'text-yellow-600' : rank === 2 ? 'text-gray-600' : 'text-amber-600';
     };
 
     const getHeightClass = (rank) => {
@@ -274,14 +270,14 @@ const LeaderboardMobileCard = ({ user, rank }) => {
 
 // --- MAIN COMPONENT ---
 const Leaderboard = () => {
-    const { isLoggedIn, user: currentUser } = useAuth();
+    const { isLoggedIn } = useAuth();
 
     const [leaderboardData, setLeaderboardData] = useState([]);
     const [timeframe, setTimeframe] = useState('all-time');
     const [category, setCategory] = useState('all');
     // const [isVisible, setIsVisible] = useState(false); // Removed unused visibility logic
     const [isLoading, setIsLoading] = useState(true);
-    const [totalUsers, setTotalUsers] = useState(0);
+    const [, setTotalUsers] = useState(0);
     const [userRank, setUserRank] = useState(null);
     const [error, setError] = useState(null);
 
@@ -364,10 +360,6 @@ const Leaderboard = () => {
 
     // Removed scroll listener logic as sticky footer is gone
 
-    const scrollToTop = useCallback(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, []);
-
     // --- RENDER DATA ---
     const allUsers = compileLeaderboard(leaderboardData);
     const topThree = allUsers.slice(0, 3);
@@ -376,14 +368,11 @@ const Leaderboard = () => {
     // So we pass 'allUsers' to the map, not 'remainingUsers'
     const usersToList = allUsers;
 
-    const currentUserEntry = allUsers.find(user => user._id === currentUser?.id);
-
     // Pagination Logic
     const indexOfLastUser = currentPage * itemsPerPage;
     const indexOfFirstUser = indexOfLastUser - itemsPerPage;
     const currentUsers = usersToList.slice(indexOfFirstUser, indexOfLastUser);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(usersToList.length / itemsPerPage)));
     const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
@@ -545,7 +534,7 @@ const Leaderboard = () => {
 
                         {/* Mobile Card View */}
                         <div className="md:hidden space-y-2">
-                            {currentUsers.map((user, index) => (
+                            {currentUsers.map((user) => (
                                 <LeaderboardMobileCard
                                     key={user._id || user.username}
                                     user={user}
