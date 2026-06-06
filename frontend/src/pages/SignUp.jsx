@@ -109,10 +109,10 @@ const SignUp = () => {
     } catch (error) {
       console.error('[SignUp] Error:', error.message);
       
-      if (error.message.includes('already registered') || error.message.includes('already exists')) {
+      if (error.message && (error.message.includes('already registered') || error.message.includes('already exists'))) {
          showMessage('success', 'Registration successful! Please check your email for verification link.');
       } else {
-         showMessage('error', error.message || 'Failed to create account.');
+         showMessage('error', error.response?.data?.msg || error.message || 'Failed to create account.');
       }
     } finally {
       setLoading(false);

@@ -88,7 +88,7 @@ const SignIn = () => {
 
     } catch (error) {
       console.error('[SignIn] Login error:', error.response?.data?.msg || error.message);
-      showMessage('error', error.message || 'Invalid email or password.');
+      showMessage('error', error.response?.data?.msg || error.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
