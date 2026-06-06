@@ -124,8 +124,9 @@ exports.logout = async (req, res) => {
     console.error('Logout error:', error.message);
   } finally {
     // Always clear cookies
-    res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
-    res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('access_token', { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
+    res.clearCookie('refresh_token', { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
     res.json({ success: true, msg: 'Logged out successfully' });
   }
 };
@@ -212,18 +213,19 @@ exports.verifyMFA = async (req, res) => {
 
 // Helper function
 function setCookies(res, session) {
+  const isProd = process.env.NODE_ENV === 'production';
   res.cookie('access_token', session.access_token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: session.expires_in * 1000 // usually 3600s
   });
 
   if (session.refresh_token) {
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 7 * 24 * 3600000 // 7 days
     });
   }
