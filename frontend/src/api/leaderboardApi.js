@@ -1,6 +1,6 @@
 // frontend/src/api/leaderboardApi.js
 
-import { API_ENDPOINTS, getHeaders } from '../config/api.js';
+import { API_ENDPOINTS, getHeaders, buildApiUrl } from '../config/api.js';
 
 /**
  * Fetches the global leaderboard data from the backend.
@@ -10,7 +10,7 @@ import { API_ENDPOINTS, getHeaders } from '../config/api.js';
 export const fetchLeaderboard = async (timeframe = 'all-time', category = 'all') => {
     // Construct query parameters
     const query = new URLSearchParams({ timeframe, category }).toString();
-    const url = `${API_ENDPOINTS.LEADERBOARD.GET}?${query}`;
+    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.GET}?${query}`);
     
     const response = await fetch(url, {
         method: 'GET',
@@ -30,7 +30,7 @@ export const fetchLeaderboard = async (timeframe = 'all-time', category = 'all')
  * Fetch current user's rank and stats
  */
 export const fetchUserRank = async () => {
-    const url = `${API_ENDPOINTS.LEADERBOARD.USER_RANK}`;
+    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.USER_RANK}`);
     
     const response = await fetch(url, {
         method: 'GET',
@@ -50,7 +50,7 @@ export const fetchUserRank = async () => {
  * Fetch total number of users with solved problems
  */
 export const fetchTotalUsers = async () => {
-    const url = `${API_ENDPOINTS.LEADERBOARD.TOTAL_USERS}`;
+    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.TOTAL_USERS}`);
     
     const response = await fetch(url, {
         method: 'GET',

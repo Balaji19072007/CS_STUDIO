@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, ShieldAlert, Loader, Check, X } from 'lucide-react';
+import api from '../../config/api';
 
 const MFASection = () => {
   const [status, setStatus] = useState('loading'); // 'loading', 'disabled', 'enrolling', 'enabled'
@@ -17,8 +18,8 @@ const MFASection = () => {
 
   const fetchStatus = async () => {
     try {
-      const res = await fetch('/api/auth/session/mfa/status');
-      const data = await res.json();
+      const res = await api.get('/api/auth/session/mfa/status');
+      const data = res.data;
       if (data.success) {
         setFactors(data.factors);
         if (data.factors.length > 0 && data.factors[0].status === 'verified') {
@@ -31,6 +32,7 @@ const MFASection = () => {
       }
     } catch (err) {
       setError('Network error');
+      setStatus('error');
     }
   };
 
@@ -38,8 +40,8 @@ const MFASection = () => {
     setIsProcessing(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/session/mfa/enroll', { method: 'POST' });
-      const data = await res.json();
+      const res = await api.post('/api/auth/session/mfa/enroll');
+      const data = res.data;
       if (data.success && data.data.totp.qr_code) {
         setQrCodeData(data.data.totp.qr_code);
         setFactorId(data.data.id);
@@ -63,28 +65,20 @@ const MFASection = () => {
     setError('');
     try {
       // First, challenge
-      const challengeRes = await fetch('/api/auth/session/mfa/challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factorId })
-      });
-      const challengeData = await challengeRes.json();
+      const challengeRes = await api.post('/api/auth/session/mfa/challenge', { factorId });
+      const challengeData = challengeRes.data;
       
       if (!challengeData.success) {
         throw new Error(challengeData.msg || 'Challenge failed');
       }
 
       // Then verify
-      const verifyRes = await fetch('/api/auth/session/mfa/verify-enroll', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          factorId, 
-          challengeId: challengeData.data.id, 
-          code: verifyCode 
-        })
+      const verifyRes = await api.post('/api/auth/session/mfa/verify-enroll', { 
+        factorId, 
+        challengeId: challengeData.data.id, 
+        code: verifyCode 
       });
-      const verifyData = await verifyRes.json();
+      const verifyData = verifyRes.data;
       
       if (verifyData.success) {
         setStatus('enabled');
@@ -104,12 +98,8 @@ const MFASection = () => {
     setIsProcessing(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/session/mfa/unenroll', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factorId: factors[0].id })
-      });
-      const data = await res.json();
+      const res = await api.post('/api/auth/session/mfa/unenroll', { factorId: factors[0].id });
+      const data = res.data;
       if (data.success) {
         setStatus('disabled');
         setFactors([]);

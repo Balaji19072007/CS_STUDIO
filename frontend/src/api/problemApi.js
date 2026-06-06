@@ -1,4 +1,5 @@
 import socketService from '../services/socketService';
+import { buildApiUrl } from '../config/api.js';
 
 const API_BASE_URL = '/api/problems';
 
@@ -22,7 +23,7 @@ export const fetchDailyProblem = async () => {
     if (token) headers['x-auth-token'] = token;
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const response = await fetch(`${API_BASE_URL}/daily?version=${Date.now()}&timezone=${encodeURIComponent(timezone)}`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/daily?version=${Date.now()}&timezone=${encodeURIComponent(timezone)}`), {
         method: 'GET',
         headers
     });
@@ -37,7 +38,7 @@ export const fetchRecommendedProblems = async () => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}/recommended`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended`), {
         method: 'GET',
         headers
     });
@@ -52,7 +53,7 @@ export const fetchAllProblems = async () => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}`), {
         method: 'GET',
         headers
     });
@@ -67,7 +68,7 @@ export const fetchProblemById = async (id) => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}`), {
         method: 'GET',
         headers
     });
@@ -83,7 +84,7 @@ export const fetchProblemProgress = async (id) => {
 
     const headers = { 'x-auth-token': token };
 
-    const response = await fetch(`${API_BASE_URL}/${id}/progress`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
         method: 'GET',
         headers
     });
@@ -98,7 +99,7 @@ export const fetchProblemTestCases = async (id) => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}/${id}/test-cases`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/test-cases`), {
         method: 'GET',
         headers
     });
@@ -113,7 +114,7 @@ export const submitSolution = async (id, code, language, timeSpent, timezone) =>
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}/${id}/submit`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/submit`), {
         method: 'POST',
         headers,
         body: JSON.stringify({ code, language, timeSpent, timezone })
@@ -129,7 +130,7 @@ export const runTestCases = async (id, code, language) => {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(`${API_BASE_URL}/${id}/run-tests`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/run-tests`), {
         method: 'POST',
         headers,
         body: JSON.stringify({ code, language })
@@ -176,7 +177,7 @@ export const updateProblemProgress = async (id, payload) => {
     if (token) headers['x-auth-token'] = token;
 
     // payload: { status: 'attempted', timeSpent: 123 }
-    const response = await fetch(`${API_BASE_URL}/${id}/progress`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
         method: 'POST',
         headers,
         body: JSON.stringify(payload)
