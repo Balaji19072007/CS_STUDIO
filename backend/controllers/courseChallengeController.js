@@ -555,19 +555,25 @@ exports.submitChallenge = async (req, res) => {
       });
     }
 
-    if (source === 'database') {
-      await supabase.from('course_challenge_status').upsert(
-        {
-          user_id: userId,
-          course_challenge_id: challenge.id,
-          status: 'solved',
-          solved_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id, course_challenge_id' }
-      );
-    }
+    try {
+      if (source === 'database') {
+        await supabase.from('course_challenge_status').upsert(
+          {
+            user_id: userId,
+            course_challenge_id: challenge.id,
+            status: 'solved',
+            solved_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id, course_challenge_id' }
+        );
+      }
 
-    await markTopicComplete(userId, challenge.topic_id, challenge.course_id);
+      await markTopicComplete(userId, challenge.topic_id, challenge.course_id);
+    } catch (progressError) {
+      console.error('submitChallenge progress save error:', progressError);
+      // We don't return 500 here, because the user's solution WAS correct.
+      // We still want to show them success even if their topic_id is missing from the db.
+    }
 
     return res.json({
       success: true,
@@ -577,6 +583,6 @@ exports.submitChallenge = async (req, res) => {
     });
   } catch (error) {
     console.error('submitChallenge error:', error.message);
-    return res.status(500).json({ msg: 'Server Error' });
+    return res.status(500).json({ msg: 'Server Error', error: error.message });
   }
 };
