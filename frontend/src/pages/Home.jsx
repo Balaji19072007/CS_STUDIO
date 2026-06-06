@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import UserHomePage from './UserHomePage.jsx';
 import Loader from '../components/common/Loader.jsx';
+import api from '../config/api.js';
 
 // Use relative URLs since CORS is now enabled
 // Use relative URLs since CORS is now enabled
@@ -148,24 +149,17 @@ const APIDebug = () => {
         const testAPI = async () => {
             try {
                 console.log('Testing API endpoint: /api/stats/user-stats');
-                const response = await fetch('/api/stats/user-stats');
-                const contentType = response.headers.get('content-type');
-                const responseText = await response.text();
-
+                const response = await api.get('/api/stats/user-stats');
+                
                 console.log('Response status:', response.status);
-                console.log('Content-Type:', contentType);
-                console.log('Response text:', responseText);
-
-                if (contentType && contentType.includes('text/html')) {
-                    setApiStatus('❌ API ERROR: Got HTML page instead of JSON');
-                    setResponseData(responseText.substring(0, 200) + '...');
-                } else if (response.ok) {
-                    const data = JSON.parse(responseText);
+                
+                if (response.status === 200) {
+                    const data = response.data;
                     setApiStatus('✅ API SUCCESS');
                     setResponseData(data);
                 } else {
                     setApiStatus(`❌ API ERROR: ${response.status} ${response.statusText}`);
-                    setResponseData(responseText);
+                    setResponseData(response.data);
                 }
             } catch (error) {
                 console.error('API test error:', error);
@@ -209,21 +203,10 @@ const RatingPrompt = () => {
                 const token = localStorage.getItem('token');
                 console.log('Checking rating eligibility...');
 
-                const response = await fetch('/api/stats/rating-eligibility', {
-                    headers: {
-                        'x-auth-token': token,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await api.get('/api/stats/rating-eligibility');
 
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('text/html')) {
-                    console.log('Rating eligibility API returned HTML - endpoint likely missing');
-                    return;
-                }
-
-                if (response.ok) {
-                    const data = await response.json();
+                if (response.status === 200) {
+                    const data = response.data;
                     console.log('Rating eligibility response:', data);
                     if (data.eligible) {
                         const hasSeenPrompt = sessionStorage.getItem('hasSeenRatingPrompt');
@@ -232,14 +215,16 @@ const RatingPrompt = () => {
                             sessionStorage.setItem('hasSeenRatingPrompt', 'true');
                         }
                     }
-                } else if (response.status === 401) {
+                }
+            } catch (error) {
+                if (error.response?.status === 401) {
                     console.log('Authentication failed for rating eligibility check');
                     // Token might be invalid, clear it
                     localStorage.removeItem('token');
                     localStorage.removeItem('userData');
+                } else {
+                    console.log('Rating eligibility check failed:', error.message);
                 }
-            } catch (error) {
-                console.log('Rating eligibility check failed:', error.message);
             }
         };
 
@@ -249,38 +234,23 @@ const RatingPrompt = () => {
 
     const handleRating = async (rating) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/stats/submit-rating', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': token
-                },
-                body: JSON.stringify({ rating })
-            });
+            const response = await api.post('/api/stats/submit-rating', { rating });
 
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('text/html')) {
-                console.log('Submit rating API returned HTML - endpoint likely missing');
-                setShowPrompt(false);
-                return;
-            }
-
-            if (response.ok) {
+            if (response.status === 200) {
                 console.log('Rating submitted successfully');
                 setShowPrompt(false);
                 window.location.reload();
-            } else if (response.status === 401) {
+            }
+        } catch (error) {
+            if (error.response?.status === 401) {
                 console.log('Authentication failed, clearing token');
                 localStorage.removeItem('token');
                 localStorage.removeItem('userData');
                 setShowPrompt(false);
             } else {
-                console.error('Failed to submit rating');
+                console.error('Failed to submit rating:', error);
+                setShowPrompt(false);
             }
-        } catch (error) {
-            console.error('Failed to submit rating:', error);
-            setShowPrompt(false);
         }
     };
 
@@ -342,9 +312,9 @@ const Home = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await fetch('/api/stats/user-stats');
-                if (response.ok) {
-                    const data = await response.json();
+                const response = await api.get('/api/stats/user-stats');
+                if (response.status === 200) {
+                    const data = response.data;
                     setUserStats(prev => ({ ...prev, ...data }));
                 }
             } catch (error) {

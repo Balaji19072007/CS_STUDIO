@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../config/api';
 
 export const AuthContext = createContext();
 
@@ -16,10 +17,10 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/me');
+      const response = await api.get('/api/auth/me');
 
-      if (response.ok) {
-        const profile = await response.json();
+      if (response.status === 200) {
+        const profile = response.data;
         
         // Ensure user is updated
         const userData = {
@@ -37,31 +38,33 @@ export const AuthProvider = ({ children }) => {
 
         setUser(userData);
         setIsAuthenticated(true);
-      } else if (response.status === 401) {
-        // Try refresh
-        const refreshRes = await fetch('/api/auth/session/refresh', { method: 'POST' });
-        if (refreshRes.ok) {
-          // If refresh worked, fetch session again
-          const retryRes = await fetch('/api/auth/me');
-          if (retryRes.ok) {
-            const profile = await retryRes.json();
-            const userData = {
-                ...profile,
-                userId: profile.id,
-                name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || (profile.email ? profile.email.split('@')[0] : 'Developer'),
-                role: profile.role || 'student'
-            };
-            setUser(userData);
-            setIsAuthenticated(true);
-            return;
-          }
-        }
-        
-        // Refresh failed or no session
-        setUser(null);
-        setIsAuthenticated(false);
       }
     } catch (err) {
+      if (err.response?.status === 401) {
+        // Try refresh
+        try {
+          const refreshRes = await api.post('/api/auth/session/refresh');
+          if (refreshRes.status === 200) {
+            // If refresh worked, fetch session again
+            const retryRes = await api.get('/api/auth/me');
+            if (retryRes.status === 200) {
+              const profile = retryRes.data;
+              const userData = {
+                  ...profile,
+                  userId: profile.id,
+                  name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || (profile.email ? profile.email.split('@')[0] : 'Developer'),
+                  role: profile.role || 'student'
+              };
+              setUser(userData);
+              setIsAuthenticated(true);
+              return;
+            }
+          }
+        } catch (refreshErr) {
+          console.error('Refresh Failed:', refreshErr);
+        }
+      }
+      
       console.error('Auth Profile Fetch Error:', err);
       setUser(null);
       setIsAuthenticated(false);
@@ -86,7 +89,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/session/logout', { method: 'POST' });
+      await api.post('/api/auth/session/logout');
       setUser(null);
       setIsAuthenticated(false);
       navigate('/');
