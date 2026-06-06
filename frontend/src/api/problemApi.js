@@ -117,6 +117,7 @@ export const submitSolution = async (id, code, language, timeSpent, timezone) =>
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/submit`), {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify({ code, language, timeSpent, timezone })
     });
     return handleResponse(response);
@@ -133,6 +134,7 @@ export const runTestCases = async (id, code, language) => {
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/run-tests`), {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify({ code, language })
     });
     return handleResponse(response);
@@ -180,6 +182,7 @@ export const updateProblemProgress = async (id, payload) => {
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify(payload)
     });
     return handleResponse(response);

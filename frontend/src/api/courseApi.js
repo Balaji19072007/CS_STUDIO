@@ -76,6 +76,7 @@ export const fetchLastActiveCourse = async () => {
   try {
     const res = await fetch(buildApiUrl('/api/courses/last-active'), {
       headers: getAuthHeaders(),
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Failed to fetch last active course');
     const data = await res.json();
@@ -90,6 +91,7 @@ export const getEnrolledCourses = async () => {
   try {
     const res = await fetch(buildApiUrl('/api/courses/enrolled'), {
       headers: getAuthHeaders(),
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Failed to fetch enrolled courses');
     const data = await res.json();
@@ -276,6 +278,7 @@ export const getCourseChallengeById = async (challengeId) => {
   try {
     const res = await fetch(buildApiUrl(`/api/course-challenges/${challengeId}`), {
       headers: getAuthHeaders(),
+      credentials: 'include',
     });
 
     if (!res.ok) throw new Error('Failed to fetch challenge');
@@ -289,7 +292,8 @@ export const getCourseChallengeById = async (challengeId) => {
 export const runCourseChallenge = async (challengeId, code, language = 'C', custom_input = '') => {
   const res = await fetch(buildApiUrl(`/api/course-challenges/${challengeId}/run`), {
     method: 'POST',
-    headers: getAuthHeaders(true),
+    headers: getAuthHeaders(),
+      credentials: 'include',
     body: JSON.stringify({ code, language, custom_input }),
   });
 
@@ -305,6 +309,7 @@ export const getPracticeProblemById = async (problemId) => {
   try {
     const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}`), {
       headers: getAuthHeaders(),
+      credentials: 'include',
     });
 
     if (!res.ok) throw new Error('Failed to fetch practice problem');
@@ -318,7 +323,8 @@ export const getPracticeProblemById = async (problemId) => {
 export const runPracticeProblem = async (problemId, code, language = 'C') => {
   const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}/run`), {
     method: 'POST',
-    headers: getAuthHeaders(true),
+    headers: getAuthHeaders(),
+      credentials: 'include',
     body: JSON.stringify({ code, language }),
   });
 
@@ -333,7 +339,8 @@ export const runPracticeProblem = async (problemId, code, language = 'C') => {
 export const submitPracticeProblem = async (problemId, code, language = 'C') => {
   const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}/submit`), {
     method: 'POST',
-    headers: getAuthHeaders(true),
+    headers: getAuthHeaders(),
+      credentials: 'include',
     body: JSON.stringify({ code, language }),
   });
 

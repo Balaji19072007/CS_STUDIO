@@ -303,6 +303,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
         try {
             const response = await fetch(buildApiUrl(`/api/course-challenges/${challengeId}/submit`), {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
