@@ -306,7 +306,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'x-auth-token': localStorage.getItem('token'),
                 },
                 body: JSON.stringify({ code, language: challenge?.language || 'C' }),
             });
@@ -342,6 +342,8 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                             },
                         })
                     );
+                    
+                    sessionStorage.setItem('invalidate_dashboard_cache', 'true');
                 }
 
                 showFloatingNotification('Challenge completed successfully.', 'success');

@@ -39,7 +39,7 @@ export const fetchRecommendedProblems = async () => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended`), {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended?t=${Date.now()}`), {
         method: 'GET',
         headers,
         credentials: 'include'
@@ -55,7 +55,7 @@ export const fetchAllProblems = async () => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}`), {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}?t=${Date.now()}`), {
         method: 'GET',
         headers,
         credentials: 'include'

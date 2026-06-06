@@ -44,7 +44,14 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const practiceProblemRoutes = require('./routes/practiceProblemRoutes');
 
 // Enable CORS
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://cs-studio.in', 'https://www.cs-studio.in'];
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'https://cs-studio.in', 
+  'https://www.cs-studio.in',
+  'https://cs-studio-ashen.vercel.app',
+  'https://cs-studio.onrender.com'
+];
 if (process.env.FRONTEND_URL) {
   // Strip trailing slash if present
   allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''));

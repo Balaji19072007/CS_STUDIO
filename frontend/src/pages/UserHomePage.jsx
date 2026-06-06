@@ -230,7 +230,7 @@ const UserHomePage = () => {
 
                 let sData = null;
                 if (token) {
-                    const pStatsRes = await fetch('/api/progress/user-stats', { headers });
+                    const pStatsRes = await fetch(`/api/progress/user-stats?t=${new Date().getTime()}`, { headers });
                     if (pStatsRes.ok) {
                         sData = await pStatsRes.json();
                         console.log('📊 Stats API Response:', sData);
@@ -248,7 +248,7 @@ const UserHomePage = () => {
                 const [daily, recommended, historyRes, enrolledCourses] = await Promise.all([
                     fetchDailyProblem().catch(() => null),
                     fetchRecommendedProblems().catch(() => []),
-                    token ? fetch('/api/progress/history', { headers }) : Promise.resolve(null),
+                    token ? fetch(`/api/progress/history?t=${new Date().getTime()}`, { headers }) : Promise.resolve(null),
                     token ? getEnrolledCourses().catch(() => []) : Promise.resolve([])
                 ]);
 

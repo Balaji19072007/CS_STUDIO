@@ -100,13 +100,22 @@ const ProblemCard = ({ problem }) => {
                     >
                         {/* Desktop: Solve Button */}
                         <span className="hidden sm:flex items-center px-3 py-1.5 text-sm font-medium">
-                            <Code className="w-4 h-4 mr-2" />
-                            Solve
+                            {status === 'solved' ? (
+                                <>
+                                    <Check className="w-4 h-4 mr-2" />
+                                    Solved
+                                </>
+                            ) : (
+                                <>
+                                    <Code className="w-4 h-4 mr-2" />
+                                    Solve
+                                </>
+                            )}
                         </span>
 
                         {/* Mobile: Pen Icon */}
                         <span className="sm:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white">
-                            <Edit2 className="w-4 h-4" />
+                            {status === 'solved' ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                         </span>
                     </Link>
                 </div>
