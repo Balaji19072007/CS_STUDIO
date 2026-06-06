@@ -45,6 +45,9 @@ export const AuthProvider = ({ children }) => {
         try {
           const refreshRes = await api.post('/api/auth/session/refresh');
           if (refreshRes.status === 200) {
+            if (refreshRes.data.token) {
+               localStorage.setItem('token', refreshRes.data.token);
+            }
             // If refresh worked, fetch session again
             const retryRes = await api.get('/api/auth/me');
             if (retryRes.status === 200) {

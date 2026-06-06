@@ -82,6 +82,10 @@ const SignIn = () => {
           return;
       }
 
+      if (data.token) {
+          localStorage.setItem('token', data.token);
+      }
+
       showMessage('success', 'Signed in successfully!');
       window.dispatchEvent(new Event('auth-login'));
       setTimeout(() => navigate('/'), 1000);
@@ -117,6 +121,9 @@ const SignIn = () => {
       
       if (!verifyData.success) throw new Error(verifyData.msg || 'Invalid verification code');
 
+      if (verifyData.token) {
+          localStorage.setItem('token', verifyData.token);
+      }
       showMessage('success', 'Signed in successfully!');
       window.dispatchEvent(new Event('auth-login'));
       setTimeout(() => navigate('/'), 1000);

@@ -66,7 +66,7 @@ exports.login = async (req, res) => {
       }
 
       logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'SUCCESS');
-      return res.json({ success: true, user: data.user });
+      return res.json({ success: true, user: data.user, token: data.session.access_token, session: data.session });
     } else if (data.user) {
       // Edge case: User exists but no session
       logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required (Edge case)');
@@ -105,7 +105,7 @@ exports.signup = async (req, res) => {
     if (data.session) {
       setCookies(res, data.session);
     }
-    res.json({ success: true, user: data.user, session: data.session });
+    res.json({ success: true, user: data.user, session: data.session, token: data.session?.access_token });
   } catch (error) {
     console.error('Signup Exception:', error.message);
     res.status(500).json({ success: false, msg: 'Server error' });
@@ -114,7 +114,7 @@ exports.signup = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
     
     if (token) {
       // Invalidate on Supabase side
@@ -148,7 +148,7 @@ exports.refresh = async (req, res) => {
     }
 
     setCookies(res, data.session);
-    res.json({ success: true, user: data.user });
+    res.json({ success: true, user: data.user, session: data.session, token: data.session.access_token });
   } catch (error) {
     console.error('Refresh Exception:', error.message);
     res.status(500).json({ success: false, msg: 'Server error' });
@@ -202,6 +202,7 @@ exports.verifyMFA = async (req, res) => {
         
         if (!sessionError && sessionData.session) {
              setCookies(res, sessionData.session);
+             return res.json({ success: true, session: sessionData.session, token: sessionData.session.access_token });
         }
         
         res.json({ success: true });
