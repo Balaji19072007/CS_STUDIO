@@ -263,6 +263,7 @@ export const getCourseChallenge = async (topicId) => {
         'Cache-Control': 'no-cache',
         Pragma: 'no-cache',
       },
+      credentials: 'include',
       cache: 'no-store',
     });
 

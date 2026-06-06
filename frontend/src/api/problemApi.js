@@ -25,7 +25,8 @@ export const fetchDailyProblem = async () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/daily?version=${Date.now()}&timezone=${encodeURIComponent(timezone)}`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
@@ -40,7 +41,8 @@ export const fetchRecommendedProblems = async () => {
 
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
@@ -55,7 +57,8 @@ export const fetchAllProblems = async () => {
 
     const response = await fetch(buildApiUrl(`${API_BASE_URL}`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
@@ -70,7 +73,8 @@ export const fetchProblemById = async (id) => {
 
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
@@ -86,7 +90,8 @@ export const fetchProblemProgress = async (id) => {
 
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
@@ -101,7 +106,8 @@ export const fetchProblemTestCases = async (id) => {
 
     const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/test-cases`), {
         method: 'GET',
-        headers
+        headers,
+        credentials: 'include'
     });
     return handleResponse(response);
 };
