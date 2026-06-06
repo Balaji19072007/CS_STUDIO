@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as feather from 'feather-icons';
 import { useAuth } from '../hooks/useAuth.jsx';
+import { buildApiUrl } from '../config/api.js';
 
 const MyProblemStats = () => {
     const { isLoggedIn, loading: authLoading } = useAuth();
@@ -14,7 +15,7 @@ const MyProblemStats = () => {
             if (!isLoggedIn) return;
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('/api/progress/history', {
+                const response = await fetch(buildApiUrl('/api/progress/history'), {
                     headers: {
                         'x-auth-token': token
                     }

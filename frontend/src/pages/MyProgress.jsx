@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as feather from 'feather-icons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Link } from 'react-router-dom';
+import { buildApiUrl } from '../config/api.js';
 
 const MyProgress = () => {
   const { isLoggedIn } = useAuth();
@@ -22,15 +23,15 @@ const MyProgress = () => {
         const headers = { 'x-auth-token': token };
 
         // 1. Fetch Stats (Summary + Difficulty)
-        const statsRes = await fetch('/api/progress/user-stats', { headers });
+        const statsRes = await fetch(buildApiUrl('/api/progress/user-stats'), { headers });
         const statsData = await statsRes.json();
 
         // 2. Fetch History (For Heatmap)
-        const historyRes = await fetch('/api/progress/history', { headers });
+        const historyRes = await fetch(buildApiUrl('/api/progress/history'), { headers });
         const historyData = await historyRes.json();
 
         // 3. Fetch Enrolled Courses
-        const coursesRes = await fetch('/api/courses/enrolled', { headers });
+        const coursesRes = await fetch(buildApiUrl('/api/courses/enrolled'), { headers });
         const coursesData = await coursesRes.json();
 
         if (statsData.success) setStats(statsData);

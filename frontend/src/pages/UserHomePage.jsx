@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import { fetchUserRank } from '../api/leaderboardApi.js';
 import { fetchDailyProblem, fetchRecommendedProblems } from '../api/problemApi.js';
 import { getEnrolledCourses } from '../api/courseApi.js';
+import { buildApiUrl } from '../config/api.js';
 import TopUserStats from '../components/TopUserStats.jsx';
 import { DashboardSkeleton } from '../components/common/SkeletonLoader';
 
@@ -230,7 +231,7 @@ const UserHomePage = () => {
 
                 let sData = null;
                 if (token) {
-                    const pStatsRes = await fetch(`/api/progress/user-stats?t=${new Date().getTime()}`, { headers });
+                    const pStatsRes = await fetch(buildApiUrl(`/api/progress/user-stats?t=${new Date().getTime()}`), { headers });
                     if (pStatsRes.ok) {
                         sData = await pStatsRes.json();
                         console.log('📊 Stats API Response:', sData);
@@ -248,7 +249,7 @@ const UserHomePage = () => {
                 const [daily, recommended, historyRes, enrolledCourses] = await Promise.all([
                     fetchDailyProblem().catch(() => null),
                     fetchRecommendedProblems().catch(() => []),
-                    token ? fetch(`/api/progress/history?t=${new Date().getTime()}`, { headers }) : Promise.resolve(null),
+                    token ? fetch(buildApiUrl(`/api/progress/history?t=${new Date().getTime()}`), { headers }) : Promise.resolve(null),
                     token ? getEnrolledCourses().catch(() => []) : Promise.resolve([])
                 ]);
 

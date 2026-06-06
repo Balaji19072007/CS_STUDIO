@@ -1,4 +1,5 @@
 // frontend/src/api/authApi.js
+import { buildApiUrl } from '../config/api.js';
 
 const API_BASE_URL = '/api/auth';
 
@@ -17,7 +18,7 @@ const handleResponse = async (response) => {
  * Sends credentials for local sign-in.
  */
 export const signInLocal = async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/signin`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/signin`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -30,7 +31,7 @@ export const signInLocal = async (email, password) => {
  */
 export const signInGoogle = async (idToken) => {
     // FIX: Updated to use the correct Google Auth endpoint /api/google-auth
-    const response = await fetch(`/api/google-auth`, {
+    const response = await fetch(buildApiUrl(`/api/google-auth`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
@@ -62,7 +63,7 @@ export const updateProfile = async (profileData) => {
     // IMPORTANT: If sending FormData (file upload), DO NOT set 'Content-Type'. 
     // The browser automatically sets the correct 'multipart/form-data' header.
 
-    const response = await fetch(`${API_BASE_URL}/profile`, {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/profile`), {
         method: 'PUT',
         headers: headers,
         // If it's FormData, pass the object directly. Otherwise, stringify the JSON payload.

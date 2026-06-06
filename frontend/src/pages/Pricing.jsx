@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { buildApiUrl } from '../config/api';
 
 const Pricing = () => {
     const { user } = useAuth();
@@ -14,7 +15,7 @@ const Pricing = () => {
     const fetchCurrentPlan = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/subscriptions/my-plan', {
+            const response = await fetch(buildApiUrl('/api/subscriptions/my-plan'), {
                 'x-auth-token': token
             });
             if (response.ok) {
