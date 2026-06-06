@@ -230,8 +230,11 @@ const UserHomePage = () => {
                 }
 
                 let sData = null;
-                if (token) {
-                    const pStatsRes = await fetch(buildApiUrl(`/api/progress/user-stats?t=${new Date().getTime()}`), { headers });
+                // Always fetch, use credentials to send cookies if token is missing
+                const pStatsRes = await fetch(buildApiUrl(`/api/progress/user-stats?t=${new Date().getTime()}`), { 
+                    headers,
+                    credentials: 'include'
+                });
                     if (pStatsRes.ok) {
                         sData = await pStatsRes.json();
                         console.log('📊 Stats API Response:', sData);
@@ -244,13 +247,12 @@ const UserHomePage = () => {
                     } else {
                         console.warn('⚠️ Stats API failed:', pStatsRes.status);
                     }
-                }
 
                 const [daily, recommended, historyRes, enrolledCourses] = await Promise.all([
                     fetchDailyProblem().catch(() => null),
                     fetchRecommendedProblems().catch(() => []),
-                    token ? fetch(buildApiUrl(`/api/progress/history?t=${new Date().getTime()}`), { headers }) : Promise.resolve(null),
-                    token ? getEnrolledCourses().catch(() => []) : Promise.resolve([])
+                    fetch(buildApiUrl(`/api/progress/history?t=${new Date().getTime()}`), { headers, credentials: 'include' }).catch(() => null),
+                    getEnrolledCourses().catch(() => [])
                 ]);
 
                 // Manually force 'solved' on daily problem if we just solved it, 

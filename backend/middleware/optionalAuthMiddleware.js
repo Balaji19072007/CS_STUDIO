@@ -2,6 +2,7 @@ const { supabase } = require('../config/supabase');
 
 module.exports = async function optionalAuthMiddleware(req, res, next) {
   const token =
+    req.cookies?.access_token ||
     req.header('x-auth-token') ||
     req.header('Authorization')?.replace('Bearer ', '') ||
     req.query.token;

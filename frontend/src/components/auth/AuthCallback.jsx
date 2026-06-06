@@ -28,6 +28,9 @@ const AuthCallback = () => {
             if (response.status !== 200) {
                 throw new Error(response.data.msg || 'Failed to initialize session');
             }
+            
+            // Store token for x-auth-token fallback due to blocked 3rd party cookies
+            localStorage.setItem('token', session.access_token);
 
             // Clean up localStorage to maintain security (prevent XSS extraction)
             // We just remove the supabase keys since we use HttpOnly cookies

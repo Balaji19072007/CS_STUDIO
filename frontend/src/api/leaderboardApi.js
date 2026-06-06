@@ -35,6 +35,7 @@ export const fetchUserRank = async () => {
     const response = await fetch(url, {
         method: 'GET',
         headers: getHeaders(true),
+        credentials: 'include',
     });
 
     const data = await response.json();
