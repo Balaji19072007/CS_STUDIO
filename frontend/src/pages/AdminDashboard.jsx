@@ -27,19 +27,23 @@ const AdminDashboard = () => {
           api.get('/api/admin/audit-logs')
         ]);
         
+        if (typeof updatesRes.data === 'string' && updatesRes.data.toLowerCase().includes('<!doctype html>')) {
+           throw new Error("API request returned an HTML page. Please ensure VITE_API_BASE_URL is correctly set in your frontend hosting environment variables and you've triggered a new build.");
+        }
+
         if (updatesRes.data && updatesRes.data.success) {
           setUpdates(updatesRes.data.data);
         } else {
-          setError('Failed to fetch updates.');
+          setError(`Failed to fetch updates. Server responded with: ${JSON.stringify(updatesRes.data)}`);
         }
 
-        if (logsRes.data && logsRes.data.success) {
+        if (logsRes.data && typeof logsRes.data !== 'string' && logsRes.data.success) {
           setAuditLogs(logsRes.data.data);
         }
       } catch (err) {
         console.error('Failed to load admin data:', err);
         const errorMsg = err.response?.data?.msg || err.response?.data?.error || err.message || 'Unknown error';
-        setError(`Failed to fetch updates: ${errorMsg}`);
+        setError(`Access Error: ${errorMsg}`);
       } finally {
         setFetching(false);
       }
