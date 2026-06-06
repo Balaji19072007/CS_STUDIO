@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import * as feather from 'feather-icons';
-import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases } from '../api/problemApi.js';
+import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases, fetchProblemProgress, updateProblemProgress } from '../api/problemApi.js';
 // import { testAPI } from '../config/api.js';
 import Loader from '../components/common/Loader.jsx';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
@@ -244,9 +244,6 @@ const SolveProblem = () => {
         // SYNC: Fetch User Progress from Backend
         if (isLoggedIn) {
           try {
-            // We need to import fetchProblemProgress at the top, or use the imported one if available
-            // Assuming fetchProblemProgress is imported or available in api
-            const { fetchProblemProgress } = await import('../api/problemApi.js');
             const progressData = await fetchProblemProgress(problemId);
 
             if (progressData && progressData.progress) {
@@ -301,9 +298,7 @@ const SolveProblem = () => {
       const timeSpent = progress.timeElapsed || 0;
       if (isLoggedIn && !progress.solved && timeSpent > 300000) {
         // Fire and forget status update
-        import('../api/problemApi.js').then(({ updateProblemProgress }) => {
-          updateProblemProgress(problemId, { status: 'attempted', timeSpent: 0 }).catch(console.error);
-        });
+        updateProblemProgress(problemId, { status: 'attempted', timeSpent: 0 }).catch(console.error);
       }
 
       if (!progress.solved && progress.timeRemaining > 0 && !progress.solved) {
