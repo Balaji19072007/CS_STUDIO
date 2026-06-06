@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../contexts/ThemeContext';
+import { Link } from 'react-router-dom';
+// import { useAuth } from '../../hooks/useAuth';
+// import { useTheme } from '../../contexts/ThemeContext';
 
 // --- Styles for the Roadmap Timeline ---
 
-const TimelineNode = ({ number, status, isLast }) => {
+const TimelineNode = ({ number, status }) => {
     // Status: 'completed' | 'active' | 'locked'
 
     const styles = {
@@ -194,7 +194,7 @@ const OutcomeSection = ({ data }) => {
 };
 
 const RoadmapLayout = ({ data, roadmapId }) => {
-    const { isLoggedIn } = useAuth();
+    // const { isLoggedIn } = useAuth();
     // We assume dark mode is default/preferred for this view, but could use theme hook if needed
     const [completedPhases, setCompletedPhases] = useState([]);
     const [expandedPhases, setExpandedPhases] = useState([0]);
@@ -213,7 +213,7 @@ const RoadmapLayout = ({ data, roadmapId }) => {
                 } else {
                     setCompletedPhases([]);
                 }
-            } catch (error) {
+            } catch {
                 setCompletedPhases([]);
             } finally {
                 setIsLoading(false);

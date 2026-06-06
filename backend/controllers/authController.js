@@ -38,6 +38,8 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
+const xss = require('xss');
+
 /**
  * @desc    Update User Profile
  * @route   PUT /api/auth/profile
@@ -50,9 +52,9 @@ exports.updateProfile = async (req, res) => {
 
   try {
     const updates = {};
-    if (firstName !== undefined) updates.first_name = firstName;
-    if (lastName !== undefined) updates.last_name = lastName;
-    if (bio !== undefined) updates.bio = bio;
+    if (firstName !== undefined) updates.first_name = xss(firstName);
+    if (lastName !== undefined) updates.last_name = xss(lastName);
+    if (bio !== undefined) updates.bio = xss(bio);
 
     if (removeProfilePicture === 'true') {
       updates.photo_url = '';

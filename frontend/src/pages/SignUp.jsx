@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import { supabase } from '../config/supabase';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const SignUp = () => {
   const { isLoggedIn } = useAuth();
@@ -23,12 +24,14 @@ const SignUp = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    captchaToken: '',
   });
 
   const [termsChecked, setTermsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ type: null, text: '' });
   const [loading, setLoading] = useState(false);
+  const turnstileRef = useRef();
 
   useEffect(() => {
     feather.replace();
@@ -81,34 +84,36 @@ const SignUp = () => {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            // full_name: `${firstName} ${lastName}`.trim()
-          }
-        }
+      const response = await fetch('/api/auth/session/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, firstName, lastName, captchaToken: formData.captchaToken })
       });
+      
+      const data = await response.json();
 
-      if (error) throw error;
+      if (!response.ok || !data.success) {
+          throw new Error(data.msg || 'Failed to create account');
+      }
 
       if (data.user && !data.session) {
         showMessage('success', 'Registration successful! Please check your email for verification link.');
       } else {
-        showMessage('success', 'Account created successfully!');
-        setTimeout(() => navigate('/'), 2000);
+        showMessage('success', 'Registration successful! Please check your email for verification link.');
+        // Navigate or dispatch event if auto-login is preferred
       }
 
     } catch (error) {
       console.error('[SignUp] Error:', error.message);
-      let errorMsg = 'Failed to create account.';
-      if (error.message.includes('already registered')) errorMsg = 'Email is already in use.';
-      if (error.message.includes('Password should be')) errorMsg = error.message;
-
-      showMessage('error', errorMsg);
+      
+      // Prevent email enumeration
+      if (error.message.includes('already registered') || error.message.includes('already exists')) {
+         showMessage('success', 'Registration successful! Please check your email for verification link.');
+      } else if (error.message.includes('Password should be')) {
+         showMessage('error', error.message);
+      } else {
+         showMessage('error', 'Failed to create account.');
+      }
     } finally {
       setLoading(false);
     }
@@ -123,6 +128,7 @@ const SignUp = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -339,6 +345,19 @@ const SignUp = () => {
                 </label>
               </div>
 
+              {/* Turnstile CAPTCHA */}
+              <div className="flex justify-center my-4">
+                  <Turnstile
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                    onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
+                    onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
+                    ref={turnstileRef}
+                    options={{
+                      theme: 'dark'
+                    }}
+                  />
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -385,7 +404,7 @@ const SignUp = () => {
                   try {
                     const { error } = await supabase.auth.signInWithOAuth({
                       provider: 'github',
-                      options: { redirectTo: `${window.location.origin}/` },
+                      options: { redirectTo: `${window.location.origin}/auth/callback` },
                     });
                     if (error) throw error;
                   } catch (error) {

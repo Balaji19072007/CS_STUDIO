@@ -372,7 +372,7 @@ const TopicContent = ({
                     </div>
                 );
 
-            case 'example':
+            case 'example': {
                 const isCodeOnly = codeText.startsWith('// [CODE_ONLY]\n');
                 const displayCodeText = isCodeOnly ? codeText.replace('// [CODE_ONLY]\n', '') : codeText;
                 
@@ -405,7 +405,6 @@ const TopicContent = ({
                                             navigate(`/code?lang=${presentation.playgroundLanguage}&source=${encodeURIComponent(displayCodeText)}`);
                                             return;
                                         }
-
                                         navigator.clipboard.writeText(displayCodeText);
                                     }}
                                     className={`absolute bottom-4 right-4 rounded-lg px-4 py-2 text-xs font-bold shadow-lg transition-all ${presentation.buttonClass}`}
@@ -416,6 +415,7 @@ const TopicContent = ({
                         </div>
                     </div>
                 );
+            }
 
             case 'note':
                 return (
@@ -657,13 +657,14 @@ const TopicContent = ({
 
                 {/* Tips are now rendered sequentially above */}
 
-                <div className="mt-12 flex items-center justify-between border-t border-gray-800 pt-8">
+                <div className="mt-8 sm:mt-12 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 gap-3">
                     <button
                         onClick={onPrevious}
                         disabled={isFirst}
-                        className={`rounded-xl px-6 py-3 font-bold transition-all ${isFirst ? 'cursor-not-allowed bg-gray-800/50 text-gray-600' : 'border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                        className={`rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${isFirst ? 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600' : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
                     >
-                        Previous
+                        <span className="hidden sm:inline">Previous Lesson</span>
+                        <span className="sm:hidden">Previous</span>
                     </button>
 
                     <button
@@ -690,9 +691,10 @@ const TopicContent = ({
                         }}
                         disabled={courseChallenge && !courseChallenge.solved}
                         title={courseChallenge && !courseChallenge.solved ? 'Complete the challenge to continue' : ''}
-                        className={`rounded-xl px-8 py-3 font-bold transition-all ${courseChallenge && !courseChallenge.solved ? 'cursor-not-allowed bg-gray-800/50 text-gray-600' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500'}`}
+                        className={`rounded-xl px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${courseChallenge && !courseChallenge.solved ? 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500'}`}
                     >
-                        {isLast ? 'Finish Course' : 'Next Lesson'}
+                        <span className="hidden sm:inline">{isLast ? 'Finish Course' : 'Next Lesson'}</span>
+                        <span className="sm:hidden">{isLast ? 'Finish' : 'Next'}</span>
                     </button>
                 </div>
             </main>

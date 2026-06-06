@@ -1,0 +1,303 @@
+const { supabase } = require('../config/supabase');
+const { body, validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
+
+const authLogPath = path.join(__dirname, '..', 'auth.log');
+
+const logAuthEvent = (event, email, ip, status, details = '') => {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] EVENT: ${event} | EMAIL: ${email} | IP: ${ip} | STATUS: ${status} | DETAILS: ${details}\n`;
+  fs.appendFile(authLogPath, logMessage, (err) => {
+    if (err) console.error('Failed to write to auth log:', err);
+  });
+};
+
+// Validation schemas
+exports.loginValidation = [
+  body('email').isEmail().withMessage('Please enter a valid email address'),
+  body('password').notEmpty().withMessage('Password is required'),
+];
+
+exports.login = async (req, res) => {
+  // 1. Validate request
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    logAuthEvent('LOGIN_VALIDATION_FAILED', req.body.email || 'unknown', req.ip, 'FAILED', JSON.stringify(errors.array()));
+    // Generic error to prevent enumeration
+    return res.status(401).json({ success: false, msg: 'Invalid credentials' });
+  }
+
+  const { email, password, captchaToken } = req.body;
+
+  try {
+    // 2. Authenticate with Supabase
+    const options = {};
+    if (captchaToken) {
+        options.captchaToken = captchaToken;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      ...(Object.keys(options).length > 0 && { options })
+    });
+
+    if (error) {
+      logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'FAILED', error.message);
+      console.error('Supabase Login Error:', error.message);
+      return res.status(401).json({ success: false, msg: 'Invalid credentials' });
+    }
+
+    if (data.session) {
+      // 3. Set HttpOnly cookies
+      setCookies(res, data.session);
+      
+      // Check AAL
+      const { createClient } = require('@supabase/supabase-js');
+      const client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+        global: { headers: { Authorization: `Bearer ${data.session.access_token}` } }
+      });
+      const { data: aalData } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
+      
+      if (aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
+          logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required');
+          return res.json({ success: true, user: data.user, mfa_required: true });
+      }
+
+      logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'SUCCESS');
+      return res.json({ success: true, user: data.user });
+    } else if (data.user) {
+      // Edge case: User exists but no session
+      logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required (Edge case)');
+      return res.json({ success: true, user: data.user, mfa_required: true });
+    }
+
+    logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'FAILED', 'Unknown error');
+    return res.status(401).json({ success: false, msg: 'Invalid credentials' });
+  } catch (error) {
+    console.error('Login Exception:', error.message);
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
+exports.signup = async (req, res) => {
+  const { email, password, firstName, lastName, captchaToken } = req.body;
+  try {
+    const options = {
+      data: { first_name: firstName, last_name: lastName }
+    };
+    if (captchaToken) {
+      options.captchaToken = captchaToken;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options
+    });
+
+    if (error) {
+      console.error('Supabase Signup Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
+    }
+
+    if (data.session) {
+      setCookies(res, data.session);
+    }
+    res.json({ success: true, user: data.user, session: data.session });
+  } catch (error) {
+    console.error('Signup Exception:', error.message);
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    
+    if (token) {
+      // Invalidate on Supabase side
+      await supabase.auth.admin.signOut(token);
+    }
+  } catch (error) {
+    console.error('Logout error:', error.message);
+  } finally {
+    // Always clear cookies
+    res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    res.json({ success: true, msg: 'Logged out successfully' });
+  }
+};
+
+exports.refresh = async (req, res) => {
+  const refreshToken = req.cookies.refresh_token;
+
+  if (!refreshToken) {
+    return res.status(401).json({ success: false, msg: 'No refresh token' });
+  }
+
+  try {
+    const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+
+    if (error || !data.session) {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      return res.status(401).json({ success: false, msg: 'Session expired' });
+    }
+
+    setCookies(res, data.session);
+    res.json({ success: true, user: data.user });
+  } catch (error) {
+    console.error('Refresh Exception:', error.message);
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
+exports.setCookie = (req, res) => {
+  const { access_token, refresh_token, expires_in } = req.body;
+  
+  if (!access_token || !refresh_token) {
+    return res.status(400).json({ success: false, msg: 'Missing tokens' });
+  }
+  
+  // We can reconstruct a session object to use our helper
+  const session = {
+    access_token,
+    refresh_token,
+    expires_in: expires_in || 3600
+  };
+  
+  setCookies(res, session);
+  res.json({ success: true });
+};
+
+exports.verifyMFA = async (req, res) => {
+    const { factorId, challengeId, code } = req.body;
+    // We would need the access token of the user in AAL1 state.
+    // If we just logged in, the token isn't in a cookie yet if AAL2 is required.
+    // So the frontend needs to pass the temporary access_token from login,
+    // OR we set the AAL1 token in the cookie during login, and then upgrade it here.
+    
+    // Setting AAL1 cookie during login is better, let's read it:
+    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    
+    if (!token) return res.status(401).json({ success: false, msg: 'Missing AAL1 token' });
+
+    try {
+        const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+            factorId,
+            code
+        });
+        
+        if (error) {
+            console.error('MFA Verify Error:', error.message);
+            return res.status(401).json({ success: false, msg: 'Invalid verification code' });
+        }
+        
+        // At this point we have a new AAL2 session?
+        // Wait, challengeAndVerify updates the session. We should fetch the new session.
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (!sessionError && sessionData.session) {
+             setCookies(res, sessionData.session);
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('MFA Verify Exception:', error.message);
+        res.status(500).json({ success: false, msg: 'Server error' });
+    }
+};
+
+// Helper function
+function setCookies(res, session) {
+  res.cookie('access_token', session.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: session.expires_in * 1000 // usually 3600s
+  });
+
+  if (session.refresh_token) {
+    res.cookie('refresh_token', session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 3600000 // 7 days
+    });
+  }
+}
+
+const getClient = (req) => {
+  const token = req.cookies.access_token;
+  if (!token) return null;
+  const { createClient } = require('@supabase/supabase-js');
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+    global: { headers: { Authorization: `Bearer ${token}` } }
+  });
+};
+
+exports.mfaEnroll = async (req, res) => {
+  const client = getClient(req);
+  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  try {
+    const { data, error } = await client.auth.mfa.enroll({ factorType: 'totp' });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+};
+
+exports.mfaChallenge = async (req, res) => {
+  const { factorId } = req.body;
+  const client = getClient(req);
+  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  try {
+    const { data, error } = await client.auth.mfa.challenge({ factorId });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+};
+
+exports.mfaVerifyEnroll = async (req, res) => {
+  const { factorId, challengeId, code } = req.body;
+  const client = getClient(req);
+  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  try {
+    const { data, error } = await client.auth.mfa.verify({ factorId, challengeId, code });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+};
+
+exports.mfaUnenroll = async (req, res) => {
+  const { factorId } = req.body;
+  const client = getClient(req);
+  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  try {
+    const { data, error } = await client.auth.mfa.unenroll({ factorId });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+};
+
+exports.mfaStatus = async (req, res) => {
+  const client = getClient(req);
+  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  try {
+    const { data, error } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error) throw error;
+    const { data: factorsData } = await client.auth.mfa.listFactors();
+    res.json({ success: true, aal: data, factors: factorsData?.totp || [] });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+};

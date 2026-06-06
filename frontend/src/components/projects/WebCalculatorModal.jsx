@@ -25,7 +25,7 @@ const WebCalculatorModal = ({ isOpen, onClose, challengeId, code, language }) =>
 
     const calculateResult = async () => {
         // Parse the expression from display (e.g. "10+20", "5*4")
-        const match = display.match(/^(\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(\d+(?:\.\d+)?)$/);
+        const match = display.match(/^(\d+(?:\.\d+)?)\s*([-+/*])\s*(\d+(?:\.\d+)?)$/);
         
         if (!match) {
             setError("Invalid expression. Format: A + B");
@@ -59,7 +59,7 @@ const WebCalculatorModal = ({ isOpen, onClose, challengeId, code, language }) =>
                 const output = response.data.output;
                 // Look for "Result = 30.00" or "Cannot divide by zero"
                 if (output.includes("Result =")) {
-                    const resultMatch = output.match(/Result\s*=\s*([0-9\.\-]+)/);
+                    const resultMatch = output.match(/Result\s*=\s*([0-9.-]+)/);
                     if (resultMatch) {
                         setDisplay(resultMatch[1]);
                     } else {

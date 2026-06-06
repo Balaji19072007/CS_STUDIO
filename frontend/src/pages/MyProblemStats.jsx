@@ -79,12 +79,9 @@ const MyProblemStats = () => {
 
                 {/* Back Button */}
                 <div className="flex items-center mb-6">
-                    <Link to="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
-                        <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-primary-500 transition-colors">
-                            <i data-feather="arrow-left" className="w-4 h-4"></i>
-                        </div>
-                        <span className="text-sm font-medium">Back to Dashboard</span>
-                    </Link>
+                    <button onClick={() => window.history.back()} className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" title="Go Back">
+                        <i data-feather="arrow-left" className="w-5 h-5"></i>
+                    </button>
                 </div>
 
                 {/* Header */}

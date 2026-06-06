@@ -1,13 +1,14 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import { supabase } from '../config/supabase';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const SignIn = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -20,15 +21,20 @@ const SignIn = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    mfaCode: '',
+    captchaToken: '',
   });
+  
+  const [mfaRequired, setMfaRequired] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ type: null, text: '' });
   const [loading, setLoading] = useState(false);
+  const turnstileRef = useRef();
 
   useEffect(() => {
     feather.replace();
-  }, [message, showPassword, loading]);
+  }, [message, showPassword, mfaRequired, loading]);
 
   // --- Utility Functions ---
 
@@ -51,7 +57,7 @@ const SignIn = () => {
     setLoading(true);
     setMessage({ type: null, text: '' });
 
-    const { email, password } = formData;
+    const { email, password, captchaToken } = formData;
 
     if (!email || !password) {
       showMessage('error', 'Please fill in all fields');
@@ -60,22 +66,67 @@ const SignIn = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/session/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, captchaToken })
       });
+      
+      const data = await response.json();
 
-      if (error) throw error;
+      if (!response.ok || !data.success) {
+          throw new Error(data.msg || 'Invalid credentials');
+      }
+
+      if (data.mfa_required) {
+          setMfaRequired(true);
+          setLoading(false);
+          return;
+      }
 
       showMessage('success', 'Signed in successfully!');
-      // Navigation handled by AuthContext or explicit here
+      window.dispatchEvent(new Event('auth-login'));
       setTimeout(() => navigate('/'), 1000);
 
     } catch (error) {
       console.error('[SignIn] Login error:', error.message);
-      let errorMsg = 'Invalid credentials';
-      if (error.message.includes('Invalid login credentials')) errorMsg = 'Invalid email or password.';
-      showMessage('error', errorMsg);
+      showMessage('error', 'Invalid email or password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMfaVerify = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: null, text: '' });
+
+    try {
+      // First get the active factor
+      const statusRes = await fetch('/api/auth/session/mfa/status');
+      const statusData = await statusRes.json();
+      const factors = statusData.factors || [];
+      if (factors.length === 0) throw new Error('No MFA factors found');
+
+      const factorId = factors[0].id;
+
+      // Verify
+      const verifyRes = await fetch('/api/auth/session/verify-mfa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          factorId, 
+          code: formData.mfaCode 
+        })
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) throw new Error(verifyData.msg || 'Invalid verification code');
+
+      showMessage('success', 'Signed in successfully!');
+      window.dispatchEvent(new Event('auth-login'));
+      setTimeout(() => navigate('/'), 1000);
+    } catch (error) {
+      showMessage('error', error.message || 'MFA verification failed');
     } finally {
       setLoading(false);
     }
@@ -90,6 +141,7 @@ const SignIn = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -195,6 +247,44 @@ const SignIn = () => {
               </div>
             )}
 
+            {mfaRequired ? (
+              <form onSubmit={handleMfaVerify} className="space-y-5">
+                <div>
+                  <label htmlFor="mfaCode" className="sr-only">Authenticator Code</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-400">
+                      <i data-feather="shield" className="w-5 h-5"></i>
+                    </span>
+                    <input
+                      type="text"
+                      id="mfaCode"
+                      name="mfaCode"
+                      value={formData.mfaCode}
+                      onChange={handleChange}
+                      maxLength={6}
+                      className="form-input w-full pl-12 pr-4 py-3.5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-center tracking-widest font-mono text-xl"
+                      placeholder="000000"
+                      disabled={loading}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-center text-gray-400">Enter the 6-digit code from your authenticator app</p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || formData.mfaCode.length !== 6}
+                  className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Verifying...' : 'Verify'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMfaRequired(false)}
+                  className="w-full py-2 text-sm text-gray-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
             <form onSubmit={handleEmailSignIn} className="space-y-5">
               {/* Email Field */}
               <div>
@@ -263,6 +353,19 @@ const SignIn = () => {
                 </div>
               </div>
 
+              {/* Turnstile CAPTCHA */}
+              <div className="flex justify-center my-4">
+                  <Turnstile
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                    onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
+                    onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
+                    ref={turnstileRef}
+                    options={{
+                      theme: 'dark'
+                    }}
+                  />
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -279,6 +382,7 @@ const SignIn = () => {
                 )}
               </button>
             </form>
+            )}
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-4">
@@ -309,7 +413,7 @@ const SignIn = () => {
                   try {
                     const { error } = await supabase.auth.signInWithOAuth({
                       provider: 'github',
-                      options: { redirectTo: `${window.location.origin}/` },
+                      options: { redirectTo: `${window.location.origin}/auth/callback` },
                     });
                     if (error) throw error;
                   } catch (error) {

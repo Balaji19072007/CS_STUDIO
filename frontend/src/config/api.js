@@ -21,6 +21,7 @@ export const buildApiUrl = (path = '') => {
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -53,8 +54,9 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('userData');
 
-      // Redirect to login page if not already there
-      redirectToSignIn();
+      // Do NOT auto redirect here because it ruins silent token refreshes
+      // AuthContext handles the redirect if the session is truly invalid
+      // redirectToSignIn();
     }
 
     // Handle network errors

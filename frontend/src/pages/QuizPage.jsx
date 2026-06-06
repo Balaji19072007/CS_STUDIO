@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuiz, getQuizQuestionsWithOptions, submitQuizAttempt, getUserQuizAttempts } from '../api/quizApi';
 import { updateCourseProgress } from '../api/progressApi';
@@ -56,6 +56,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
         };
 
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resolvedQuizId]);
 
     // Anti-Cheat & Fullscreen Logic
@@ -260,21 +261,33 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
 
             {/* Embedded Navigation */}
             {embedded && (
-                <div className="mt-12 flex items-center justify-between border-t border-gray-800 pt-8">
-                    <button
-                        onClick={onPrevious}
-                        disabled={isFirst}
-                        className={`rounded-xl px-6 py-3 font-bold transition-all ${isFirst ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
-                    >
-                        Previous
-                    </button>
+                <div className="mt-8 sm:mt-12 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 gap-3">
+                    {isFirst ? (
+                        <div></div>
+                    ) : (
+                        <button
+                            onClick={onPrevious}
+                            className={`rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white`}
+                        >
+                            <span className="hidden sm:inline">Previous Lesson</span>
+                            <span className="sm:hidden">Previous</span>
+                        </button>
+                    )}
 
                     <button
-                        onClick={onNext}
-                        disabled={isLast}
-                        className={`rounded-xl px-8 py-3 font-bold transition-all ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500'}`}
+                        onClick={async () => {
+                            const allPassed = history.length > 0 && history.some(h => h.passed);
+                            if (allPassed) {
+                                if (onNext) {
+                                    onNext();
+                                }
+                            }
+                        }}
+                        disabled={!(history.length > 0 && history.some(h => h.passed))}
+                        className={`rounded-xl px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${(history.length > 0 && history.some(h => h.passed)) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500' : 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600'}`}
                     >
-                        Skip Quiz / Next
+                        <span className="hidden sm:inline">{isLast ? 'Finish Course' : 'Continue to Next Lesson'}</span>
+                        <span className="sm:hidden">{isLast ? 'Finish' : 'Next'}</span>
                     </button>
                 </div>
             )}
@@ -387,10 +400,11 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
 
             <div className="flex flex-wrap gap-4 justify-center mb-10">
                 {!embedded ? (
-                    <button onClick={() => setGameState('IDLE')} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-xl font-bold transition-colors">Back to Menu</button>
+                    <button onClick={() => setGameState('IDLE')} className="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-xl font-bold transition-colors whitespace-nowrap">Back to Menu</button>
                 ) : (
-                    <button onClick={onNext} disabled={isLast} className={`px-8 py-3 rounded-xl font-bold transition-all shadow-sm ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 shadow-lg'}`}>
-                        Continue to Next Lesson
+                    <button onClick={onNext} disabled={isLast} className={`px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl font-bold transition-all shadow-sm whitespace-nowrap ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 shadow-lg'}`}>
+                        <span className="hidden sm:inline">Continue to Next Lesson</span>
+                        <span className="sm:hidden">Next Lesson</span>
                     </button>
                 )}
                 <button onClick={() => setShowAnswers(!showAnswers)} className="px-6 py-3 border-2 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold rounded-xl transition-colors">
@@ -400,7 +414,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
 
             {showAnswers && (
                 <div className="space-y-6">
-                    {questions.map((q, idx) => {
+                    {questions.map((q) => {
                         const detail = results.answerDetails.find(d => d.questionId === q.id);
                         const isCorr = detail?.isCorrect;
 

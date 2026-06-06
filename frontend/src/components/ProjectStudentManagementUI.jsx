@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as feather from 'feather-icons';
 
 const Icon = ({ name, className = '' }) => {
@@ -6,7 +6,7 @@ const Icon = ({ name, className = '' }) => {
     return <span className={`inline-flex items-center justify-center flex-shrink-0 ${className}`} dangerouslySetInnerHTML={{ __html: feather.icons[name].toSvg({ class: 'w-full h-full' }) }} />;
 };
 
-const ProjectStudentManagementUI = ({ projectId, code, onClose }) => {
+const ProjectStudentManagementUI = ({ onClose }) => {
     const [students, setStudents] = useState([]);
     const [view, setView] = useState('dashboard'); // dashboard, add, edit
     const [searchQuery, setSearchQuery] = useState('');

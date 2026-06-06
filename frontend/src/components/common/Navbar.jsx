@@ -68,7 +68,7 @@ const Navbar = () => {
         }, 100);
 
         return () => clearTimeout(timer);
-    });
+    }, [location.pathname, isDropdownOpen]);
 
     // Handle content spacing for fixed navbars
     useEffect(() => {
@@ -617,35 +617,84 @@ const Navbar = () => {
                                                                 {isDark ? 'Light Mode' : 'Dark Mode'}
                                                             </button>
 
-                                                            <Link
-                                                                to="/my-progress"
-                                                                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                                                    }`}
-                                                                onClick={handleDropdownItemClick}
-                                                            >
-                                                                <div className={`mr-3 p-1.5 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-blue-400 group-hover:bg-gray-700' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
-                                                                    }`}>
-                                                                    <i data-feather="bar-chart-2" className="w-4 h-4"></i>
-                                                                </div>
-                                                                My Progress
-                                                            </Link>
+                                                            {user.role === 'admin' && (
+                                                                <Link
+                                                                    to="/admin"
+                                                                    className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group mb-2 ${isDark
+                                                                        ? 'text-blue-400 hover:text-white hover:bg-gray-700/50'
+                                                                        : 'text-blue-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                        }`}
+                                                                    onClick={handleDropdownItemClick}
+                                                                >
+                                                                    <div className={`mr-3 p-1.5 rounded-lg transition-colors ${isDark ? 'bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
+                                                                        }`}>
+                                                                        <i data-feather="shield" className="w-4 h-4"></i>
+                                                                    </div>
+                                                                    Admin Dashboard
+                                                                </Link>
+                                                            )}
 
-                                                            <Link
-                                                                to="/settings"
-                                                                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
-                                                                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                                                    }`}
-                                                                onClick={handleDropdownItemClick}
-                                                            >
-                                                                <div className={`mr-3 p-1.5 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-purple-400 group-hover:bg-gray-700' : 'bg-purple-50 text-purple-600 group-hover:bg-purple-100'
-                                                                    }`}>
-                                                                    <i data-feather="settings" className="w-4 h-4"></i>
-                                                                </div>
-                                                                Settings
-                                                            </Link>
+                                                            <div className="grid grid-cols-2 gap-2">
+                                                                <Link
+                                                                    to="/my-progress"
+                                                                    className={`flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
+                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                        }`}
+                                                                    onClick={handleDropdownItemClick}
+                                                                >
+                                                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-blue-400 group-hover:bg-gray-700' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
+                                                                        }`}>
+                                                                        <i data-feather="bar-chart-2" className="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <span className="text-xs text-center font-semibold">Progress</span>
+                                                                </Link>
+
+                                                                <Link
+                                                                    to="/my-courses"
+                                                                    className={`flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
+                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                        }`}
+                                                                    onClick={handleDropdownItemClick}
+                                                                >
+                                                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-indigo-400 group-hover:bg-gray-700' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100'
+                                                                        }`}>
+                                                                        <i data-feather="book-open" className="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <span className="text-xs text-center font-semibold">Courses</span>
+                                                                </Link>
+
+                                                                <Link
+                                                                    to="/problem-stats"
+                                                                    className={`flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
+                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                        }`}
+                                                                    onClick={handleDropdownItemClick}
+                                                                >
+                                                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-emerald-400 group-hover:bg-gray-700' : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'
+                                                                        }`}>
+                                                                        <i data-feather="clock" className="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <span className="text-xs text-center font-semibold">History</span>
+                                                                </Link>
+
+                                                                <Link
+                                                                    to="/settings"
+                                                                    className={`flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isDark
+                                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                                        }`}
+                                                                    onClick={handleDropdownItemClick}
+                                                                >
+                                                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-purple-400 group-hover:bg-gray-700' : 'bg-purple-50 text-purple-600 group-hover:bg-purple-100'
+                                                                        }`}>
+                                                                        <i data-feather="settings" className="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <span className="text-xs text-center font-semibold">Settings</span>
+                                                                </Link>
+                                                            </div>
 
                                                             <div className={`my-1 border-t ${isDark ? 'border-gray-700/50' : 'border-gray-100'}`}></div>
 
@@ -723,7 +772,7 @@ const Navbar = () => {
                         ></div>
 
                         {/* Menu Panel */}
-                        <div className={`absolute right-0 top-0 w-80 h-full shadow-2xl border-l transform transition-transform duration-300 ease-in-out ${mobileBgClass} ${mobileBorderClass}`}>
+                        <div className={`absolute right-0 top-0 w-80 max-w-[calc(100vw-3rem)] h-full shadow-2xl border-l transform transition-transform duration-300 ease-in-out ${mobileBgClass} ${mobileBorderClass}`}>
                             <div className="flex flex-col h-full">
                                 {/* Header */}
                                 <div className={`flex items-center justify-between p-4 border-b ${mobileBorderClass} ${isDark ? 'bg-gray-800/50' : 'bg-gray-50'}`}>

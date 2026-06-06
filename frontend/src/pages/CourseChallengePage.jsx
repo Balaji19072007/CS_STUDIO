@@ -61,6 +61,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     const [challenge, setChallenge] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
+    const [mobileSubTab, setMobileSubTab] = useState('code');
     const [code, setCode] = useState('');
     const [cmdArgs, setCmdArgs] = useState('');
     const [output, setOutput] = useState('Compile and run your code to see output...');
@@ -412,7 +413,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     }
 
     return (
-        <div className="flex h-screen flex-col overflow-hidden bg-gray-50 dark:bg-[#0F172A]">
+        <div className="flex h-[100dvh] pb-16 lg:pb-0 lg:h-screen flex-col overflow-hidden bg-gray-50 dark:bg-[#0F172A]">
             {notification ? (
                 <div
                     className={`fixed right-4 top-4 z-50 rounded-lg p-4 text-sm font-medium text-white shadow-xl ${notification.type === 'success'
@@ -438,33 +439,33 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                 </div>
             ) : null}
 
-            <div className="relative z-10 flex flex-none flex-col items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 shadow-sm sm:flex-row">
-                <div className="flex items-center gap-4">
+            <div className="relative z-10 flex flex-none flex-row items-center justify-between w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-6 py-3 sm:py-4 shadow-sm">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <button
                         onClick={() => navigate(location.state?.from || '/courses')}
-                        className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                        className="flex items-center justify-center p-2 sm:w-10 sm:h-10 rounded-lg sm:border border-transparent sm:border-gray-200 dark:sm:border-gray-700 bg-transparent sm:bg-white dark:sm:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                         title="Back to Course"
                     >
-                        <Icon name="arrow-left" className="h-5 w-5" />
+                        <Icon name="arrow-left" className="h-5 w-5 sm:h-5 sm:w-5" />
                     </button>
-                    <div className="mx-2 hidden h-6 w-px bg-gray-300 dark:bg-gray-700 sm:block"></div>
-                    <h1 className="hidden text-lg font-bold text-gray-900 dark:text-white sm:block">{challenge.title}</h1>
+                    <div className="mx-1 hidden h-6 w-px bg-gray-300 dark:bg-gray-700 sm:block"></div>
+                    <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate max-w-[140px] sm:max-w-none">{challenge.title}</h1>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center">
                     {isSolved ? (
-                        <div className="flex items-center rounded-full border border-green-500/50 bg-green-100 dark:bg-green-500/10 px-4 py-1.5 text-sm font-bold text-green-700 dark:text-green-500">
-                            <Icon name="check-circle" className="mr-2 h-4 w-4" />
+                        <div className="flex items-center rounded-full border border-green-500/50 bg-green-100 dark:bg-green-500/10 px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-bold text-green-700 dark:text-green-500 whitespace-nowrap">
+                            <Icon name="check-circle" className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             Solved
                         </div>
                     ) : isSolutionUnlocked ? (
-                        <div className="flex items-center rounded-full border border-blue-500/50 bg-blue-100 dark:bg-blue-500/10 px-4 py-1.5 text-sm font-bold text-blue-700 dark:text-blue-400">
-                            <Icon name="unlock" className="mr-2 h-4 w-4" />
-                            Solution Unlocked
+                        <div className="flex items-center rounded-full border border-blue-500/50 bg-blue-100 dark:bg-blue-500/10 px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">
+                            <Icon name="unlock" className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            Unlocked
                         </div>
                     ) : (
-                        <div className="flex items-center rounded-full border border-yellow-500/50 bg-yellow-100 dark:bg-yellow-500/10 px-4 py-1.5 text-sm font-bold text-yellow-700 dark:text-yellow-400">
-                            <Icon name="clock" className="mr-2 h-4 w-4" />
+                        <div className="flex items-center rounded-full border border-yellow-500/50 bg-yellow-100 dark:bg-yellow-500/10 px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-bold text-yellow-700 dark:text-yellow-400 whitespace-nowrap">
+                            <Icon name="clock" className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             {formatTime(Math.max(0, LOCK_TIME_SECONDS - timeElapsed))}
                         </div>
                     )}
@@ -472,13 +473,31 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
             </div>
 
             <div className="relative z-0 mx-auto flex w-full max-w-screen-2xl flex-1 flex-col gap-0 overflow-hidden px-0 py-0 lg:flex-row lg:gap-6 lg:px-8 lg:py-6">
-                <div className="flex h-full flex-col overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl lg:w-[46%] lg:rounded-xl">
-                    <div className="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-2 lg:px-0">
+                {/* MOBILE TAB BAR */}
+                <div className="lg:hidden flex border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm shrink-0">
+                    {['overview', 'code', 'hints', 'solution'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors ${activeTab === tab
+                                ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                }`}
+                        >
+                            {tab === 'solution' && !isSolutionUnlocked && !isSolved ? 'Solution 🔒' : tab}
+                        </button>
+                    ))}
+                </div>
+
+                {/* LEFT COLUMN */}
+                <div className={`flex-1 lg:flex-none h-full flex-col overflow-hidden border-t-0 lg:border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl lg:w-[46%] lg:rounded-xl ${activeTab === 'code' ? 'hidden lg:flex' : 'flex'}`}>
+                    {/* DESKTOP TABS */}
+                    <div className="hidden lg:flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-2 lg:px-0">
                         {['overview', 'hints', 'solution'].map((tab) => (
                             <button
                                 key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`flex-1 border-b-2 py-4 text-sm font-medium uppercase tracking-wider transition-all ${activeTab === tab
+                                onClick={() => setActiveTab(tab === 'code' ? 'overview' : tab)}
+                                className={`flex-1 border-b-2 py-4 text-sm font-medium uppercase tracking-wider transition-all ${(activeTab === tab || (activeTab === 'code' && tab === 'overview'))
                                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                                     }`}
@@ -566,8 +585,41 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                     </div>
                 </div>
 
-                <div className="mt-4 flex h-[60vh] w-full flex-col gap-4 lg:mt-0 lg:h-full lg:w-[54%]">
-                    <div className="relative flex flex-1 flex-col overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl lg:rounded-xl">
+                {/* RIGHT COLUMN */}
+                <div className={`mt-0 lg:mt-0 flex-1 lg:flex-none h-full w-full flex-col gap-0 lg:gap-4 lg:h-full lg:w-[54%] ${activeTab === 'code' ? 'flex' : 'hidden lg:flex'}`}>
+                    
+                    {/* MOBILE CODE TOPBAR */}
+                    <div className="lg:hidden flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setMobileSubTab('code')}
+                                className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileSubTab === 'code'
+                                    ? 'border border-blue-500 text-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`}
+                            >
+                                main.{challenge?.language?.toLowerCase() || 'c'}
+                            </button>
+                            <button
+                                onClick={() => setMobileSubTab('output')}
+                                className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileSubTab === 'output'
+                                    ? 'border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                                    : 'border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`}
+                            >
+                                Output
+                            </button>
+                        </div>
+                        <button
+                            onClick={handleRunCode}
+                            disabled={running || submitting}
+                            className={`flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors flex items-center justify-center ${running || submitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        >
+                            {running || submitting ? <Icon name="loader" className="h-4 w-4 animate-spin" /> : <Icon name="play" className="h-4 w-4" />}
+                        </button>
+                    </div>
+
+                    <div className={`relative flex flex-1 flex-col overflow-hidden border-t-0 lg:border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl lg:rounded-xl ${mobileSubTab === 'code' ? 'flex' : 'hidden lg:flex'}`}>
                         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3">
                             <div className="flex items-center gap-2">
                                 <Icon name="code" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
@@ -629,7 +681,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                                     disabled={running || submitting}
                                 />
                             </div>
-                            <div className="flex items-center gap-2 md:gap-3 justify-end">
+                            <div className="flex items-center gap-2 md:gap-3 justify-end hidden lg:flex">
                             {running && (
                                 <button
                                     onClick={handleStopExecution}
@@ -666,13 +718,24 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                         </div>
                     </div>
 
-                    <div className="flex h-64 flex-col overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1E1E1E] shadow-xl lg:rounded-xl">
+                    <div className={`flex flex-1 lg:flex-none h-full lg:h-64 flex-col overflow-hidden border-t-0 lg:border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1E1E1E] shadow-xl lg:rounded-xl ${mobileSubTab === 'output' ? 'flex' : 'hidden lg:flex'}`}>
                         <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2">
                             <Icon name="terminal" className="h-4 w-4 text-green-600 dark:text-green-400" />
                             <span className="font-mono text-xs uppercase tracking-wider text-gray-600 dark:text-gray-300">Console Output</span>
                             {isWaitingForInput && (
                                 <span className="text-yellow-600 dark:text-yellow-400 text-xs font-semibold ml-2">(Waiting for input...)</span>
                             )}
+                            <div className="ml-auto lg:hidden">
+                                {running && (
+                                    <button
+                                        onClick={handleStopExecution}
+                                        className="flex items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-red-700 shadow-sm"
+                                    >
+                                        <Icon name="square" className="h-3 w-3" />
+                                        <span>Stop</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         <div 
                             ref={terminalRef}
@@ -687,6 +750,23 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                             {isWaitingForInput && (
                                 <span className="text-yellow-500 blink font-bold">█</span>
                             )}
+                        </div>
+                        <div className="lg:hidden p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                             <button
+                                onClick={handleSubmit}
+                                disabled={running || submitting || isSolved}
+                                className={`w-full flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50 ${isSolved ? 'cursor-default bg-green-600' : 'bg-blue-600 hover:bg-blue-500'
+                                    }`}
+                            >
+                                {submitting ? (
+                                    <Icon name="loader" className="h-4 w-4 animate-spin" />
+                                ) : isSolved ? (
+                                    <Icon name="check" className="h-4 w-4" />
+                                ) : (
+                                    <Icon name="send" className="h-4 w-4" />
+                                )}
+                                <span>{isSolved ? 'Solved' : submitting ? 'Submitting...' : 'Submit Challenge'}</span>
+                            </button>
                         </div>
                     </div>
                 </div>

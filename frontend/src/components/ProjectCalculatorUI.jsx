@@ -6,7 +6,7 @@ const Icon = ({ name, className = '' }) => {
     return <span className={`inline-flex items-center justify-center flex-shrink-0 ${className}`} dangerouslySetInnerHTML={{ __html: feather.icons[name].toSvg({ class: 'w-full h-full' }) }} />;
 };
 
-const ProjectCalculatorUI = ({ projectId, code, onClose }) => {
+const ProjectCalculatorUI = ({ onClose }) => {
     const [display, setDisplay] = useState('0');
     const [operand1, setOperand1] = useState(null);
     const [operator, setOperator] = useState(null);

@@ -798,7 +798,7 @@ const getSyntaxForTopic = (title, kind) => {
   return defaults[kind] || defaults.general;
 };
 
-const getExampleForTopic = (title, kind) => {
+const getExampleForTopic = (title) => {
   switch (title) {
     case 'What is C Programming?':
       return `#include <stdio.h>\n\nint main(void) {\n    printf("C is efficient, compiled, and close to the machine.\\n");\n    return 0;\n}`;
@@ -996,6 +996,7 @@ export const isCProgrammingCourse = (courseId = '') => courseId === 'c' || cours
 
 export const getFallbackPhases = (courseId) =>
   isCProgrammingCourse(courseId)
+    // eslint-disable-next-line no-unused-vars
     ? C_PROGRAMMING_PHASES.map(({ topics, ...phase }) => ({ ...phase }))
     : [];
 

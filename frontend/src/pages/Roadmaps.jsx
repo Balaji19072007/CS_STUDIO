@@ -352,13 +352,11 @@ const RoadmapCategoryCard = ({ roadmap, isExpanded, onToggleExpand }) => {
         case 'modeling-ds': navigate('/roadmaps/data-science-modeling'); break;
         case 'bigdata-ds': navigate('/roadmaps/data-science-bigdata'); break;
         default:
-          const roadmapName = child.title;
           // Fallback for demo
-          console.log(`Navigating to ${roadmapName}`);
+          console.log(`Navigating to ${child.title}`);
       }
     } else {
-      const roadmapName = roadmap.title;
-      // alert(`Viewing roadmap for: ${roadmapName}`);
+      // alert(`Viewing roadmap for: ${roadmap.title}`);
     }
   };
 
@@ -482,7 +480,7 @@ const RoadmapCategoryCard = ({ roadmap, isExpanded, onToggleExpand }) => {
 const Roadmaps = () => {
   const { isLoggedIn } = useAuth();
   const { isDark } = useTheme();
-  const [showBackToTop, setShowBackToTop] = useState(false);
+  // const [showBackToTop, setShowBackToTop] = useState(false);
   const [expandedRoadmapId, setExpandedRoadmapId] = useState(null);
 
   useEffect(() => {
@@ -491,7 +489,7 @@ const Roadmaps = () => {
     }
 
     const toggleVisibility = () => {
-      setShowBackToTop(window.scrollY > 300);
+      // setShowBackToTop(window.scrollY > 300);
     };
 
     window.addEventListener('scroll', toggleVisibility);

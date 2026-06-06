@@ -1,7 +1,5 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../config/supabase';
 
 export const AuthContext = createContext();
 
@@ -10,102 +8,87 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Initialize from localStorage if available
-  const storedUser = localStorage.getItem('userData');
-  const [isAuthenticated, setIsAuthenticated] = useState(!!storedUser);
-  const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // 1. Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session);
-    });
-
-    // 2. Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      handleSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleSession = async (session) => {
-    if (!session?.user) {
-      setUser(null);
-      setIsAuthenticated(false);
-      localStorage.removeItem('userData');
-      localStorage.removeItem('token');
-      setLoading(false);
-      return;
-    }
-
-    const token = session.access_token;
-
-    // Fetch detailed profile from backend using the Supabase JWT
+  const fetchSession = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      setLoading(true);
+      const response = await fetch('/api/auth/me');
 
       if (response.ok) {
         const profile = await response.json();
+        
+        // Ensure user is updated
         const userData = {
           ...profile,
-          token: token,
           userId: profile.id,
-          // Map Supabase snake_case to camelCase for frontend components
           firstName: profile.first_name,
           lastName: profile.last_name,
-          photoUrl: profile.photo_url || session.user.user_metadata?.avatar_url,
+          photoUrl: profile.photo_url || profile.avatar_url,
           totalPoints: profile.total_points,
           problemsSolved: profile.problems_solved,
           currentStreak: profile.current_streak,
-          // Fallbooks
-          name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || session.user.email,
+          name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || (profile.email ? profile.email.split('@')[0] : 'Developer'),
           role: profile.role || 'student'
         };
 
         setUser(userData);
         setIsAuthenticated(true);
-        localStorage.setItem('userData', JSON.stringify(userData));
-        localStorage.setItem('token', token);
-      } else {
-        console.error('Failed to fetch profile', response.statusText);
-        // Fallback to basic session info
-        const userData = {
-          id: session.user.id,
-          userId: session.user.id,
-          email: session.user.email,
-          photoUrl: session.user.user_metadata?.avatar_url,
-          token: token,
-          role: 'student'
-        };
-        setUser(userData);
-        setIsAuthenticated(true);
-        localStorage.setItem('userData', JSON.stringify(userData));
-        localStorage.setItem('token', token);
+      } else if (response.status === 401) {
+        // Try refresh
+        const refreshRes = await fetch('/api/auth/session/refresh', { method: 'POST' });
+        if (refreshRes.ok) {
+          // If refresh worked, fetch session again
+          const retryRes = await fetch('/api/auth/me');
+          if (retryRes.ok) {
+            const profile = await retryRes.json();
+            const userData = {
+                ...profile,
+                userId: profile.id,
+                name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || (profile.email ? profile.email.split('@')[0] : 'Developer'),
+                role: profile.role || 'student'
+            };
+            setUser(userData);
+            setIsAuthenticated(true);
+            return;
+          }
+        }
+        
+        // Refresh failed or no session
+        setUser(null);
+        setIsAuthenticated(false);
       }
-
     } catch (err) {
       console.error('Auth Profile Fetch Error:', err);
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchSession();
+
+    const handleLoginEvent = () => fetchSession();
+    window.addEventListener('auth-login', handleLoginEvent);
+    
+    return () => window.removeEventListener('auth-login', handleLoginEvent);
+  }, []);
+
   const login = (token, userData) => {
-    // Usually handled by Supabase Auth UI, but if manual login needed:
     setIsAuthenticated(true);
     if (userData) setUser(userData);
   };
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      await fetch('/api/auth/session/logout', { method: 'POST' });
+      setUser(null);
+      setIsAuthenticated(false);
       navigate('/');
     } catch (error) {
       console.error('Error during logout:', error);
@@ -124,6 +107,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    refreshSession: fetchSession
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

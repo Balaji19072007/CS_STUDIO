@@ -7,6 +7,7 @@ const MyProgress = () => {
   const { isLoggedIn } = useAuth();
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [heatmapData, setHeatmapData] = useState({});
 
@@ -28,10 +29,17 @@ const MyProgress = () => {
         const historyRes = await fetch('/api/progress/history', { headers });
         const historyData = await historyRes.json();
 
+        // 3. Fetch Enrolled Courses
+        const coursesRes = await fetch('/api/courses/enrolled', { headers });
+        const coursesData = await coursesRes.json();
+
         if (statsData.success) setStats(statsData);
         if (historyData.success) {
           setHistory(historyData.history);
           processHeatmap(historyData.history);
+        }
+        if (coursesData.success) {
+          setEnrolledCourses(coursesData.courses);
         }
 
       } catch (error) {
@@ -126,12 +134,9 @@ const MyProgress = () => {
 
         {/* Back Button */}
         <div className="flex items-center">
-          <Link to="/" className="flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group">
-            <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700 group-hover:border-primary-500 transition-colors">
-              <i data-feather="arrow-left" className="w-4 h-4 text-gray-700 dark:text-gray-300"></i>
-            </div>
-            <span className="text-sm font-medium">Back to Dashboard</span>
-          </Link>
+          <button onClick={() => window.history.back()} className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" title="Go Back">
+            <i data-feather="arrow-left" className="w-5 h-5"></i>
+          </button>
         </div>
 
         {/* --- HEADER --- */}
@@ -161,6 +166,43 @@ const MyProgress = () => {
 
           {/* --- LEFT COLUMN (2/3) --- */}
           <div className="lg:col-span-2 space-y-8">
+
+            {/* 0. Enrolled Courses */}
+            {enrolledCourses.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-xl relative overflow-hidden">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                  <i data-feather="book-open" className="w-5 h-5 text-indigo-500 dark:text-indigo-400"></i>
+                  My Enrolled Courses
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {enrolledCourses.map((course) => (
+                    <Link key={course.id} to={`/courses/${course.id}/learn`} className="group flex flex-col justify-between bg-gray-50 dark:bg-gray-750 border border-gray-200 dark:border-gray-600 rounded-xl p-4 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600">
+                            {course.coverImage && course.coverImage !== '/api/placeholder/400/300' ? (
+                              <img src={course.coverImage} alt={course.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-xl">{course.icon || '💻'}</span>
+                            )}
+                          </div>
+                          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{course.title}</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs font-semibold">
+                          <span className="text-gray-500 dark:text-gray-400">Progress</span>
+                          <span className="text-indigo-600 dark:text-indigo-400">{course.progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000" style={{ width: `${course.progress}%` }}></div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* 1. Contribution Graph */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-xl relative overflow-hidden">

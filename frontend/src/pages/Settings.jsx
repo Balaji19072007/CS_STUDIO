@@ -20,6 +20,7 @@ import {
 import { updateProfile } from '../api/authApi.js';
 import { useSimpleImageCropper } from '../hooks/useSimpleImageCropper.js';
 import { ProfileSkeleton } from '../components/common/SkeletonLoader';
+import MFASection from '../components/settings/MFASection.jsx';
 
 const Settings = () => {
     const { user, updateUser: updateUserProfile, isLoggedIn, logout } = useAuth();
@@ -513,6 +514,12 @@ const Settings = () => {
                             </div>
 
                         </div>
+                    </div>
+
+                    {/* Security & MFA Section */}
+                    <div className="mt-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 p-6 lg:p-8">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Security & Authentication</h2>
+                        <MFASection />
                     </div>
 
                     {/* Support & Feedback Section */}

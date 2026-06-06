@@ -72,6 +72,34 @@ export const getAllCourses = async () => {
   }
 };
 
+export const fetchLastActiveCourse = async () => {
+  try {
+    const res = await fetch(buildApiUrl('/api/courses/last-active'), {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error('Failed to fetch last active course');
+    const data = await res.json();
+    return data.success ? data.course : null;
+  } catch (error) {
+    console.error('Error fetching last active course:', error);
+    return null;
+  }
+};
+
+export const getEnrolledCourses = async () => {
+  try {
+    const res = await fetch(buildApiUrl('/api/courses/enrolled'), {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error('Failed to fetch enrolled courses');
+    const data = await res.json();
+    return data.success ? data.courses : [];
+  } catch (error) {
+    console.error('Error fetching enrolled courses:', error);
+    return [];
+  }
+};
+
 export const getPhases = async (courseId) => {
   try {
     if (isCProgrammingCourse(courseId)) {

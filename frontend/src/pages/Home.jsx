@@ -396,7 +396,7 @@ const Home = () => {
             <div id="hero-section" className="gradient-bg text-white relative overflow-hidden min-h-screen flex items-center border-b border-gray-700">
                 <AbstractBackground />
 
-                <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24 relative z-20 w-full">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12 sm:py-20 lg:py-24 relative z-20 w-full">
                     <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
                         {/* Text Content */}
                         <div className="text-center lg:text-left lg:col-span-6 space-y-8">
@@ -472,7 +472,7 @@ const Home = () => {
 
             {/* Stats Section - Clean & Spacious */}
             <div className="py-12 sm:py-16 lg:py-20 dark-gradient-secondary border-b border-gray-700">
-                <div className="max-w-6xl mx-auto px-6 sm:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-8">
                     <div className="bg-gray-800/50 rounded-3xl border border-gray-700 p-8 sm:p-10 lg:p-12">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
                             <div className="text-center space-y-2">
@@ -505,7 +505,7 @@ const Home = () => {
 
             {/* Features Section */}
             <div className="py-16 sm:py-20 lg:py-24 dark-gradient-secondary">
-                <div className="max-w-6xl mx-auto px-6 sm:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-8">
                     <div className="text-center mb-12 sm:mb-16 space-y-4">
                         <h2 className="text-sm sm:text-base text-primary-500 font-semibold tracking-wide uppercase">Why Choose CS Studio</h2>
                         <p className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white">
@@ -534,7 +534,7 @@ const Home = () => {
 
             {/* Learning Paths */}
             <div className="py-16 sm:py-20 lg:py-24 dark-gradient-secondary border-t border-gray-700">
-                <div className="max-w-6xl mx-auto px-6 sm:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-8">
                     <div className="text-center mb-12 sm:mb-16 space-y-4">
                         <h2 className="text-sm sm:text-base text-primary-500 font-semibold tracking-wide uppercase">Your Learning Path</h2>
                         <p className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white">
@@ -572,7 +572,7 @@ const Home = () => {
 
             {/* Testimonials */}
             <div className="py-16 sm:py-20 lg:py-24 dark-gradient-secondary border-t border-gray-700">
-                <div className="max-w-6xl mx-auto px-6 sm:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-8">
                     <div className="text-center mb-12 sm:mb-16 space-y-4">
                         <h2 className="text-sm sm:text-base text-primary-500 font-semibold tracking-wide uppercase">Success Stories</h2>
                         <p className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white">
@@ -608,7 +608,7 @@ const Home = () => {
 
             {/* CTA Section */}
             <div className="py-16 sm:py-20 lg:py-24 dark-gradient-secondary">
-                <div className="max-w-5xl mx-auto px-6 sm:px-8">
+                <div className="max-w-5xl mx-auto px-4 sm:px-8">
                     <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-3xl p-8 sm:p-12 lg:p-16 text-center">
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4">
                             Ready to Start Learning?

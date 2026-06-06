@@ -6,7 +6,8 @@ const { supabase } = require('../config/supabase');
  */
 module.exports = async function (req, res, next) {
   // Get token
-  const token = req.header('x-auth-token') ||
+  const token = req.cookies?.access_token ||
+    req.header('x-auth-token') ||
     req.header('Authorization')?.replace('Bearer ', '') ||
     req.query.token;
 

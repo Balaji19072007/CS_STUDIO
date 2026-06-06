@@ -1,7 +1,7 @@
 // src/App.jsx
 
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { useAuth } from './hooks/useAuth.jsx';
@@ -18,6 +18,8 @@ import Home from './pages/Home.jsx';
 
 import SignIn from './pages/SignIn.jsx';
 import SignUp from './pages/SignUp.jsx';
+import Settings from './pages/Settings.jsx';
+import AuthCallback from './components/auth/AuthCallback.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import Problems from './pages/Problems.jsx';
@@ -29,17 +31,18 @@ import TopicContent from './pages/TopicContent.jsx';
 import QuizPage from './pages/QuizPage.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Community from './pages/Community.jsx';
-import Settings from './pages/Settings.jsx';
 import Code from './pages/Code.jsx';
 import CodeVerification from './pages/CodeVerification.jsx';
 import SolveProblem from './pages/SolveProblem.jsx';
 import CourseChallenge from './pages/CourseChallenge.jsx';
 import CourseChallengePage from './pages/CourseChallengePage.jsx';
 import ProjectEditorPage from './pages/ProjectEditorPage.jsx';
+import MyCourses from './pages/MyCourses.jsx';
 import MyProgress from './pages/MyProgress.jsx';
 import MyProblemStats from './pages/MyProblemStats.jsx';
 import Notifications from './pages/Notifications.jsx';
 import MyCertificates from './pages/MyCertificates.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 import VerifyCertificate from './pages/VerifyCertificate.jsx';
 import RatingPopup from './components/common/RatingPopup.jsx';
 import CodeEditorFloatingIcon from './components/common/CodeEditorFloatingIcon.jsx';
@@ -91,7 +94,7 @@ function AppContent() {
       <Navbar />
 
       <main
-        className={`flex-grow ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') ? 'pt-0 lg:pt-16' : 'pt-16'} pb-20 sm:pb-0`}
+        className={`flex-grow flex flex-col ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16' : 'pt-14 lg:pt-16'} pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden`}
         style={{ minHeight: '60vh' }}
       >
 
@@ -99,6 +102,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/problems" element={<Problems />} />
@@ -123,9 +127,11 @@ function AppContent() {
           <Route path="/course-project/:projectId" element={<ProtectedRoute><ProjectEditorPage /></ProtectedRoute>} />
           <Route path="/code" element={<ProtectedRoute><Code /></ProtectedRoute>} />
           <Route path="/code-verification" element={<ProtectedRoute><CodeVerification /></ProtectedRoute>} />
+          <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
           <Route path="/my-progress" element={<ProtectedRoute><MyProgress /></ProtectedRoute>} />
           <Route path="/problem-stats" element={<ProtectedRoute><MyProblemStats /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/certificates" element={<ProtectedRoute><MyCertificates /></ProtectedRoute>} />
           <Route path="/certificates/verify/:certificateId" element={<VerifyCertificate />} />
           <Route path="/verify-certificate" element={<VerifyCertificate />} />
@@ -156,7 +162,7 @@ function AppContent() {
       {!location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
 
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
-      {isLoggedIn && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
+      {isLoggedIn && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
     </div>
   );
 }

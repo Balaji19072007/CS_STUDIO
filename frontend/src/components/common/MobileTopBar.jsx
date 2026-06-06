@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, Award, Bell, Moon, Sun } from 'lucide-react';
+import { User, LogOut, Settings, Award, Bell, Moon, Sun, BarChart2, BookOpen, Clock } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useNotifications } from '../../hooks/useNotifications';
@@ -19,17 +19,17 @@ const MobileTopBar = () => {
 
     return (
         <>
-            <div className="fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#101827]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 h-14 px-4 flex items-center justify-between sm:hidden transition-all duration-300">
+            <div className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#101827]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 h-14 px-4 flex items-center justify-between sm:hidden transition-colors duration-300 transform-gpu shadow-sm dark:shadow-[0_4px_25px_rgba(0,0,0,0.1)]">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-inner">
                         CS
                     </div>
                 </Link>
 
                 <div className="flex items-center gap-3">
                     {/* Notification Icon */}
-                    <Link to="/notifications" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <Link to="/notifications" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-colors">
                         <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         {unreadCount > 0 && (
                             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#101827]"></span>
@@ -56,9 +56,6 @@ const MobileTopBar = () => {
                 </div>
             </div>
 
-            {/* Height spacer */}
-            <div className="h-14 sm:hidden"></div>
-
             {/* Profile Dropdown Menu */}
             {isMenuOpen && (
                 <>
@@ -66,7 +63,7 @@ const MobileTopBar = () => {
                         className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm sm:hidden"
                         onClick={() => setIsMenuOpen(false)}
                     ></div>
-                    <div className="fixed top-16 right-4 z-50 w-64 bg-white dark:bg-[#1c273a] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 sm:hidden animate-in fade-in slide-in-from-top-5 duration-200">
+                    <div className="fixed top-16 right-4 z-50 w-64 max-w-[calc(100vw-2rem)] bg-white/95 dark:bg-[#1c273a]/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 sm:hidden animate-in fade-in slide-in-from-top-5 duration-200">
                         <div className="p-4 border-b border-gray-100 dark:border-gray-700/50 flex items-center gap-3">
                             <button
                                 onClick={(e) => {
@@ -84,34 +81,52 @@ const MobileTopBar = () => {
                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                             </div>
                         </div>
-                        <div className="p-2 space-y-1">
-                            <Link
-                                to="/settings"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                            >
-                                <User className="w-4 h-4" />
-                                Profile Settings
-                            </Link>
-                            <Link
-                                to="/settings"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                            >
-                                <Settings className="w-4 h-4" />
-                                Settings
-                            </Link>
-                            <Link
-                                to="/leaderboard"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                            >
-                                <Award className="w-4 h-4" />
-                                Leaderboard
-                            </Link>
-
-
-                            <div className="h-px bg-gray-100 dark:bg-gray-700/50 my-1"></div>
+                        <div className="p-2">
+                            <div className="grid grid-cols-2 gap-2">
+                                <Link
+                                    to="/my-progress"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                >
+                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-blue-400 group-hover:bg-gray-700' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
+                                        <BarChart2 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs text-center font-semibold">Progress</span>
+                                </Link>
+                                <Link
+                                    to="/my-courses"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                >
+                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-indigo-400 group-hover:bg-gray-700' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100'}`}>
+                                        <BookOpen className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs text-center font-semibold">Courses</span>
+                                </Link>
+                                <Link
+                                    to="/problem-stats"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                >
+                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-emerald-400 group-hover:bg-gray-700' : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'}`}>
+                                        <Clock className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs text-center font-semibold">History</span>
+                                </Link>
+                                <Link
+                                    to="/settings"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex flex-col items-center justify-center p-3 text-sm font-medium rounded-xl transition-all duration-200 group text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                >
+                                    <div className={`mb-2 p-2 rounded-lg transition-colors ${isDark ? 'bg-gray-800 text-purple-400 group-hover:bg-gray-700' : 'bg-purple-50 text-purple-600 group-hover:bg-purple-100'}`}>
+                                        <Settings className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs text-center font-semibold">Settings</span>
+                                </Link>
+                            </div>
+                            
+                            <div className="h-px bg-gray-100 dark:bg-gray-700/50 my-2"></div>
+                            
                             <button
                                 onClick={handleLogout}
                                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"

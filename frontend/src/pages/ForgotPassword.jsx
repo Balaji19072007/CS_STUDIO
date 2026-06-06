@@ -36,12 +36,14 @@ const ForgotPassword = () => {
 
             if (error) throw error;
 
-            showMessage('success', 'Password reset email sent! Please check your inbox (and spam folder).');
+            showMessage('success', 'If your email is registered, a password reset link has been sent.');
         } catch (error) {
             console.error('Password reset error:', error.message);
-            let msg = 'Failed to send reset email.';
-            if (error.message.includes('rate limit')) msg = 'Too many requests. Please try again later.';
-            showMessage('error', msg);
+            if (error.message.includes('rate limit')) {
+                showMessage('error', 'Too many requests. Please try again later.');
+            } else {
+                showMessage('success', 'If your email is registered, a password reset link has been sent.');
+            }
         } finally {
             setLoading(false);
         }

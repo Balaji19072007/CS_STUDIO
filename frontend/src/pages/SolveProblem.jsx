@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import * as feather from 'feather-icons';
 import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases } from '../api/problemApi.js';
-import { testAPI } from '../config/api.js';
+// import { testAPI } from '../config/api.js';
 import Loader from '../components/common/Loader.jsx';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -97,7 +97,7 @@ function processBackspaces(prev, incoming) {
 
 // ---------- Component ----------
 const SolveProblem = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const [searchParams] = useSearchParams();
@@ -188,7 +188,7 @@ const SolveProblem = () => {
         clearInterval(timerIntervalRef.current);
       }
     }, 1000);
-  }, [problemId, showFloatingNotification]);
+  }, [problemId]);
 
   // ---------- Load problem and testcases ----------
   useEffect(() => {
@@ -315,16 +315,12 @@ const SolveProblem = () => {
         timerIntervalRef.current = null;
       }
     };
-  }, [problemId, initializeOrResumeTimer]);
+  }, [problemId, initializeOrResumeTimer, isLoggedIn]);
 
   // register console ref with editor
   useEffect(() => {
     if (consoleRef.current && editorRef.current?.setTerminalRef) editorRef.current.setTerminalRef(consoleRef.current);
-  }, [consoleRef.current, editorRef.current, problem]);
-
-  useEffect(() => {
-    if (consoleRef.current && editorRef.current?.setTerminalRef) editorRef.current.setTerminalRef(consoleRef.current);
-  }, [consoleRef.current, editorRef.current, problem]);
+  }, [problem]);
 
   // feather.replace() REMOVED to prevent React DOM conflicts
 
@@ -445,13 +441,7 @@ const SolveProblem = () => {
     setOutputError(Boolean(isError));
   }, []);
 
-  // ---------- Console Input Handling ----------
-  const handleConsoleKeyPress = (e) => {
-    if (!isWaitingForInput) return;
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
-  };
+
 
   // ---------- Execute / Stop ----------
   const handleRunCode = async () => {

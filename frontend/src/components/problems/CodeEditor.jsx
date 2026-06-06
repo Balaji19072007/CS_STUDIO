@@ -51,7 +51,7 @@ const CodeEditor = forwardRef(({
   const [isWaitingForInput, setIsWaitingForInput] = useState(false);
   const [error, setError] = useState('');
 
-  const socketRef = useRef(null);
+
   const editorRef = useRef(null);
   const terminalRef = useRef(null);
   const inputBufferRef = useRef('');
@@ -227,7 +227,7 @@ const CodeEditor = forwardRef(({
       setOutput(`Execution Error: ${error.message}`);
       setIsRunning(false);
     }
-  }, [language]);
+  }, [language, cmdArgs]);
 
   // Stop execution
   const handleStopExecution = useCallback(() => {
@@ -377,11 +377,11 @@ const CodeEditor = forwardRef(({
       {showControls && (
         <div className="lg:hidden flex flex-col border-b border-gray-200 dark:border-gray-700">
           {/* Row 1: Tabs and Run Button */}
-          <div className={`flex items-center justify-between p-2 ${toolbarBg}`}>
-            <div className="flex gap-2">
+          <div className={`flex items-center justify-between p-2 ${toolbarBg} gap-1 overflow-x-auto custom-scrollbar`}>
+            <div className="flex gap-1 sm:gap-2 shrink-0">
               <button
                 onClick={() => setMobileTab('editor')}
-                className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileTab === 'editor'
+                className={`px-3 sm:px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileTab === 'editor'
                   ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
                   : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                   }`}
@@ -390,7 +390,7 @@ const CodeEditor = forwardRef(({
               </button>
               <button
                 onClick={() => setMobileTab('output')}
-                className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileTab === 'output'
+                className={`px-3 sm:px-4 py-1.5 rounded text-sm font-medium transition-colors ${mobileTab === 'output'
                   ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
                   : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                   }`}
@@ -398,13 +398,13 @@ const CodeEditor = forwardRef(({
                 Output
               </button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0 ml-1">
               <div className={`flex items-center px-1.5 py-1 border rounded-md ${borderClass} ${ioBodyBg} focus-within:ring-1 focus-within:ring-blue-500`}>
-                <span className={`text-[10px] mr-1 font-medium opacity-70 ${textMain}`}>Args:</span>
+                <span className={`text-[10px] mr-1 font-medium opacity-70 ${textMain} hidden sm:inline`}>Args:</span>
                 <input 
                   type="text" 
                   placeholder="args..."
-                  className={`bg-transparent text-xs font-mono w-16 focus:outline-none ${textMain} placeholder-gray-400`}
+                  className={`bg-transparent text-xs font-mono w-14 sm:w-16 min-w-0 focus:outline-none ${textMain} placeholder-gray-400`}
                   value={cmdArgs}
                   onChange={(e) => setCmdArgs(e.target.value)}
                   disabled={isRunning}
@@ -412,7 +412,7 @@ const CodeEditor = forwardRef(({
               </div>
               <button
                 onClick={handleInternalRunCode}
-                className={`w-10 h-8 flex items-center justify-center rounded transition-colors ${isRunning
+                className={`w-9 h-8 sm:w-10 flex shrink-0 items-center justify-center rounded transition-colors ${isRunning
                   ? 'bg-red-600 text-white'
                   : 'bg-green-600 text-white'
                   }`}

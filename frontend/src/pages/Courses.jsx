@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import * as feather from 'feather-icons';
 import CourseLearning from './CourseLearning';
 
@@ -8,7 +8,7 @@ const Courses = () => {
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
     const navRef = useRef(null);
     const activeTabRef = useRef(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const courseList = [
         { id: 'c', name: 'C', icon: '📘' },
@@ -65,9 +65,9 @@ const Courses = () => {
     const activeCourseData = courseList.find(c => c.id === activeCourse);
 
     return (
-        <div className={`bg-gray-50 dark:bg-gray-900 transition-colors duration-300 ${activeCourse === 'c' ? 'h-[calc(100dvh-144px)] sm:h-[calc(100dvh-64px)] overflow-hidden flex flex-col' : 'min-h-screen pb-20'}`}>
+        <div className="w-full pt-14 lg:pt-0 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 h-[100dvh] lg:h-[calc(100dvh-4rem)] overflow-hidden flex flex-col">
             {/* Course Navbar (Internal) - Moved to top, added border, smaller height */}
-            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-16 lg:top-0 z-30 transition-colors duration-300">
+            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-30 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="relative">
                         {/* Horizontal scroll container */}
@@ -118,8 +118,8 @@ const Courses = () => {
                     <CourseLearning embeddedCourseId="c-lang" />
                 </div>
             ) : (
-                <div className="w-full px-4 sm:px-6 lg:px-8 mt-6">
-                    <div className="max-w-5xl mx-auto">
+                <div className="flex-1 w-full overflow-y-auto px-4 sm:px-6 lg:px-8 pb-20">
+                    <div className="max-w-5xl mx-auto mt-6 lg:mt-12">
                         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-3xl p-12 md:p-20 text-center shadow-xl dark:shadow-2xl transition-all duration-300 relative overflow-hidden">
                             {/* Decorative background glow for dark mode */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-2xl pointer-events-none opacity-0 dark:opacity-20 transition-opacity duration-300">

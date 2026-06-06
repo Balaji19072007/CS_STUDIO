@@ -111,7 +111,7 @@ class SocketService {
       console.log(`🔄 Reconnection attempt ${attempt}/${this.maxConnectionAttempts}`);
     });
 
-    this.socket.on('reconnect', (attempt) => {
+    this.socket.on('reconnect', () => {
       console.log('✅ Reconnected to server, rejoining rooms...');
       this.joinNotificationRoom();
     });

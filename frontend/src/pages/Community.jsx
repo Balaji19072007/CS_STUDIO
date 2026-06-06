@@ -99,7 +99,7 @@ const MentionTextarea = ({ value, onChange, placeholder, rows = 4, allUsers = []
     const [dropdown, setDropdown] = useState({ show: false, type: null, query: '', pos: 0 });
     const textareaRef = useRef(null);
 
-    const handleKeyUp = (e) => {
+    const handleKeyUp = () => {
         const ta = textareaRef.current;
         if (!ta) return;
 

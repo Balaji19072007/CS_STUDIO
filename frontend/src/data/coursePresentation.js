@@ -480,7 +480,7 @@ const getSnippetPair = (presentation, kind) => {
   if (languageKey === 'javascript' && kind === 'api') {
     return {
       syntax: `const express = require("express");\nconst app = express();\n\napp.get("/status", (req, res) => {\n  res.json({ ok: true });\n});`,
-      example: `function buildResponse(userName) {\n  return { ok: true, message: \`Welcome, ${userName}\` };\n}\n\nconsole.log(buildResponse("Asha"));`,
+      example: `function buildResponse(userName) {\n  return { ok: true, message: \`Welcome, \${userName}\` };\n}\n\nconsole.log(buildResponse("Asha"));`,
     };
   }
 

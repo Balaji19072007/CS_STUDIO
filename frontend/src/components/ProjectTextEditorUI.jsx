@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as feather from 'feather-icons';
 
 const Icon = ({ name, className = '' }) => {
@@ -6,7 +6,7 @@ const Icon = ({ name, className = '' }) => {
     return <span className={`inline-flex items-center justify-center flex-shrink-0 ${className}`} dangerouslySetInnerHTML={{ __html: feather.icons[name].toSvg({ class: 'w-full h-full' }) }} />;
 };
 
-const ProjectTextEditorUI = ({ projectId, code, onClose }) => {
+const ProjectTextEditorUI = ({ onClose }) => {
     const [text, setText] = useState('');
     const [view, setView] = useState('editor'); // editor, preview, stats
     const [notification, setNotification] = useState(null);

@@ -165,7 +165,7 @@ exports.getLastActiveCourse = async (req, res) => {
         // Fallback: Map by Language if courseId is missing
         if (!courseId && lastProblem.language) {
             const LANG_MAP = {
-                'C': 'c-lang',
+                'C': 'c-programming',
                 'Java': 'java-lang',
                 'Python': 'python-lang',
                 'C++': 'cpp-lang'
@@ -219,6 +219,115 @@ exports.getLastActiveCourse = async (req, res) => {
 
     } catch (error) {
         console.error('Get last active course error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+exports.getEnrolledCourses = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const { loadAllProblems } = require('../util/problemUtils');
+        const allProblems = await loadAllProblems();
+        
+        // Fetch all courses
+        const { data: allCoursesData, error: coursesError } = await supabase.from('courses').select('*');
+        if (coursesError) throw coursesError;
+        
+        // Fetch user's problem progress
+        const { data: problemProgress } = await supabase
+            .from('progress')
+            .select('problem_id, status')
+            .eq('user_id', userId);
+            
+        // Fetch user_course_progress
+        const { data: userCourseProgress } = await supabase
+            .from('user_course_progress')
+            .select('*')
+            .eq('user_id', userId);
+
+        const courses = [];
+        
+        for (const courseData of (allCoursesData || [])) {
+            const courseIdMap = courseData.id === 'c-lang' ? 'c-programming' : courseData.id;
+            const courseLanguage = (courseData.id === 'c-lang' || courseData.id === 'c-programming') ? 'C' : 
+                                  courseData.id === 'java-lang' ? 'Java' : 
+                                  courseData.id === 'python-lang' ? 'Python' : 
+                                  courseData.id === 'cpp-lang' ? 'C++' : null;
+                                  
+            const courseProblems = allProblems.filter(p =>
+                p.courseId === courseData.id || p.courseId === courseIdMap ||
+                (courseLanguage && p.language === courseLanguage && p.id >= 1001)
+            );
+            
+            const totalTopics = courseProblems.length;
+            let solvedCount = 0;
+            let attemptedCount = 0;
+            
+            if (problemProgress && courseProblems.length > 0) {
+                const courseProblemIds = new Set(courseProblems.map(p => p.id));
+                const userCourseProblemProgress = problemProgress.filter(p => courseProblemIds.has(p.problem_id));
+                
+                solvedCount = userCourseProblemProgress.filter(p => p.status === 'solved').length;
+                attemptedCount = userCourseProblemProgress.length;
+            }
+            
+            const problemProgressPercent = totalTopics > 0 ? Math.round((solvedCount / totalTopics) * 100) : 0;
+            
+            const ucp = userCourseProgress ? userCourseProgress.find(p => p.course_id === courseData.id || p.course_id === courseIdMap) : null;
+            
+            // Prefer the official course progress (from topics/quizzes) if it exists, otherwise fallback to coding problems progress
+            let finalProgress = problemProgressPercent;
+            if (ucp && ucp.progress_percentage !== undefined) {
+                finalProgress = ucp.progress_percentage;
+            }
+            
+            // User is enrolled if they have an explicit user_course_progress entry, OR they've attempted/solved at least one problem in the course
+            // ALSO consider them enrolled if they have any topic progress in user_progress table
+            
+            // We fetch the topic progress for this user to check enrollment
+            const { count: topicProgressCount, error: tpError } = await supabase
+                .from('user_progress')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+                
+            if (tpError) {
+                console.error("Error fetching topic progress:", tpError);
+            }
+                
+            // If they have topic progress and the course is C, they are likely enrolled in C.
+            // A more robust check would join topics -> phases -> course_id, but if ucp exists it catches most.
+            // Since they completed the course, ucp WILL exist as long as we check both c-lang and c-programming.
+            // Wait, what if they don't have ucp? Then finalProgress might be 0. Let's assume if they completed, they have ucp.
+            // If they don't, we'll calculate it from topicProgressCount approximately (max 100).
+            if (!ucp && courseLanguage === 'C' && topicProgressCount > 0) {
+                // Approximate fallback if no ucp. 135 topics + 43 quizzes = 178 total
+                const approxPercent = Math.min(100, Math.round((topicProgressCount / 178) * 100));
+                finalProgress = Math.max(finalProgress, approxPercent);
+            }
+
+            console.log(`Course ${courseData.id}: ucp=${!!ucp}, attemptedCount=${attemptedCount}, topicProgressCount=${topicProgressCount}, finalProgress=${finalProgress}`);
+
+            if (ucp || attemptedCount > 0 || (courseLanguage === 'C' && topicProgressCount > 0)) {
+                courses.push({
+                    id: courseData.id,
+                    title: courseData.title,
+                    description: courseData.description,
+                    icon: courseData.icon || '💻',
+                    progress: finalProgress,
+                    coverImage: courseData.cover_image || '/api/placeholder/400/300',
+                    lastAccessed: ucp ? ucp.last_accessed_at : new Date().toISOString()
+                });
+            }
+        }
+        
+        // Sort by lastAccessed descending
+        courses.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
+
+        console.log("Returning courses:", courses.length);
+        res.json({ success: true, courses });
+    } catch (error) {
+        console.error('Error fetching enrolled courses:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };

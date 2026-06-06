@@ -116,6 +116,26 @@ export const getUserCourseProgress = async (userId, courseId) => {
   }
 };
 
+// Get all user course progress entries
+export const getAllUserCourseProgress = async (userId) => {
+  try {
+    const { data, error } = await supabase
+      .from('user_course_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .order('last_accessed_at', { ascending: false, nullsFirst: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching all user course progress:', error);
+    return [];
+  }
+};
+
 // Get user's topic progress
 export const getUserTopicProgress = async (userId, topicId) => {
   try {
