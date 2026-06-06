@@ -280,7 +280,7 @@ const SignIn = () => {
                 </button>
               </form>
             ) : (
-            <form onSubmit={handleEmailSignIn} className="space-y-5">
+            <form onSubmit={handleLoginSubmit} className="space-y-5">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="sr-only">Email</label>
