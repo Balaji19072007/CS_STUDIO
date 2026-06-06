@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Loader } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../config/supabase';
+import api from '../../config/api';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -18,20 +19,14 @@ const AuthCallback = () => {
 
         try {
             // Send tokens to backend to set HttpOnly cookies
-            const response = await fetch('/api/auth/session/set-cookie', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    access_token: session.access_token,
-                    refresh_token: session.refresh_token,
-                    expires_in: session.expires_in
-                })
+            const response = await api.post('/api/auth/session/set-cookie', {
+                access_token: session.access_token,
+                refresh_token: session.refresh_token,
+                expires_in: session.expires_in
             });
 
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.msg || 'Failed to initialize session');
+            if (response.status !== 200) {
+                throw new Error(response.data.msg || 'Failed to initialize session');
             }
 
             // Clean up localStorage to maintain security (prevent XSS extraction)

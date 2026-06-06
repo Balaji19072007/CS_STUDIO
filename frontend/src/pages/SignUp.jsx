@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import { supabase } from '../config/supabase';
 import { Turnstile } from '@marsidev/react-turnstile';
+import api from '../config/api';
 
 const SignUp = () => {
   const { isLoggedIn } = useAuth();
@@ -84,15 +85,17 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/session/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, firstName, lastName, captchaToken: formData.captchaToken })
+      const response = await api.post('/api/auth/session/signup', { 
+        email, 
+        password, 
+        firstName, 
+        lastName, 
+        captchaToken: formData.captchaToken 
       });
       
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok || !data.success) {
+      if (response.status !== 200 || !data.success) {
           throw new Error(data.msg || 'Failed to create account');
       }
 

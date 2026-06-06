@@ -4,11 +4,11 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import { supabase } from '../config/supabase';
 import { Turnstile } from '@marsidev/react-turnstile';
+import api from '../config/api';
 
 const SignIn = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -21,27 +21,26 @@ const SignIn = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    mfaCode: '',
     captchaToken: '',
+    mfaCode: ''
   });
-  
-  const [mfaRequired, setMfaRequired] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ type: null, text: '' });
   const [loading, setLoading] = useState(false);
+  const [mfaRequired, setMfaRequired] = useState(false);
   const turnstileRef = useRef();
 
   useEffect(() => {
     feather.replace();
-  }, [message, showPassword, mfaRequired, loading]);
+  }, [message, showPassword, loading, mfaRequired]);
 
   // --- Utility Functions ---
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
     if (type === 'success') {
-      setTimeout(() => setMessage({ type: null, text: '' }), 5000);
+      setTimeout(() => setMessage({ type: null, text: '' }), 3000);
     }
   };
 
@@ -49,10 +48,9 @@ const SignIn = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // --- Password Reset ---
-  // --- Core Authentication Handlers ---
+  // --- Login Handler ---
 
-  const handleEmailSignIn = async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: null, text: '' });
@@ -66,15 +64,15 @@ const SignIn = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/session/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, captchaToken })
+      const response = await api.post('/api/auth/session/login', { 
+        email, 
+        password, 
+        captchaToken 
       });
       
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok || !data.success) {
+      if (response.status !== 200 || !data.success) {
           throw new Error(data.msg || 'Invalid credentials');
       }
 
@@ -89,7 +87,7 @@ const SignIn = () => {
       setTimeout(() => navigate('/'), 1000);
 
     } catch (error) {
-      console.error('[SignIn] Login error:', error.message);
+      console.error('[SignIn] Login error:', error.response?.data?.msg || error.message);
       showMessage('error', 'Invalid email or password.');
     } finally {
       setLoading(false);
@@ -103,30 +101,27 @@ const SignIn = () => {
 
     try {
       // First get the active factor
-      const statusRes = await fetch('/api/auth/session/mfa/status');
-      const statusData = await statusRes.json();
+      const statusRes = await api.get('/api/auth/session/mfa/status');
+      const statusData = statusRes.data;
       const factors = statusData.factors || [];
       if (factors.length === 0) throw new Error('No MFA factors found');
 
       const factorId = factors[0].id;
 
       // Verify
-      const verifyRes = await fetch('/api/auth/session/verify-mfa', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          factorId, 
-          code: formData.mfaCode 
-        })
+      const verifyRes = await api.post('/api/auth/session/verify-mfa', {
+        factorId, 
+        code: formData.mfaCode 
       });
-      const verifyData = await verifyRes.json();
+      const verifyData = verifyRes.data;
+      
       if (!verifyData.success) throw new Error(verifyData.msg || 'Invalid verification code');
 
       showMessage('success', 'Signed in successfully!');
       window.dispatchEvent(new Event('auth-login'));
       setTimeout(() => navigate('/'), 1000);
     } catch (error) {
-      showMessage('error', error.message || 'MFA verification failed');
+      showMessage('error', error.response?.data?.msg || error.message || 'MFA verification failed');
     } finally {
       setLoading(false);
     }
