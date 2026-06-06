@@ -88,7 +88,7 @@ const SignIn = () => {
 
     } catch (error) {
       console.error('[SignIn] Login error:', error.response?.data?.msg || error.message);
-      showMessage('error', 'Invalid email or password.');
+      showMessage('error', error.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
@@ -349,17 +349,19 @@ const SignIn = () => {
               </div>
 
               {/* Turnstile CAPTCHA */}
-              <div className="flex justify-center my-4">
-                  <Turnstile
-                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                    onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
-                    onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
-                    ref={turnstileRef}
-                    options={{
-                      theme: 'dark'
-                    }}
-                  />
-              </div>
+              {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+                <div className="flex justify-center my-4">
+                    <Turnstile
+                      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                      onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
+                      onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
+                      ref={turnstileRef}
+                      options={{
+                        theme: 'dark'
+                      }}
+                    />
+                </div>
+              )}
 
               {/* Submit Button */}
               <button

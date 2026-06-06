@@ -109,13 +109,10 @@ const SignUp = () => {
     } catch (error) {
       console.error('[SignUp] Error:', error.message);
       
-      // Prevent email enumeration
       if (error.message.includes('already registered') || error.message.includes('already exists')) {
          showMessage('success', 'Registration successful! Please check your email for verification link.');
-      } else if (error.message.includes('Password should be')) {
-         showMessage('error', error.message);
       } else {
-         showMessage('error', 'Failed to create account.');
+         showMessage('error', error.message || 'Failed to create account.');
       }
     } finally {
       setLoading(false);
@@ -349,17 +346,19 @@ const SignUp = () => {
               </div>
 
               {/* Turnstile CAPTCHA */}
-              <div className="flex justify-center my-4">
-                  <Turnstile
-                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                    onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
-                    onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
-                    ref={turnstileRef}
-                    options={{
-                      theme: 'dark'
-                    }}
-                  />
-              </div>
+              {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+                <div className="flex justify-center my-4">
+                    <Turnstile
+                      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                      onSuccess={(token) => setFormData(prev => ({ ...prev, captchaToken: token }))}
+                      onError={() => showMessage('error', 'CAPTCHA failed. Please try again.')}
+                      ref={turnstileRef}
+                      options={{
+                        theme: 'dark'
+                      }}
+                    />
+                </div>
+              )}
 
               {/* Submit Button */}
               <button
