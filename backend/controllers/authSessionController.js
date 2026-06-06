@@ -1,16 +1,8 @@
 const { supabase } = require('../config/supabase');
 const { body, validationResult } = require('express-validator');
-const fs = require('fs');
-const path = require('path');
-
-const authLogPath = path.join(__dirname, '..', 'auth.log');
-
 const logAuthEvent = (event, email, ip, status, details = '') => {
   const timestamp = new Date().toISOString();
-  const logMessage = `[${timestamp}] EVENT: ${event} | EMAIL: ${email} | IP: ${ip} | STATUS: ${status} | DETAILS: ${details}\n`;
-  fs.appendFile(authLogPath, logMessage, (err) => {
-    if (err) console.error('Failed to write to auth log:', err);
-  });
+  console.log(`[AUTH] [${timestamp}] EVENT: ${event} | EMAIL: ${email} | IP: ${ip} | STATUS: ${status} | DETAILS: ${details}`);
 };
 
 // Validation schemas

@@ -185,8 +185,8 @@ async function runCodeTest(language, code, input, testArgs = []) {
     });
 
     try {
-      const logMsg = `[${new Date().toISOString()}] CMD: ${runCommand} ARGS: ${JSON.stringify(runArgs)} CWD: ${execCwd} FILES: ${JSON.stringify(fs.readdirSync(execCwd))}\n`;
-      fs.appendFileSync(path.join(__dirname, '../debug_java.log'), logMsg);
+      const logMsg = `[${new Date().toISOString()}] CMD: ${runCommand} ARGS: ${JSON.stringify(runArgs)} CWD: ${execCwd} FILES: ${JSON.stringify(fs.readdirSync(execCwd))}`;
+      console.log(logMsg);
     } catch (e) { console.error('Log failed', e); }
 
     let stdout = '';
