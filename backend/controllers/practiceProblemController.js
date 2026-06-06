@@ -150,7 +150,7 @@ exports.submitPracticeProblem = async (req, res) => {
         });
       }
 
-      let expectedOutput = testCase.expected ?? testCase.expectedOutput ?? null;
+      let expectedOutput = testCase.expected ?? testCase.expectedOutput ?? testCase.expected_output ?? null;
 
       if (expectedOutput === null) {
         if (!practiceProblem.solution_code) {

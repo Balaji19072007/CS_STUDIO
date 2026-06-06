@@ -181,7 +181,7 @@ exports.verifyMFA = async (req, res) => {
     // OR we set the AAL1 token in the cookie during login, and then upgrade it here.
     
     // Setting AAL1 cookie during login is better, let's read it:
-    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
     
     if (!token) return res.status(401).json({ success: false, msg: 'Missing AAL1 token' });
 
@@ -232,7 +232,7 @@ function setCookies(res, session) {
 }
 
 const getClient = (req) => {
-  const token = req.cookies.access_token;
+  const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
   if (!token) return null;
   const { createClient } = require('@supabase/supabase-js');
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {

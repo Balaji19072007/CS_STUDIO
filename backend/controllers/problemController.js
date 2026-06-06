@@ -118,13 +118,14 @@ exports.runTestCases = async (req, res) => {
 
                 const result = await runCodeTest(language, code, cleanedInput);
                 const cleanedOutput = evaluationService.cleanOutput(result.stdout);
-                const comparison = evaluationService.compareOutputs(cleanedOutput, test.expected, language);
+                const expected = test.expected ?? test.expected_output ?? test.expectedOutput;
+                const comparison = evaluationService.compareOutputs(cleanedOutput, expected, language);
 
                 if (comparison.passed) passedCount++;
 
                 results.push({
                     input: test.input,
-                    expected: test.expected,
+                    expected: expected,
                     output: cleanedOutput,
                     error: result.stderr,
                     passed: comparison.passed
@@ -201,9 +202,10 @@ exports.submitProblem = async (req, res) => {
 
             const result = await runCodeTest(language, code, cleanedInput);
             const cleanedOutput = evaluationService.cleanOutput(result.stdout);
-            const comparison = evaluationService.compareOutputs(cleanedOutput, test.expected, language);
+            const expected = test.expected ?? test.expected_output ?? test.expectedOutput;
+            const comparison = evaluationService.compareOutputs(cleanedOutput, expected, language);
             if (comparison.passed) passedCount++;
-            else if (!firstFailure) firstFailure = { input: test.input, expected: test.expected, actual: cleanedOutput };
+            else if (!firstFailure) firstFailure = { input: test.input, expected: expected, actual: cleanedOutput };
         }
 
         const totalTests = problem.test_cases.length;
