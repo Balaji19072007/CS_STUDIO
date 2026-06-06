@@ -46,15 +46,24 @@ const practiceProblemRoutes = require('./routes/practiceProblemRoutes');
 // Enable CORS
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
+  // Strip trailing slash if present
+  allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
 }
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+    
+    // Strip trailing slash from origin just in case
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
+    if (allowedOrigins.includes(normalizedOrigin) || normalizedOrigin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      // Don't throw an error, just return false so cors middleware handles it gracefully
+      // returning false will block the request with a standard CORS response rather than 500
+      callback(null, false);
     }
   },
   credentials: true
