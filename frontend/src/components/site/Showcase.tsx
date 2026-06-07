@@ -56,7 +56,7 @@ export function Showcase() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35 }}
-              className="grid gap-8 p-8 md:grid-cols-2 md:p-12"
+              className="grid gap-8 p-5 md:grid-cols-2 md:p-12"
             >
               <div className="flex flex-col justify-center">
                 <h3 className="text-3xl font-semibold tracking-tight">{active.body.title}</h3>
