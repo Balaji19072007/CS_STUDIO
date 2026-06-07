@@ -91,10 +91,10 @@ function AppContent() {
       {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
-      <Navbar />
+      {location.pathname !== '/' && <Navbar />}
 
       <main
-        className={`flex-grow flex flex-col ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16' : 'pt-14 lg:pt-16'} pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden`}
+        className={`flex-grow flex flex-col ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16' : (location.pathname === '/' ? 'pt-0' : 'pt-14 lg:pt-16')} pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden`}
         style={{ minHeight: '60vh' }}
       >
 
@@ -159,7 +159,7 @@ function AppContent() {
         !(location.pathname === '/' && !isLoggedIn) &&
         <CodeEditorFloatingIcon />}
 
-      {!location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
+      {location.pathname !== '/' && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
 
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
       {isLoggedIn && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
