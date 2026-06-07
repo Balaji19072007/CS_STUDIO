@@ -15,22 +15,20 @@ export function Navbar() {
         transition={{ duration: 0.6 }}
       >
         <div className="glass-strong shadow-glass flex items-center justify-between rounded-2xl px-5 py-3">
-          <div className="flex flex-1 items-center justify-start">
-            <a href="#" className="flex items-center gap-2 shrink-0">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow">
-                <Code2 className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="text-base font-semibold tracking-tight">CS Studio</span>
-            </a>
-          </div>
-          <nav className="hidden flex-none items-center gap-7 text-sm text-muted-foreground md:flex">
+          <a href="#" className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-glow">
+              <Code2 className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="text-base font-semibold tracking-tight">CS Studio</span>
+          </a>
+          <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a className="hover:text-foreground transition" href="#product">Product</a>
             <a className="hover:text-foreground transition" href="#paths">Learn</a>
             <a className="hover:text-foreground transition" href="#arena">Arena</a>
             <a className="hover:text-foreground transition" href="#community">Community</a>
             <a className="hover:text-foreground transition" href="#pricing">Why us</a>
           </nav>
-          <div className="flex flex-1 items-center justify-end gap-2 shrink-0">
+          <div className="flex items-center gap-2">
             <button 
               onClick={toggleTheme} 
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition md:mr-2"
