@@ -4,8 +4,8 @@ import { Terminal, Globe, Trophy, Users, Award } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
 
 const TABS = [
-  { id: "ide", label: "Cloud IDE", icon: Terminal, body: { title: "Multi-language Cloud IDE", desc: "Java, Python, C, C++, JavaScript — instant containers, zero setup.", chips: ["Real-time compiler", "Auto-save", "Shareable workspaces"], image: "/cloud-ide.png" } },
-  { id: "web", label: "Web Studio", icon: Globe, body: { title: "Live HTML/CSS/JS Studio", desc: "Build websites in the browser with live preview and one-click deploy.", chips: ["Live preview", "Snippets", "Deploy"], image: "/web-studio.png" } },
+  { id: "ide", label: "Cloud IDE", icon: Terminal, body: { title: "Multi-language Cloud IDE", desc: "Java, Python, C, C++, JavaScript — instant containers, zero setup.", chips: ["Real-time compiler", "Auto-save", "Shareable workspaces"] } },
+  { id: "web", label: "Web Studio", icon: Globe, body: { title: "Live HTML/CSS/JS Studio", desc: "Build websites in the browser with live preview and one-click deploy.", chips: ["Live preview", "Snippets", "Deploy"] } },
   { id: "ch", label: "Challenges", icon: Trophy, body: { title: "500+ Coding Challenges", desc: "From warm-ups to contest-grade problems with editorial solutions.", chips: ["DSA", "Contests", "Editorial"] } },
   { id: "co", label: "Community", icon: Users, body: { title: "Builder Community", desc: "Pair, review, and ship together. A culture of relentless improvement.", chips: ["Reviews", "Squads", "Showcases"] } },
   { id: "ce", label: "Certificates", icon: Award, body: { title: "Verified Certificates", desc: "Earn shareable certificates verified on a public ledger.", chips: ["Verified", "Shareable", "Portfolio-ready"] } },
@@ -68,17 +68,11 @@ export function Showcase() {
                 </div>
               </div>
               <div className="relative">
-                <div className="glass rounded-2xl p-2 md:p-6 min-h-72 grid place-items-center text-center overflow-hidden">
-                  {/* @ts-ignore */}
-                  {active.body.image ? (
-                    // @ts-ignore
-                    <img src={active.body.image} alt={active.label} className="w-full h-full object-cover rounded-xl shadow-md border border-border/40" />
-                  ) : (
-                    <div>
-                      <active.icon className="mx-auto h-12 w-12 text-primary mb-4" />
-                      <p className="text-sm text-muted-foreground">Interactive {active.label.toLowerCase()} preview</p>
-                    </div>
-                  )}
+                <div className="glass rounded-2xl p-6 h-72 grid place-items-center text-center">
+                  <div>
+                    <active.icon className="mx-auto h-12 w-12 text-primary mb-4" />
+                    <p className="text-sm text-muted-foreground">Interactive {active.label.toLowerCase()} preview</p>
+                  </div>
                 </div>
                 <div className="absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-tr from-primary/20 to-accent/20 blur-2xl" />
               </div>

@@ -61,7 +61,7 @@ export function CodeMockup() {
               <div key={i} className="px-2">{i + 1}</div>
             ))}
           </div>
-          <div className="py-4 pl-4 pr-4">
+          <div className="py-4 pl-4 pr-4 whitespace-pre overflow-x-auto">
             {LINES.map((l, i) => (
               <div key={i} className={l.c}>
                 {i < shown ? l.t : i === shown ? l.t.slice(0, char) : "\u00A0"}
