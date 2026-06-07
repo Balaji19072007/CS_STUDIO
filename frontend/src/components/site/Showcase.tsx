@@ -23,7 +23,7 @@ export function Showcase() {
           subtitle="Switch between writing code, learning concepts, and competing — without losing flow."
         />
         <div className="glass-strong shadow-elegant gradient-border rounded-3xl p-2">
-          <div className="flex flex-wrap gap-1 rounded-2xl bg-background/40 p-2">
+          <div className="flex flex-wrap gap-1 rounded-2xl p-2 border-b border-white/5">
             {TABS.map((t) => {
               const Icon = t.icon;
               const isActive = tab === t.id;
@@ -32,18 +32,18 @@ export function Showcase() {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   className={`relative flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    isActive ? "text-white" : "text-[#8F9BB3] hover:text-white"
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="tab-bg"
-                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/30 to-accent/30 shadow-glow"
+                      className="absolute inset-0 rounded-xl bg-[#133F53] shadow-[0_0_15px_rgba(19,63,83,0.5)]"
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
                   <span className="relative z-10 flex items-center gap-2">
-                    <Icon className="h-4 w-4" /> {t.label}
+                    {t.id === "ide" ? <span className="font-mono">{">_"}</span> : <Icon className="h-4 w-4" />} {t.label}
                   </span>
                 </button>
               );
@@ -59,22 +59,25 @@ export function Showcase() {
               className="grid gap-8 p-8 md:grid-cols-2 md:p-12"
             >
               <div className="flex flex-col justify-center">
-                <h3 className="text-3xl font-semibold tracking-tight">{active.body.title}</h3>
-                <p className="mt-4 text-muted-foreground">{active.body.desc}</p>
+                <h3 className="text-3xl font-semibold tracking-tight text-white">{active.body.title}</h3>
+                <p className="mt-4 text-[#8F9BB3]">{active.body.desc}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {active.body.chips.map((c) => (
-                    <span key={c} className="glass rounded-full px-3 py-1 text-xs">{c}</span>
+                    <span key={c} className="rounded-full border border-white/5 bg-[#0A0F1A] px-3 py-1 text-xs text-[#8F9BB3]">{c}</span>
                   ))}
                 </div>
               </div>
               <div className="relative">
-                <div className="glass rounded-2xl p-6 h-72 grid place-items-center text-center">
+                <div className="rounded-2xl border border-white/5 bg-[#0B1527] p-6 h-72 grid place-items-center text-center shadow-lg">
                   <div>
-                    <active.icon className="mx-auto h-12 w-12 text-primary mb-4" />
-                    <p className="text-sm text-muted-foreground">Interactive {active.label.toLowerCase()} preview</p>
+                    {tab === "ide" ? (
+                      <div className="mx-auto text-4xl text-[#8B5CF6] mb-4 font-mono">{">_"}</div>
+                    ) : (
+                      <active.icon className="mx-auto h-12 w-12 text-[#8B5CF6] mb-4" />
+                    )}
+                    <p className="text-sm text-[#8F9BB3]">Interactive {active.label.toLowerCase()} preview</p>
                   </div>
                 </div>
-                <div className="absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-tr from-primary/20 to-accent/20 blur-2xl" />
               </div>
             </motion.div>
           </AnimatePresence>
