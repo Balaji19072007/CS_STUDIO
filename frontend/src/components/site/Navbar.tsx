@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
-import { Code2 } from "lucide-react";
+import { Code2, Sun, Moon } from "lucide-react";
+import { useContext } from "react";
+import { ThemeContext } from "@/contexts/ThemeContext";
 
 export function Navbar() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
   return (
-    <motion.header
+    <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -16,20 +20,27 @@ export function Navbar() {
           </div>
           <span className="text-base font-semibold tracking-tight">CS Studio</span>
         </a>
-        <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+        <div className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
           <a className="hover:text-foreground transition" href="#product">Product</a>
           <a className="hover:text-foreground transition" href="#paths">Learn</a>
           <a className="hover:text-foreground transition" href="#arena">Arena</a>
           <a className="hover:text-foreground transition" href="#community">Community</a>
           <a className="hover:text-foreground transition" href="#pricing">Why us</a>
-        </nav>
+        </div>
         <div className="flex items-center gap-2">
+          <button 
+            onClick={toggleTheme} 
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition mr-2"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           <button className="hidden text-sm text-muted-foreground hover:text-foreground md:block">Sign in</button>
           <button className="rounded-lg bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow transition hover:opacity-90">
             Get started
           </button>
         </div>
       </div>
-    </motion.header>
+    </motion.div>
   );
 }

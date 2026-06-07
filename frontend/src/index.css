@@ -1643,6 +1643,8 @@ body.light-theme .border-gray-700 {
   --border: 0 0% 0% / 0.08;
   --input: 0 0% 0% / 0.1;
   --ring: 280 55% 22%;
+  --gradient-text: linear-gradient(135deg, hsl(270 18% 2%), hsl(280 55% 22%));
+  --gradient-primary: linear-gradient(135deg, hsl(280 55% 22%), hsl(220 55% 25%));
 }
 
 .text-gradient {
