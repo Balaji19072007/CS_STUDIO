@@ -23,7 +23,7 @@ export function Showcase() {
           subtitle="Switch between writing code, learning concepts, and competing — without losing flow."
         />
         <div className="glass-strong shadow-elegant gradient-border rounded-3xl p-2">
-          <div className="flex flex-wrap gap-1 rounded-2xl bg-background/40 p-2">
+          <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 rounded-2xl bg-background/40 p-2 snap-x">
             {TABS.map((t) => {
               const Icon = t.icon;
               const isActive = tab === t.id;
@@ -31,7 +31,7 @@ export function Showcase() {
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`relative flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+                  className={`relative flex flex-shrink-0 min-w-[140px] md:flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition snap-center ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
