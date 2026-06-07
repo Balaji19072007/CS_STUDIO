@@ -1606,7 +1606,7 @@ body.light-theme .border-gray-700 {
   --secondary: 270 26% 4%;
   --secondary-foreground: 250 98% 99%;
   --muted: 270 22% 3%;
-  --muted-foreground: 260 70% 3%;
+  --muted-foreground: 260 10% 70%;
   --accent: 200 75% 18%;
   --accent-foreground: 270 10% 2%;
   --destructive: 25 65% 24%;

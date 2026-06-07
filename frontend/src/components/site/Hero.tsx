@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Code2, Globe, Terminal } from "lucide-react";
 import { Aurora } from "./Aurora";
 import { Particles } from "./Particles";
 import { CodeMockup } from "./CodeMockup";
@@ -60,12 +60,19 @@ export function Hero() {
             className="mt-10 flex items-center gap-6 text-xs text-muted-foreground"
           >
             <div className="flex -space-x-2">
-              {[280, 200, 330, 150].map((h) => (
+              {[
+                { h: 280, Icon: Code2 },
+                { h: 200, Icon: Globe },
+                { h: 330, Icon: Terminal },
+                { h: 150, Icon: Sparkles }
+              ].map(({ h, Icon }) => (
                 <div
                   key={h}
-                  className="h-8 w-8 rounded-full border-2 border-background"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background text-white shadow-sm"
                   style={{ background: `linear-gradient(135deg, oklch(0.75 0.18 ${h}), oklch(0.6 0.2 ${h + 30}))` }}
-                />
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </div>
               ))}
             </div>
             Loved by 50,000+ developers worldwide

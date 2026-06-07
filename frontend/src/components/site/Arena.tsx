@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Flame, Trophy, Star, Zap } from "lucide-react";
+import { Flame, Trophy, Star, Zap, Globe, Code2 } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
 
 const BOARD = [
@@ -94,11 +94,19 @@ export function Arena() {
               className="glass-strong gradient-border rounded-2xl p-6"
             >
               <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold"><Star className="h-5 w-5 text-accent" /> Achievements</h3>
-              <div className="grid grid-cols-4 gap-3">
-                {[280, 200, 330, 150, 80, 50, 240, 20].map((h) => (
-                  <div key={h} className="aspect-square rounded-xl p-[1px]" style={{ background: `conic-gradient(from 0deg, oklch(0.75 0.20 ${h}), oklch(0.55 0.20 ${h + 60}), oklch(0.75 0.20 ${h}))` }}>
-                    <div className="grid h-full w-full place-items-center rounded-[10px] bg-card text-xs">
-                      <Trophy className="h-4 w-4 text-accent" />
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { name: "First Compile", icon: Zap, color: 280 },
+                  { name: "7 Day Streak", icon: Flame, color: 20 },
+                  { name: "Contest Winner", icon: Trophy, color: 50 },
+                  { name: "Bug Hunter", icon: Globe, color: 200 },
+                  { name: "Top Reviewer", icon: Star, color: 330 },
+                  { name: "Problem Solver", icon: Code2, color: 150 },
+                ].map((a) => (
+                  <div key={a.name} className="flex flex-col items-center justify-center rounded-xl p-[1px] text-center" style={{ background: `conic-gradient(from 0deg, oklch(0.75 0.20 ${a.color}), oklch(0.55 0.20 ${a.color + 60}), oklch(0.75 0.20 ${a.color}))` }}>
+                    <div className="grid h-full w-full place-items-center rounded-[10px] bg-card py-3 px-1">
+                      <a.icon className="mb-1.5 h-5 w-5" style={{ color: `oklch(0.75 0.20 ${a.color})` }} />
+                      <span className="text-xs font-medium leading-tight text-foreground">{a.name}</span>
                     </div>
                   </div>
                 ))}

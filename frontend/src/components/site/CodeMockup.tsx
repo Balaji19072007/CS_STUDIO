@@ -3,15 +3,18 @@ import { motion } from "framer-motion";
 
 const LINES = [
   { t: "// CS Studio — Cloud IDE", c: "text-muted-foreground" },
-  { t: "function solve(nums) {", c: "" },
-  { t: "  const seen = new Map();", c: "" },
-  { t: "  for (let i = 0; i < nums.length; i++) {", c: "" },
-  { t: "    const diff = target - nums[i];", c: "" },
-  { t: "    if (seen.has(diff)) return [seen.get(diff), i];", c: "" },
-  { t: "    seen.set(nums[i], i);", c: "" },
+  { t: "class Solution {", c: "text-accent" },
+  { t: "  public int[] twoSum(int[] nums, int target) {", c: "" },
+  { t: "    Map<Integer, Integer> map = new HashMap<>();", c: "" },
+  { t: "    for (int i = 0; i < nums.length; i++) {", c: "" },
+  { t: "      int diff = target - nums[i];", c: "" },
+  { t: "      if (map.containsKey(diff)) return new int[]{map.get(diff), i};", c: "" },
+  { t: "      map.put(nums[i], i);", c: "" },
+  { t: "    }", c: "" },
+  { t: "    return new int[]{};", c: "" },
   { t: "  }", c: "" },
   { t: "}", c: "" },
-  { t: "// ✓ Accepted · Runtime 64 ms · Beats 98%", c: "text-[oklch(0.78_0.18_150)]" },
+  { t: "// ✓ Accepted · Runtime 1 ms · Beats 99%", c: "text-[oklch(0.78_0.18_150)]" },
 ];
 
 export function CodeMockup() {
@@ -49,10 +52,10 @@ export function CodeMockup() {
             <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.18_80)]" />
             <span className="h-3 w-3 rounded-full bg-[oklch(0.78_0.18_150)]" />
           </div>
-          <span className="text-xs text-muted-foreground">solution.js · JavaScript</span>
+          <span className="text-xs text-muted-foreground">Solution.java · Java</span>
           <span className="text-xs text-muted-foreground">Run ▸</span>
         </div>
-        <div className="grid grid-cols-[40px_1fr] font-mono text-[13px] leading-6">
+        <div className="grid grid-cols-[40px_1fr] font-mono text-[13px] leading-6 text-left">
           <div className="border-r border-border/60 bg-background/40 py-4 text-right text-muted-foreground/70">
             {LINES.map((_, i) => (
               <div key={i} className="px-2">{i + 1}</div>
