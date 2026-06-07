@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Code2, Sun, Moon } from "lucide-react";
 import { useContext } from "react";
-import { ThemeContext } from "@/contexts/ThemeContext";
+// @ts-ignore
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 export function Navbar() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme } = useContext(ThemeContext) as any;
 
   return (
     <motion.div
