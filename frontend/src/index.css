@@ -231,7 +231,7 @@ body.dark-theme {
 }
 
 /* UTILITIES FOR FIXED COLORS (Ignore Theme) */
-.text-always-white {
+.text-always-white, .text-always-white * {
   color: #ffffff !important;
 }
 
