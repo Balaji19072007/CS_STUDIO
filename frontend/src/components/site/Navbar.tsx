@@ -10,7 +10,7 @@ export function Navbar() {
 
   return (
     <div className="fixed top-4 left-1/2 z-50 w-[min(1100px,calc(100%-2rem))] -translate-x-1/2">
-      <motion.header
+      <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -47,7 +47,7 @@ export function Navbar() {
             </div>
           </div>
         </div>
-      </motion.header>
+      </motion.div>
     </div>
   );
 }

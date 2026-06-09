@@ -26,7 +26,11 @@ export function Testimonials() {
               <Quote className="h-7 w-7 text-accent" />
               <p className="mt-4 text-sm leading-relaxed text-foreground/90">"{t.quote}"</p>
               <div className="mt-6 flex items-center gap-3 border-t border-border/60 pt-4">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent" />
+                <img 
+                  src={`https://api.dicebear.com/7.x/notionists/svg?seed=${t.name}&backgroundColor=transparent`} 
+                  alt={t.name} 
+                  className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent p-0.5" 
+                />
                 <div>
                   <div className="text-sm font-medium">{t.name}</div>
                   <div className="text-xs text-muted-foreground">{t.role}</div>
