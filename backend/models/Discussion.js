@@ -103,10 +103,14 @@ class Discussion {
     async deleteOne() {
         if (this.id) {
             console.log('Attempting to delete discussion:', this.id);
-            const { data, error } = await supabase.from('discussions').delete().eq('id', this.id);
+            const { data, error } = await supabase.from('discussions').delete().eq('id', this.id).select();
             if (error) {
                 console.error('Error deleting discussion:', error);
                 throw error;
+            }
+            if (!data || data.length === 0) {
+                console.error('No rows deleted for discussion:', this.id);
+                throw new Error('No rows deleted. Possible RLS or missing ID.');
             }
             console.log('Successfully deleted discussion', data);
         }
