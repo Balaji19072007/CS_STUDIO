@@ -29,7 +29,9 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ type: null, text: '' });
   const [loading, setLoading] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState('idle'); // idle, checking, available, unavailable
   const turnstileRef = useRef();
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     feather.replace();
@@ -47,7 +49,34 @@ const SignUp = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+
+    if (id === 'username') {
+        setUsernameStatus('checking');
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        
+        if (!value.trim()) {
+            setUsernameStatus('idle');
+            return;
+        }
+
+        typingTimeoutRef.current = setTimeout(async () => {
+            try {
+                const response = await api.get(`/api/auth/session/check-username?username=${value}`);
+                if (response.data.success) {
+                    setUsernameStatus(response.data.available ? 'available' : 'unavailable');
+                } else {
+                    setUsernameStatus('idle');
+                }
+            } catch (error) {
+                console.error('Error checking username:', error);
+                setUsernameStatus('idle');
+            }
+        }, 500); // 500ms debounce
+    }
   };
 
   // --- Registration Handler ---
@@ -296,6 +325,9 @@ const SignUp = () => {
                     autoComplete="username"
                   />
                 </div>
+                {usernameStatus === 'checking' && <p className="mt-1 text-xs text-gray-400">Checking availability...</p>}
+                {usernameStatus === 'available' && <p className="mt-1 text-xs text-green-500">The username is available</p>}
+                {usernameStatus === 'unavailable' && <p className="mt-1 text-xs text-red-500">The username is not available</p>}
               </div>
 
               {/* Email */}

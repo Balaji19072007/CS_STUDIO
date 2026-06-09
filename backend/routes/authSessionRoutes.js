@@ -26,6 +26,9 @@ router.post('/login', loginLimiter, authSessionController.loginValidation, authS
 // --- POST /api/auth/session/signup ---
 router.post('/signup', signupLimiter, authSessionController.signup);
 
+// --- GET /api/auth/session/check-username ---
+router.get('/check-username', authSessionController.checkUsername);
+
 // --- POST /api/auth/session/logout ---
 router.post('/logout', authSessionController.logout);
 

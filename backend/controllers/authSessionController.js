@@ -124,6 +124,30 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.checkUsername = async (req, res) => {
+    const { username } = req.query;
+    if (!username) {
+        return res.status(400).json({ success: false, msg: 'Username is required' });
+    }
+
+    try {
+        const { data: existingUser, error } = await supabase.from('users').select('id').eq('username', username).single();
+        
+        if (existingUser) {
+            return res.json({ success: true, available: false });
+        } else {
+            return res.json({ success: true, available: true });
+        }
+    } catch (error) {
+        if (error.code === 'PGRST116') {
+             // Supabase single() returns this error when no rows are found. This means username is available.
+             return res.json({ success: true, available: true });
+        }
+        console.error('Check Username Exception:', error.message);
+        res.status(500).json({ success: false, msg: 'Server error' });
+    }
+};
+
 exports.logout = async (req, res) => {
   try {
     const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
