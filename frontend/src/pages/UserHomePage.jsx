@@ -84,7 +84,7 @@ const ActivityGraph = ({ history }) => {
     }).join(' ');
 
     return (
-        <div className="bg-white dark:bg-gray-800/80 backdrop-blur-md rounded-3xl border border-gray-200 dark:border-gray-700/50 p-6 shadow-xl dark:shadow-2xl relative overflow-hidden group">
+        <div className="bg-white dark:dark-glass backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 p-6 shadow-xl dark:shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="flex justify-between items-center mb-4 relative z-10">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -362,13 +362,13 @@ const UserHomePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-[#0f111a] pt-6 sm:pt-8 pb-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:dark-gradient-secondary pt-6 sm:pt-8 pb-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
 
                 {/* --- HEADER --- */}
                 <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-3 sm:gap-4 pb-4 sm:pb-6 md:pb-8 border-b border-gray-200 dark:border-gray-800 text-center md:text-left">
                     <div className="space-y-1 sm:space-y-2">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 tracking-tight">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-always-white font-outfit tracking-tight">
                             {getGreeting()}, <span className="text-blue-600 dark:text-blue-500">{user.name || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) || 'Developer'}</span>!
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Ready to push your limits today?</p>
@@ -493,7 +493,7 @@ const UserHomePage = () => {
                         {ongoingCourses && ongoingCourses.length > 0 ? (
                             <div className="space-y-6">
                                 {ongoingCourses.map((course) => (
-                                    <div key={course.id} className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/50 rounded-2xl sm:rounded-3xl overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-colors shadow-sm dark:shadow-none">
+                                    <div key={course.id} className="bg-white dark:dark-glass border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-colors shadow-sm dark:shadow-none">
                                         <div className="p-5 sm:p-6 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
                                             <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
                                                 <div className="p-1.5 bg-indigo-100 dark:bg-indigo-500/20 rounded-md">
@@ -553,7 +553,7 @@ const UserHomePage = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="bg-white dark:bg-[#151821] rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden group transition-all">
+                            <div className="bg-white dark:dark-glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden group transition-all">
                                 {/* Subtle decorative elements */}
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
                                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
@@ -588,7 +588,7 @@ const UserHomePage = () => {
                             rankData ? (
                                 <TopUserStats rankData={rankData} />
                             ) : (
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm dark:shadow-none">
+                                <div className="bg-white dark:dark-glass rounded-2xl sm:rounded-3xl p-6 border border-gray-200 dark:border-white/10 text-center shadow-sm dark:shadow-none">
                                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
                                         <BarChart2 className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                                     </div>
@@ -603,7 +603,7 @@ const UserHomePage = () => {
 
 
                         {/* 3. Mastery Widget */}
-                        <div className="bg-white dark:bg-gray-800/40 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700/50 p-5 sm:p-6 shadow-xl dark:shadow-xl hover:border-pink-500/30 transition-colors">
+                        <div className="bg-white dark:dark-glass backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 p-5 sm:p-6 shadow-xl dark:shadow-xl hover:border-pink-500/30 transition-colors">
                             <div className="flex justify-between items-start mb-6">
                                 <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
                                     <span className="p-1.5 bg-pink-100 dark:bg-pink-500/20 rounded-lg">
@@ -659,7 +659,7 @@ const UserHomePage = () => {
 
                         {/* 4. Recommended Problems */}
                         {recommendedProblems.length > 0 && (
-                            <div className="bg-white dark:bg-gray-800/40 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700/50 p-5 sm:p-6 shadow-xl dark:shadow-xl">
+                            <div className="bg-white dark:dark-glass backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 p-5 sm:p-6 shadow-xl dark:shadow-xl">
                                 <div className="flex justify-between items-center mb-5 sm:mb-6">
                                     <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
                                         <span className="p-1.5 bg-cyan-100 dark:bg-cyan-500/20 rounded-lg">

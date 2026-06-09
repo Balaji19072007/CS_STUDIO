@@ -38,7 +38,8 @@ const SignUp = () => {
   const showMessage = (type, text) => {
     setMessage({ type, text });
     if (type === 'success') {
-      setTimeout(() => setMessage({ type: null, text: '' }), 5000);
+      window.dispatchEvent(new Event('auth-login'));
+      setTimeout(() => navigate('/dashboard'), 1000);
     }
   };
 

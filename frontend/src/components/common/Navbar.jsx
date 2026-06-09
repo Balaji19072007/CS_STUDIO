@@ -9,7 +9,7 @@ import SearchBar from './SearchBar.jsx';
 
 // Data that describes all navigation links
 const PRIMARY_NAV_ITEMS = [
-    { name: 'Home', path: '/', icon: 'home' },
+    { name: 'Dashboard', path: '/dashboard', icon: 'home' },
     { name: 'Courses', path: '/courses', icon: 'book' },
     { name: 'Problems', path: '/problems', icon: 'target' },
 ];
