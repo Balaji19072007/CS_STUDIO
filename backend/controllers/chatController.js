@@ -2,7 +2,7 @@
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_to_prevent_startup_crash'
 });
 
 const CS_MENTOR_SYSTEM_PROMPT = `You are CS Mentor, an expert computer science tutor and coding mentor for a modern online learning platform.
