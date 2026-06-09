@@ -128,7 +128,7 @@ exports.signup = async (req, res) => {
       await emailService.sendOTPEmail(email, otp, firstName);
     } catch (emailErr) {
       console.error('Failed to send OTP via Nodemailer:', emailErr);
-      return res.status(500).json({ success: false, msg: 'Failed to send OTP email. Please try again later.' });
+      return res.status(500).json({ success: false, msg: 'Failed to send OTP email: ' + emailErr.message });
     }
 
     // Return success to proceed to OTP screen
