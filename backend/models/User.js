@@ -64,6 +64,7 @@ class User {
                 .from('users')
                 .select('*')
                 .gt('total_points', 0)
+                .neq('role', 'admin')
                 .order('total_points', { ascending: false })
                 .limit(limitCount);
 
