@@ -24,13 +24,13 @@ export function Navbar() {
               <span className="text-base font-semibold tracking-tight">CS Studio</span>
             </a>
           </div>
-          <nav className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex flex-none">
+          <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex flex-none">
             <a className="hover:text-foreground transition" href="#product">Product</a>
             <a className="hover:text-foreground transition" href="#paths">Learn</a>
             <a className="hover:text-foreground transition" href="#arena">Arena</a>
             <a className="hover:text-foreground transition" href="#community">Community</a>
             <a className="hover:text-foreground transition" href="#pricing">Why us</a>
-          </nav>
+          </div>
           <div className="flex flex-1 items-center justify-end gap-4">
             <button 
               onClick={toggleTheme} 
