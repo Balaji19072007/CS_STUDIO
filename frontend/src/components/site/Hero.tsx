@@ -27,9 +27,9 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl"
           >
-            <span className="text-white">Build.</span>{" "}
-            <span className="bg-gradient-to-r from-[#00D2FF] to-[#3A7BD5] bg-clip-text text-transparent">Learn.</span>{" "}
-            <span className="text-[#A3B8CC]">Compete.</span>
+            <span className="text-gradient">Build.</span>{" "}
+            <span className="text-gradient-primary">Learn.</span>{" "}
+            <span className="text-gradient">Compete.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -46,11 +46,11 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mt-8 flex flex-wrap gap-3"
           >
-            <Link to="/signup" className="group inline-flex items-center gap-2 rounded-2xl bg-[#00D2FF] px-6 py-3 text-sm font-medium text-black shadow-[0_0_20px_rgba(0,210,255,0.3)] transition hover:bg-[#00b8e6] hover:scale-[1.02]">
+            <Link to="/signup" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-[1.02]">
               Start Learning
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
-            <Link to="/problems" className="rounded-2xl border border-white/5 bg-[#0A0F1A] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#111827]">
+            <Link to="/problems" className="glass-strong rounded-xl px-6 py-3 text-sm font-medium text-foreground transition hover:bg-card">
               Explore Challenges
             </Link>
           </motion.div>
@@ -58,23 +58,25 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.8 }}
-            className="mt-10 flex items-center gap-6 text-xs text-[#8F9BB3]"
+            className="mt-10 flex items-center gap-6 text-xs text-muted-foreground"
           >
             <div className="flex -space-x-2">
               {[
-                "#8B5CF6", // Purple
-                "#0EA5E9", // Blue
-                "#D946EF", // Pink
-                "#10B981", // Green
-              ].map((color, i) => (
+                { h: 280, Icon: Code2 },
+                { h: 200, Icon: Globe },
+                { h: 330, Icon: Terminal },
+                { h: 150, Icon: Sparkles }
+              ].map(({ h, Icon }) => (
                 <div
-                  key={i}
-                  className="h-8 w-8 rounded-full border-2 border-background shadow-sm"
-                  style={{ backgroundColor: color }}
-                />
+                  key={h}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background text-white shadow-sm"
+                  style={{ background: `linear-gradient(135deg, oklch(0.75 0.18 ${h}), oklch(0.6 0.2 ${h + 30}))` }}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </div>
               ))}
             </div>
-            Loved by 50,000+<br />developers worldwide
+            Loved by 50,000+ developers worldwide
           </motion.div>
         </div>
         <CodeMockup />
