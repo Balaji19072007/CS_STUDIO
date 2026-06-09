@@ -41,11 +41,6 @@ const SignUp = () => {
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
-    if (type === 'success') {
-      setTimeout(() => {
-          window.location.href = '/dashboard';
-      }, 500);
-    }
   };
 
   const handleChange = (e) => {
@@ -128,11 +123,17 @@ const SignUp = () => {
           throw new Error(data.msg || 'Failed to create account');
       }
 
+      if (data.token) {
+          localStorage.setItem('token', data.token);
+      }
+
       if (data.user && !data.session) {
         showMessage('success', 'Registration successful! Please check your email for verification link.');
+        // Don't redirect immediately so they can read the message, maybe redirect to signin after 3s
+        setTimeout(() => { window.location.href = '/signin'; }, 3000);
       } else {
-        showMessage('success', 'Registration successful! Please check your email for verification link.');
-        // Navigate or dispatch event if auto-login is preferred
+        showMessage('success', 'Registration successful!');
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       }
 
     } catch (error) {
