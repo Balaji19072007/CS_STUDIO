@@ -155,7 +155,7 @@ const SignUp = () => {
               <div className="h-12 w-12 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
                 <i data-feather="code" className="text-white text-xl"></i>
               </div>
-              <span className="text-3xl font-bold nav-user-text">CS Studio</span>
+              <span className="text-3xl font-bold text-white">CS Studio</span>
             </div>
 
             <div className="space-y-4">
@@ -209,7 +209,7 @@ const SignUp = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-md">
                 <i data-feather="code" className="text-white"></i>
               </div>
-              <span className="text-xl font-bold nav-user-text">CS Studio</span>
+              <span className="text-xl font-bold text-white">CS Studio</span>
             </Link>
           </div>
 
