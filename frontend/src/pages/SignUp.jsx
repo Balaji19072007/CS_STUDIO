@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import * as feather from 'feather-icons';
 import { supabase } from '../config/supabase';
+import { Navbar as SiteNavbar } from '../components/site/Navbar';
 import { Turnstile } from '@marsidev/react-turnstile';
 import api from '../config/api';
 
@@ -146,17 +147,10 @@ const SignUp = () => {
   // --- Component Render ---
 
   return (
-    <div className="min-h-screen dark-gradient-secondary flex items-center justify-center p-6 py-12 relative">
-      {/* Back Button */}
-      <Link 
-        to="/" 
-        className="absolute top-6 left-6 lg:top-10 lg:left-12 w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg backdrop-blur-md transition-all group z-10"
-        title="Go back"
-      >
-        <i data-feather="arrow-left" className="text-gray-400 group-hover:text-white transition-colors w-5 h-5"></i>
-      </Link>
-
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <>
+      <SiteNavbar />
+      <div className="min-h-screen dark-gradient-secondary flex items-center justify-center p-6 py-12 relative pt-24">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
         {/* LEFT COLUMN: Informational Content */}
         <div className="hidden lg:block">
@@ -453,7 +447,8 @@ const SignUp = () => {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
