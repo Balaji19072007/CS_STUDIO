@@ -59,11 +59,11 @@ export function Showcase() {
               className="grid gap-8 p-8 md:grid-cols-2 md:p-12"
             >
               <div className="flex flex-col justify-center">
-                <h3 className="text-3xl font-semibold tracking-tight text-white">{active.body.title}</h3>
-                <p className="mt-4 text-[#8F9BB3]">{active.body.desc}</p>
+                <h3 className="text-3xl font-semibold tracking-tight text-foreground">{active.body.title}</h3>
+                <p className="mt-4 text-muted-foreground">{active.body.desc}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {active.body.chips.map((c) => (
-                    <span key={c} className="rounded-full border border-white/5 bg-[#0A0F1A] px-3 py-1 text-xs text-[#8F9BB3]">{c}</span>
+                    <span key={c} className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">{c}</span>
                   ))}
                 </div>
               </div>
