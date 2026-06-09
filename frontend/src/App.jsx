@@ -100,8 +100,7 @@ function AppContent() {
       >
 
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<ProtectedRoute><UserHomePage /></ProtectedRoute>} />
+          <Route path="/" element={isLoggedIn ? <UserHomePage /> : <Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/auth/callback" element={<AuthCallback />} />

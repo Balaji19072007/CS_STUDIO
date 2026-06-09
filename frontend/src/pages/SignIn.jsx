@@ -83,7 +83,7 @@ const SignIn = () => {
 
       showMessage('success', 'Signed in successfully!');
       window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/dashboard'), 1000);
+      setTimeout(() => navigate('/'), 1000);
 
     } catch (error) {
       console.error('[SignIn] Login error:', error.response?.data?.msg || error.message);
@@ -121,7 +121,7 @@ const SignIn = () => {
       }
       showMessage('success', 'Signed in successfully!');
       window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/dashboard'), 1000);
+      setTimeout(() => navigate('/'), 1000);
     } catch (error) {
       showMessage('error', error.response?.data?.msg || error.message || 'MFA verification failed');
     } finally {

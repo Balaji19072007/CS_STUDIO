@@ -39,7 +39,7 @@ const SignUp = () => {
     setMessage({ type, text });
     if (type === 'success') {
       window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/dashboard'), 1000);
+      setTimeout(() => navigate('/'), 1000);
     }
   };
 
