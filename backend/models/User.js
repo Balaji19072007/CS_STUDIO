@@ -26,7 +26,8 @@ class User {
             if (criteria.email) {
                 query = query.eq('email', criteria.email);
             } else if (criteria.username) {
-                query = query.eq('username', criteria.username);
+                const searchUsername = criteria.username.replace(/[%_]/g, '\\$&');
+                query = query.ilike('username', searchUsername);
             } else {
                 return null;
             }

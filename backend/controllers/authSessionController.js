@@ -25,12 +25,13 @@ exports.login = async (req, res) => {
 
     try {
         if (!email.includes('@')) {
-            const { data: userRow, error: userError } = await supabase.from('users').select('email').eq('username', email).single();
-            if (userError || !userRow || !userRow.email) {
+            const searchUsername = email.replace(/[%_]/g, '\\$&');
+            const { data: userRows, error: userError } = await supabase.from('users').select('email').ilike('username', searchUsername).limit(1);
+            if (userError || !userRows || userRows.length === 0 || !userRows[0].email) {
                  logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'FAILED', 'Username not found');
                  return res.status(401).json({ success: false, msg: 'Invalid credentials' });
             }
-            authEmail = userRow.email;
+            authEmail = userRows[0].email;
         }
 
         // 2. Authenticate with Supabase
@@ -91,8 +92,9 @@ exports.signup = async (req, res) => {
     }
 
     // Check if username exists
-    const { data: existingUser } = await supabase.from('users').select('id').eq('username', username).single();
-    if (existingUser) {
+    const searchUsername = username.replace(/[%_]/g, '\\$&');
+    const { data: existingUsers } = await supabase.from('users').select('id').ilike('username', searchUsername).limit(1);
+    if (existingUsers && existingUsers.length > 0) {
         return res.status(400).json({ success: false, msg: 'Username already exists' });
     }
 
@@ -148,18 +150,15 @@ exports.checkUsername = async (req, res) => {
     }
 
     try {
-        const { data: existingUser, error } = await supabase.from('users').select('id').eq('username', username).single();
+        const searchUsername = username.replace(/[%_]/g, '\\$&');
+        const { data: existingUsers, error } = await supabase.from('users').select('id').ilike('username', searchUsername).limit(1);
         
-        if (existingUser) {
+        if (existingUsers && existingUsers.length > 0) {
             return res.json({ success: true, available: false });
         } else {
             return res.json({ success: true, available: true });
         }
     } catch (error) {
-        if (error.code === 'PGRST116') {
-             // Supabase single() returns this error when no rows are found. This means username is available.
-             return res.json({ success: true, available: true });
-        }
         console.error('Check Username Exception:', error.message);
         res.status(500).json({ success: false, msg: 'Server error' });
     }
