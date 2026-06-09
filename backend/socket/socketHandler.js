@@ -138,7 +138,21 @@ function prepareExecution(language, code, sessionId) {
         case 'javascript':
         case 'js':
             srcFile = path.join(TEMP_DIR, `${sessionId}.js`);
-            fs.writeFileSync(srcFile, cleanedCode);
+            
+            // Inject a patch so that rl.close() automatically destroys the piped stdin 
+            // otherwise the open pipe from the parent keeps the Node.js event loop alive forever.
+            let jsWrapper = `
+// CS Studio Auto-Patch: Ensure process exits when readline closes
+const _cs_readline = require('readline');
+if (_cs_readline.Interface) {
+    const _cs_origClose = _cs_readline.Interface.prototype.close;
+    _cs_readline.Interface.prototype.close = function() {
+        _cs_origClose.call(this);
+        process.stdin.destroy();
+    };
+}
+`;
+            fs.writeFileSync(srcFile, jsWrapper + cleanedCode);
             cmd = 'node';
             args = [srcFile];
             files.push(srcFile);
