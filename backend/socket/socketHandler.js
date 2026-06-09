@@ -130,7 +130,7 @@ function prepareExecution(language, code, sessionId) {
         case 'python':
             srcFile = path.join(TEMP_DIR, `${sessionId}.py`);
             fs.writeFileSync(srcFile, cleanedCode);
-            cmd = 'python'; // or 'python3'
+            cmd = process.platform === 'win32' ? 'python' : 'python3';
             args = ['-u', srcFile]; // -u for unbuffered output
             files.push(srcFile);
             break;
