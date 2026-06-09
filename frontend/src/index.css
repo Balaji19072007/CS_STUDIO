@@ -485,7 +485,6 @@ body.light-theme .light-btn-secondary:hover {
 
 /* Global Base Styles */
 body {
-  font-family: 'Inter', sans-serif;
   min-height: 100vh;
   background-color: var(--color-background-dark);
   color: var(--color-text-main);
