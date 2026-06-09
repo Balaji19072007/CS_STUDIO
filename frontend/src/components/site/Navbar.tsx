@@ -19,7 +19,7 @@ export function Navbar() {
           <div className="flex flex-1 items-center justify-start">
             <a href="#" className="flex items-center gap-2">
               <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-primary to-accent shadow-glow">
-                <Code2 className="h-4 w-4 text-primary-foreground" />
+                <Code2 className="h-4 w-4 text-always-white" />
               </div>
               <span className="text-base font-semibold tracking-tight">CS Studio</span>
             </a>
@@ -41,7 +41,7 @@ export function Navbar() {
             </button>
             <div className="flex items-center gap-4">
               <Link to="/signin" className="hidden text-sm font-medium text-foreground hover:opacity-80 md:block transition">Sign in</Link>
-              <Link to="/signup" className="rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-medium text-primary-foreground shadow-glow transition hover:opacity-90">
+              <Link to="/signup" className="rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-medium text-always-white shadow-glow transition hover:opacity-90">
                 Get started
               </Link>
             </div>

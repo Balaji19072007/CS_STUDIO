@@ -32,7 +32,7 @@ export function Showcase() {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   className={`relative flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                    isActive ? "text-white" : "text-[#8F9BB3] hover:text-white"
+                    isActive ? "text-always-white" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {isActive && (
@@ -42,8 +42,8 @@ export function Showcase() {
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-2">
-                    {t.id === "ide" ? <span className="font-mono">{">_"}</span> : <Icon className="h-4 w-4" />} {t.label}
+                  <span className={`relative z-10 flex items-center gap-2 ${isActive ? "text-always-white" : ""}`}>
+                    {t.id === "ide" ? <span className={`font-mono ${isActive ? "text-always-white" : ""}`}>{">_"}</span> : <Icon className="h-4 w-4" />} {t.label}
                   </span>
                 </button>
               );
@@ -63,7 +63,7 @@ export function Showcase() {
                 <p className="mt-4 text-muted-foreground">{active.body.desc}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {active.body.chips.map((c) => (
-                    <span key={c} className="rounded-full bg-secondary border border-border/50 px-3 py-1 text-xs text-secondary-foreground">{c}</span>
+                    <span key={c} className="rounded-full bg-slate-900 border border-slate-800 px-3 py-1 text-xs text-always-white">{c}</span>
                   ))}
                 </div>
               </div>
