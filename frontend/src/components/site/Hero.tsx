@@ -4,11 +4,8 @@ import { Link } from "react-router-dom";
 import { Aurora } from "./Aurora";
 import { Particles } from "./Particles";
 import { CodeMockup } from "./CodeMockup";
-// @ts-ignore
-import { useAuth } from "../../hooks/useAuth.jsx";
 
 export function Hero() {
-  const { isLoggedIn } = useAuth() as any;
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden pt-32 pb-20">
       <Aurora />
@@ -49,17 +46,10 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mt-8 flex flex-wrap gap-3"
           >
-            {isLoggedIn ? (
-              <Link to="/problems" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-[1.02]">
-                Go to Dashboard
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </Link>
-            ) : (
-              <Link to="/signup" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-[1.02]">
-                Start Learning
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </Link>
-            )}
+            <Link to="/signup" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 text-sm font-medium text-primary-foreground shadow-glow transition hover:scale-[1.02]">
+              Start Learning
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+            </Link>
             <Link to="/problems" className="glass-strong rounded-xl px-6 py-3 text-sm font-medium text-foreground transition hover:bg-card">
               Explore Challenges
             </Link>

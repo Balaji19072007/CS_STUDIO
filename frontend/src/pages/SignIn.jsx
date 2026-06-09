@@ -10,12 +10,7 @@ const SignIn = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/');
-    }
-  }, [isLoggedIn, navigate]);
+  // Removed auto-redirect to allow users to sign in as a different user or if token is stale
 
   // Form State
   const [formData, setFormData] = useState({
