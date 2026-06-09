@@ -1,5 +1,15 @@
 const { supabase } = require('../config/supabase');
 const { body, validationResult } = require('express-validator');
+const crypto = require('crypto');
+const emailService = require('../util/emailService');
+
+// In-memory store for OTPs: email -> { otp, userData, expiresAt }
+global.otpStore = global.otpStore || new Map();
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 const logAuthEvent = (event, email, ip, status, details = '') => {
   const timestamp = new Date().toISOString();
   console.log(`[AUTH] [${timestamp}] EVENT: ${event} | EMAIL: ${email} | IP: ${ip} | STATUS: ${status} | DETAILS: ${details}`);
