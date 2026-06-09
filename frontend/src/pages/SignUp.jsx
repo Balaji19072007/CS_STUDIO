@@ -149,7 +149,7 @@ const SignUp = () => {
       {/* Back Button */}
       <Link 
         to="/" 
-        className="absolute top-6 left-6 lg:top-8 lg:left-8 w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg backdrop-blur-md transition-all group z-10"
+        className="absolute top-6 left-6 lg:top-10 lg:left-12 w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg backdrop-blur-md transition-all group z-10"
         title="Go back"
       >
         <i data-feather="arrow-left" className="text-gray-400 group-hover:text-white transition-colors w-5 h-5"></i>
