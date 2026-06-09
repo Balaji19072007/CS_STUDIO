@@ -15,6 +15,7 @@ import MobileBottomNav from './components/common/MobileBottomNav.jsx';
 
 // Page imports
 import Home from './pages/Home.jsx';
+import UserHomePage from './pages/UserHomePage.jsx';
 
 import SignIn from './pages/SignIn.jsx';
 import SignUp from './pages/SignUp.jsx';
@@ -99,7 +100,7 @@ function AppContent() {
       >
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={isLoggedIn ? <UserHomePage /> : <Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
