@@ -27,6 +27,8 @@ const SignUp = () => {
 
   const [step, setStep] = useState(1);
   const [otpCode, setOtpCode] = useState(new Array(6).fill(''));
+  const [resendTimer, setResendTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
 
   const [termsChecked, setTermsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +40,24 @@ const SignUp = () => {
 
   useEffect(() => {
     feather.replace();
-  }, [message, showPassword, loading, step]);
+  }, [message, showPassword, loading, step, canResend]);
+
+  useEffect(() => {
+    let interval;
+    if (step === 2 && !canResend) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            clearInterval(interval);
+            return 30; // reset for next time
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, canResend]);
 
   // --- Utility Functions ---
 
@@ -133,6 +152,8 @@ const SignUp = () => {
       if (data.user && !data.session) {
         showMessage('success', 'OTP sent to your email!');
         setStep(2);
+        setCanResend(false);
+        setResendTimer(30);
       } else {
         showMessage('success', 'Registration successful!');
         setTimeout(() => { window.location.href = '/dashboard'; }, 500);
@@ -196,6 +217,28 @@ const SignUp = () => {
     } catch (error) {
       console.error('[SignUp OTP] Error:', error.message);
       showMessage('error', error.response?.data?.msg || error.message || 'Invalid OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setLoading(true);
+    setMessage({ type: null, text: '' });
+    try {
+      const response = await api.post('/api/auth/session/resend-otp', {
+        email: formData.email
+      });
+      if (response.data.success) {
+        showMessage('success', 'OTP resent to your email!');
+        setCanResend(false);
+        setResendTimer(30);
+      } else {
+        throw new Error(response.data.msg || 'Failed to resend OTP');
+      }
+    } catch (error) {
+      console.error('[SignUp Resend OTP] Error:', error.message);
+      showMessage('error', error.response?.data?.msg || error.message || 'Failed to resend OTP.');
     } finally {
       setLoading(false);
     }
@@ -530,76 +573,90 @@ const SignUp = () => {
                   )}
                 </button>
                 
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-full mt-4 py-2 text-primary-400 hover:text-white transition-colors"
-                  disabled={loading}
-                >
-                  Back to Registration
-                </button>
+                <div className="flex flex-col items-center gap-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={!canResend || loading}
+                    className={`text-sm ${canResend ? 'text-primary-400 hover:text-white transition-colors' : 'text-gray-500 cursor-not-allowed'}`}
+                  >
+                    {canResend ? 'Resend OTP' : `Resend OTP in ${resendTimer}s`}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="text-primary-400 hover:text-white transition-colors text-sm py-2"
+                    disabled={loading}
+                  >
+                    Back to Registration
+                  </button>
+                </div>
               </form>
             )}
 
-            {/* Divider */}
-            <div className="my-6 flex items-center gap-4">
-              <div className="flex-grow border-t border-gray-600"></div>
-              <span className="text-gray-400 text-sm">Or</span>
-              <div className="flex-grow border-t border-gray-600"></div>
-            </div>
+            {/* Divider and Social Buttons (Only in Step 1) */}
+            {step === 1 && (
+              <>
+                <div className="my-6 flex items-center gap-4">
+                  <div className="flex-grow border-t border-gray-600"></div>
+                  <span className="text-gray-400 text-sm">Or</span>
+                  <div className="flex-grow border-t border-gray-600"></div>
+                </div>
 
-            {/* Social Auth Buttons */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Google Button */}
-              <button
-                type="button"
-                onClick={handleGoogleSignUp}
-                disabled={loading}
-                className="py-3.5 bg-white text-gray-900 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                title="Sign up with Google"
-              >
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
-              </button>
+                {/* Social Auth Buttons */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Google Button */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignUp}
+                    disabled={loading}
+                    className="py-3.5 bg-white text-gray-900 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                    title="Sign up with Google"
+                  >
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
+                  </button>
 
-              {/* GitHub Button */}
-              <button
-                type="button"
-                onClick={async () => {
-                  setLoading(true);
-                  setMessage({ type: null, text: '' });
-                  try {
-                    const { error } = await supabase.auth.signInWithOAuth({
-                      provider: 'github',
-                      options: { redirectTo: `${window.location.origin}/auth/callback` },
-                    });
-                    if (error) throw error;
-                  } catch (error) {
-                    console.error('GitHub Auth Error:', error.message);
-                    showMessage('error', 'GitHub authentication failed.');
-                    setLoading(false);
-                  }
-                }}
-                disabled={loading}
-                className="py-3.5 bg-[#24292e] text-white rounded-lg shadow-lg hover:shadow-xl hover:bg-[#1b1f23] transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed border border-gray-700"
-                title="Sign up with GitHub"
-              >
-                <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-6 h-6 invert" alt="GitHub" />
-              </button>
-            </div>
+                  {/* GitHub Button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setLoading(true);
+                      setMessage({ type: null, text: '' });
+                      try {
+                        const { error } = await supabase.auth.signInWithOAuth({
+                          provider: 'github',
+                          options: { redirectTo: `${window.location.origin}/auth/callback` },
+                        });
+                        if (error) throw error;
+                      } catch (error) {
+                        console.error('GitHub Auth Error:', error.message);
+                        showMessage('error', 'GitHub authentication failed.');
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="py-3.5 bg-[#24292e] text-white rounded-lg shadow-lg hover:shadow-xl hover:bg-[#1b1f23] transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed border border-gray-700"
+                    title="Sign up with GitHub"
+                  >
+                    <img src="https://www.svgrepo.com/show/512317/github-142.svg" className="w-6 h-6 invert" alt="GitHub" />
+                  </button>
+                </div>
 
-
-            {/* Sign In Link */}
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Already have an account?{' '}
-                <Link
-                  to="/signin"
-                  className="text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-                >
-                  Sign In
-                </Link>
-              </p>
-            </div>
+                {/* Sign In Link */}
+                <div className="mt-6 text-center">
+                  <p className="text-gray-400 text-sm">
+                    Already have an account?{' '}
+                    <Link
+                      to="/signin"
+                      className="text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Footer */}

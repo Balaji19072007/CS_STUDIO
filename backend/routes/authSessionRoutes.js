@@ -32,6 +32,9 @@ router.get('/check-username', authSessionController.checkUsername);
 // --- POST /api/auth/session/verify-otp ---
 router.post('/verify-otp', authSessionController.verifyOtp);
 
+// --- POST /api/auth/session/resend-otp ---
+router.post('/resend-otp', authSessionController.resendOtp);
+
 // --- POST /api/auth/session/logout ---
 router.post('/logout', authSessionController.logout);
 

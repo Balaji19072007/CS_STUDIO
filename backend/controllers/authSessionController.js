@@ -195,6 +195,30 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
+exports.resendOtp = async (req, res) => {
+  const { email } = req.body;
+  try {
+    if (!email) {
+      return res.status(400).json({ success: false, msg: 'Email is required' });
+    }
+
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    });
+
+    if (error) {
+      console.error('Supabase Resend OTP Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
+    }
+
+    res.json({ success: true, msg: 'OTP resent successfully' });
+  } catch (error) {
+    console.error('Resend OTP Exception:', error.message);
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
 exports.logout = async (req, res) => {
   try {
     const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
