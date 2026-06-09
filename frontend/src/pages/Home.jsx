@@ -3,10 +3,11 @@ import { MouseGlow } from "@/components/site/MouseGlow";
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { Metrics } from "@/components/site/Metrics";
-import { FeatureSlides } from "@/components/site/FeatureSlides";
-import { ProblemVisualizer } from "@/components/site/ProblemVisualizer";
+import { Showcase } from "@/components/site/Showcase";
+import { Paths } from "@/components/site/Paths";
 import { Arena } from "@/components/site/Arena";
 import { Community } from "@/components/site/Community";
+import { AlgoVisualizer } from "@/components/site/AlgoVisualizer";
 import { TechMarquee } from "@/components/site/TechMarquee";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Certificates } from "@/components/site/Certificates";
@@ -30,10 +31,11 @@ export default function Home() {
       <main className="relative">
         <Hero />
         <Metrics />
-        <FeatureSlides />
-        <ProblemVisualizer />
+        <Showcase />
+        <Paths />
         <Arena />
         <Community />
+        <AlgoVisualizer />
         <TechMarquee />
         <Testimonials />
         <Certificates />
