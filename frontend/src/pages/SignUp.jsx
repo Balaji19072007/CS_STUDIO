@@ -325,9 +325,9 @@ const SignUp = () => {
                     autoComplete="username"
                   />
                 </div>
-                {usernameStatus === 'checking' && <p className="mt-1 text-xs text-gray-400">Checking availability...</p>}
-                {usernameStatus === 'available' && <p className="mt-1 text-xs text-green-500">The username is available</p>}
-                {usernameStatus === 'unavailable' && <p className="mt-1 text-xs text-red-500">The username is not available</p>}
+                {usernameStatus === 'checking' && <p className="mt-1 text-xs text-left text-gray-400 pl-2">Checking availability...</p>}
+                {usernameStatus === 'available' && <p className="mt-1 text-xs text-left text-green-500 pl-2">The username is available</p>}
+                {usernameStatus === 'unavailable' && <p className="mt-1 text-xs text-left text-red-500 pl-2">The username is not available</p>}
               </div>
 
               {/* Email */}
