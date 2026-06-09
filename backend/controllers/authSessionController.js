@@ -114,6 +114,23 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ success: false, msg: error.message });
     }
 
+    if (data.user) {
+      // Force upsert the user into public.users to ensure the username is saved.
+      // This is a failsafe in case the Supabase auth trigger omits the username.
+      const { error: upsertError } = await supabase.from('users').upsert({
+         id: data.user.id,
+         email: email,
+         username: username,
+         first_name: firstName,
+         last_name: lastName,
+         role: 'user'
+      }, { onConflict: 'id' });
+
+      if (upsertError) {
+         console.error('Failed to upsert username into public.users:', upsertError.message);
+      }
+    }
+
     if (data.session) {
       setCookies(res, data.session);
     }
