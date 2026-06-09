@@ -43,7 +43,7 @@ const SignUp = () => {
     setMessage({ type, text });
     if (type === 'success') {
       setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/dashboard';
       }, 500);
     }
   };
