@@ -115,24 +115,44 @@ exports.signup = async (req, res) => {
         return res.status(400).json({ success: false, msg: 'User already registered' });
     }
 
-    const otp = generateOTP();
-    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-
-    global.otpStore.set(email, {
-      otp,
-      userData: { email, password, firstName, lastName, username },
-      expiresAt
-    });
-
-    try {
-      await emailService.sendOTPEmail(email, otp, firstName);
-    } catch (emailErr) {
-      console.error('Failed to send OTP via Nodemailer:', emailErr);
-      return res.status(500).json({ success: false, msg: 'Failed to send OTP email: ' + emailErr.message });
+    const options = {
+      data: { first_name: firstName, last_name: lastName, username }
+    };
+    if (captchaToken) {
+      options.captchaToken = captchaToken;
     }
 
-    // Return success to proceed to OTP screen
-    res.json({ success: true, user: { email }, session: null });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options
+    });
+
+    if (error) {
+      console.error('Supabase Signup Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
+    }
+
+    if (data.user) {
+      // Force upsert the user into public.users to ensure the username is saved.
+      const { error: upsertError } = await supabase.from('users').upsert({
+         id: data.user.id,
+         email: email,
+         username: username,
+         first_name: firstName,
+         last_name: lastName,
+         role: 'user'
+      }, { onConflict: 'id' });
+
+      if (upsertError) {
+         console.error('Failed to upsert username into public.users:', upsertError.message);
+      }
+    }
+
+    if (data.session) {
+      setCookies(res, data.session);
+    }
+    res.json({ success: true, user: data.user, session: data.session, token: data.session?.access_token });
   } catch (error) {
     console.error('Signup Exception:', error.message);
     res.status(500).json({ success: false, msg: 'Server error' });
@@ -167,71 +187,23 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ success: false, msg: 'Email and OTP are required' });
     }
 
-    const record = global.otpStore.get(email);
-    if (!record) {
-      return res.status(400).json({ success: false, msg: 'OTP expired or invalid. Please sign up again.' });
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'signup'
+    });
+
+    if (error) {
+      console.error('Supabase Verify OTP Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
     }
 
-    if (Date.now() > record.expiresAt) {
-      global.otpStore.delete(email);
-      return res.status(400).json({ success: false, msg: 'OTP has expired. Please sign up again.' });
+    if (data.session) {
+      setCookies(res, data.session);
     }
-
-    if (record.otp !== otp) {
-      return res.status(400).json({ success: false, msg: 'Invalid OTP' });
-    }
-
-    // OTP matches! Create the user in Supabase
-    const { userData } = record;
     
-    const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
-      email: userData.email,
-      password: userData.password,
-      email_confirm: true,
-      user_metadata: {
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        username: userData.username
-      }
-    });
-
-    if (adminError) {
-      console.error('Supabase Admin Create User Error:', adminError.message);
-      return res.status(400).json({ success: false, msg: adminError.message });
-    }
-
-    // Upsert into public.users
-    if (adminData.user) {
-      const { error: upsertError } = await supabase.from('users').upsert({
-         id: adminData.user.id,
-         email: userData.email,
-         username: userData.username,
-         first_name: userData.firstName,
-         last_name: userData.lastName,
-         role: 'user'
-      }, { onConflict: 'id' });
-
-      if (upsertError) {
-         console.error('Failed to upsert username into public.users:', upsertError.message);
-      }
-    }
-
-    global.otpStore.delete(email); // Clear OTP
-
-    // Log the user in to get a session
-    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-      email: userData.email,
-      password: userData.password
-    });
-
-    if (loginError || !loginData.session) {
-      // User was created but login failed (rare)
-      return res.json({ success: true, user: adminData.user, msg: 'Account verified. Please log in.' });
-    }
-
-    setCookies(res, loginData.session);
     logAuthEvent('VERIFY_OTP_ATTEMPT', email, req.ip, 'SUCCESS');
-    res.json({ success: true, user: loginData.user, session: loginData.session, token: loginData.session.access_token });
+    res.json({ success: true, user: data.user, session: data.session, token: data.session?.access_token });
   } catch (error) {
     console.error('Verify OTP Exception:', error.message);
     res.status(500).json({ success: false, msg: 'Server error' });
@@ -245,25 +217,14 @@ exports.resendOtp = async (req, res) => {
       return res.status(400).json({ success: false, msg: 'Email is required' });
     }
 
-    const record = global.otpStore.get(email);
-    if (!record) {
-      return res.status(400).json({ success: false, msg: 'Session expired. Please sign up again.' });
-    }
-
-    const otp = generateOTP();
-    const expiresAt = Date.now() + 5 * 60 * 1000;
-
-    global.otpStore.set(email, {
-      ...record,
-      otp,
-      expiresAt
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
     });
 
-    try {
-      await emailService.sendOTPEmail(email, otp, record.userData.firstName);
-    } catch (emailErr) {
-      console.error('Failed to resend OTP via Nodemailer:', emailErr);
-      return res.status(500).json({ success: false, msg: 'Failed to send OTP email.' });
+    if (error) {
+      console.error('Supabase Resend OTP Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
     }
 
     res.json({ success: true, msg: 'OTP resent successfully' });
