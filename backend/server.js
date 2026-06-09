@@ -17,6 +17,7 @@ const cookieParser = require('cookie-parser');
 const { supabase } = require('./config/supabase');
 
 const app = express();
+app.set('trust proxy', 1); // Trust the Render reverse proxy for rate limit
 const server = http.createServer(app);
 
 // --- Model Imports ---
