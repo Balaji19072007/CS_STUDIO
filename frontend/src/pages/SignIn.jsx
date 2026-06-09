@@ -82,8 +82,9 @@ const SignIn = () => {
       }
 
       showMessage('success', 'Signed in successfully!');
-      window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/'), 1000);
+      setTimeout(() => {
+          window.location.href = '/';
+      }, 500);
 
     } catch (error) {
       console.error('[SignIn] Login error:', error.response?.data?.msg || error.message);
@@ -120,8 +121,9 @@ const SignIn = () => {
           localStorage.setItem('token', verifyData.token);
       }
       showMessage('success', 'Signed in successfully!');
-      window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/'), 1000);
+      setTimeout(() => {
+          window.location.href = '/';
+      }, 500);
     } catch (error) {
       showMessage('error', error.response?.data?.msg || error.message || 'MFA verification failed');
     } finally {

@@ -40,11 +40,8 @@ const AuthCallback = () => {
                 }
             }
 
-            // Notify AuthContext
-            window.dispatchEvent(new Event('auth-login'));
-
             setTimeout(() => {
-                navigate('/');
+                window.location.href = '/';
             }, 500);
 
         } catch (err) {

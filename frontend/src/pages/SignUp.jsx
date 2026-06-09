@@ -38,8 +38,9 @@ const SignUp = () => {
   const showMessage = (type, text) => {
     setMessage({ type, text });
     if (type === 'success') {
-      window.dispatchEvent(new Event('auth-login'));
-      setTimeout(() => navigate('/'), 1000);
+      setTimeout(() => {
+          window.location.href = '/';
+      }, 500);
     }
   };
 
