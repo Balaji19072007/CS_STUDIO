@@ -135,7 +135,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        'sans': ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
         'display': ['Outfit', 'system-ui', 'sans-serif'],
       },
       boxShadow: {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Terminal, Globe, Trophy, Users, Award } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
@@ -14,6 +14,17 @@ const TABS = [
 export function Showcase() {
   const [tab, setTab] = useState(TABS[0].id);
   const active = TABS.find((t) => t.id === tab)!;
+
+  // Auto-rotate tabs every 5 seconds
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setTab((current) => {
+        const currentIndex = TABS.findIndex((t) => t.id === current);
+        return TABS[(currentIndex + 1) % TABS.length].id;
+      });
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
   return (
     <section id="product" className="relative py-28">
       <div className="mx-auto max-w-7xl px-6">
