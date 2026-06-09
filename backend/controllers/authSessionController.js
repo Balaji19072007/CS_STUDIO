@@ -165,6 +165,36 @@ exports.checkUsername = async (req, res) => {
     }
 };
 
+exports.verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, msg: 'Email and OTP are required' });
+    }
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'signup'
+    });
+
+    if (error) {
+      console.error('Supabase Verify OTP Error:', error.message);
+      return res.status(400).json({ success: false, msg: error.message });
+    }
+
+    if (data.session) {
+      setCookies(res, data.session);
+    }
+    
+    logAuthEvent('VERIFY_OTP_ATTEMPT', email, req.ip, 'SUCCESS');
+    res.json({ success: true, user: data.user, session: data.session, token: data.session?.access_token });
+  } catch (error) {
+    console.error('Verify OTP Exception:', error.message);
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
 exports.logout = async (req, res) => {
   try {
     const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];

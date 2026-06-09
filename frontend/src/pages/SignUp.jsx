@@ -25,6 +25,9 @@ const SignUp = () => {
     captchaToken: '',
   });
 
+  const [step, setStep] = useState(1);
+  const [otpCode, setOtpCode] = useState(new Array(6).fill(''));
+
   const [termsChecked, setTermsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ type: null, text: '' });
@@ -35,7 +38,7 @@ const SignUp = () => {
 
   useEffect(() => {
     feather.replace();
-  }, [message, showPassword, loading]);
+  }, [message, showPassword, loading, step]);
 
   // --- Utility Functions ---
 
@@ -128,9 +131,8 @@ const SignUp = () => {
       }
 
       if (data.user && !data.session) {
-        showMessage('success', 'Registration successful! Please check your email for verification link.');
-        // Don't redirect immediately so they can read the message, maybe redirect to signin after 3s
-        setTimeout(() => { window.location.href = '/signin'; }, 3000);
+        showMessage('success', 'OTP sent to your email!');
+        setStep(2);
       } else {
         showMessage('success', 'Registration successful!');
         setTimeout(() => { window.location.href = '/dashboard'; }, 500);
@@ -144,6 +146,56 @@ const SignUp = () => {
       } else {
          showMessage('error', error.response?.data?.msg || error.message || 'Failed to create account.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Step 2: OTP Verification ---
+  const handleOtpChange = (element, index) => {
+    if (isNaN(element.value)) return;
+    const newOtp = [...otpCode];
+    newOtp[index] = element.value;
+    setOtpCode(newOtp);
+
+    if (element.value && element.nextSibling) {
+      element.nextSibling.focus();
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: null, text: '' });
+
+    const otp = otpCode.join('');
+
+    if (otp.length !== 6) {
+      showMessage('error', 'Please enter the complete 6-digit OTP');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.post('/api/auth/session/verify-otp', {
+        email: formData.email,
+        otp
+      });
+
+      const data = response.data;
+
+      if (response.status === 200 && data.success) {
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        showMessage('success', 'Account verified successfully!');
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
+      } else {
+        throw new Error(data.msg || 'Invalid OTP');
+      }
+    } catch (error) {
+      console.error('[SignUp OTP] Error:', error.message);
+      showMessage('error', error.response?.data?.msg || error.message || 'Invalid OTP.');
     } finally {
       setLoading(false);
     }
@@ -279,8 +331,9 @@ const SignUp = () => {
               </div>
             )}
 
-            <form onSubmit={handleRegistrationSubmit} className="space-y-5">
-              {/* First Name & Last Name */}
+            {step === 1 ? (
+              <form onSubmit={handleRegistrationSubmit} className="space-y-5">
+                {/* First Name & Last Name */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="firstName" className="sr-only">First Name</label>
@@ -439,6 +492,54 @@ const SignUp = () => {
                 )}
               </button>
             </form>
+            ) : (
+              <form onSubmit={handleOtpSubmit} className="space-y-6">
+                <p className="text-gray-400 text-center mb-6">
+                  We sent a 6-digit code to <strong className="text-white">{formData.email}</strong>
+                </p>
+
+                {/* OTP Input */}
+                <div className="flex justify-center space-x-2 mb-6">
+                  {otpCode.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      value={digit}
+                      onChange={(e) => handleOtpChange(e.target, index)}
+                      onFocus={(e) => e.target.select()}
+                      className="form-input w-12 h-14 text-center text-2xl font-bold rounded-lg text-white bg-gray-800 border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                      disabled={loading}
+                    />
+                  ))}
+                </div>
+
+                {/* Verify Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <i data-feather="loader" className="w-5 h-5 animate-spin"></i>
+                      Verifying...
+                    </span>
+                  ) : (
+                    'Verify Account'
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="w-full mt-4 py-2 text-primary-400 hover:text-white transition-colors"
+                  disabled={loading}
+                >
+                  Back to Registration
+                </button>
+              </form>
+            )}
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-4">
