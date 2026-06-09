@@ -19,9 +19,9 @@ const TopUserStats = ({ rankData }) => {
                     <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-between gap-6 relative z-10 w-full">
                         <div className="flex items-center gap-5 flex-shrink-0 w-full sm:w-auto lg:w-full justify-center sm:justify-start lg:justify-center">
                             <div className="relative">
-                                <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-gray-100 dark:dark-glass border border-gray-200 dark:border-white/10 shadow-inner group-hover:border-blue-500/50 transition-colors">
+                                <div className="flex flex-col items-center justify-center min-w-[5.5rem] px-3 h-20 rounded-2xl bg-gray-100 dark:dark-glass border border-gray-200 dark:border-white/10 shadow-inner group-hover:border-blue-500/50 transition-colors">
                                     <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold mb-0.5">Rank</span>
-                                    <span className="text-3xl font-black text-gray-900 dark:text-white">#{rank}</span>
+                                    <span className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white whitespace-nowrap">#{rank}</span>
                                 </div>
                                 <div className="absolute -top-2 -right-2 bg-yellow-500 w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                                     <Crown className="w-3 h-3 text-black fill-current" />
