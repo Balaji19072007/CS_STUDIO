@@ -4,9 +4,12 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 // @ts-ignore
 import { ThemeContext } from "../../contexts/ThemeContext";
+// @ts-ignore
+import { useAuth } from "../../hooks/useAuth.jsx";
 
 export function Navbar() {
   const { theme, toggleTheme } = useContext(ThemeContext) as any;
+  const { isLoggedIn } = useAuth() as any;
 
   return (
     <div className="fixed top-4 left-1/2 z-50 w-[min(1100px,calc(100%-2rem))] -translate-x-1/2">
@@ -40,10 +43,18 @@ export function Navbar() {
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <div className="flex items-center gap-4">
-              <Link to="/signin" className="hidden text-sm font-medium text-foreground hover:opacity-80 md:block transition">Sign in</Link>
-              <Link to="/signup" className="rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-medium text-always-white shadow-glow transition hover:opacity-90">
-                Get started
-              </Link>
+              {isLoggedIn ? (
+                <Link to="/problems" className="rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-medium text-always-white shadow-glow transition hover:opacity-90">
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link to="/signin" className="hidden text-sm font-medium text-foreground hover:opacity-80 md:block transition">Sign in</Link>
+                  <Link to="/signup" className="rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-medium text-always-white shadow-glow transition hover:opacity-90">
+                    Get started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
