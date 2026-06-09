@@ -102,7 +102,13 @@ class Discussion {
 
     async deleteOne() {
         if (this.id) {
-            await supabase.from('discussions').delete().eq('id', this.id);
+            console.log('Attempting to delete discussion:', this.id);
+            const { data, error } = await supabase.from('discussions').delete().eq('id', this.id);
+            if (error) {
+                console.error('Error deleting discussion:', error);
+                throw error;
+            }
+            console.log('Successfully deleted discussion', data);
         }
     }
 }
