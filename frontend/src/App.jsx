@@ -89,7 +89,7 @@ function AppContent() {
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
 
       {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve page */}
-      {isLoggedIn && location.pathname !== '/' && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
+      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
       {!(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
@@ -163,7 +163,7 @@ function AppContent() {
       {location.pathname !== '/' && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
 
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
-      {isLoggedIn && location.pathname !== '/' && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
+      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
     </div>
   );
 }
