@@ -65,7 +65,8 @@ class CodeExecutionService {
       const tempFile = path.join(this.tempDir, `${sessionId}.py`);
       fs.writeFileSync(tempFile, code);
 
-      const pythonProcess = spawn('python', [tempFile], {
+      const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+      const pythonProcess = spawn(pythonCmd, [tempFile], {
         timeout: 10000 // 10 seconds timeout
       });
 
