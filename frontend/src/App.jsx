@@ -143,7 +143,7 @@ function AppContent() {
       </main>
 
       <RatingPopup />
-      {location.pathname !== '/' && !location.pathname.startsWith('/solve') &&
+      {!location.pathname.startsWith('/solve') &&
         !location.pathname.startsWith('/challenge') &&
         !location.pathname.startsWith('/course-challenge') &&
         !location.pathname.startsWith('/course-project') &&
