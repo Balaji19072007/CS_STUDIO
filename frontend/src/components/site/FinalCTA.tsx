@@ -11,7 +11,7 @@ export function FinalCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-5xl font-semibold tracking-tight md:text-6xl text-gradient"
+          className="text-5xl font-display font-semibold tracking-tight md:text-6xl text-gradient"
         >
           Your next breakthrough<br />starts with one line of code.
         </motion.h2>

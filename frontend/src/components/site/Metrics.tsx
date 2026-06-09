@@ -10,7 +10,7 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
     if (inView) animate(mv, to, { duration: 1.8, ease: "easeOut" });
   }, [inView, to, mv]);
   return (
-    <span ref={ref} className="text-4xl font-semibold md:text-5xl text-gradient-primary">
+    <span ref={ref} className="text-4xl font-display font-semibold md:text-5xl text-gradient-primary">
       <motion.span>{rounded}</motion.span>
       {suffix}
     </span>

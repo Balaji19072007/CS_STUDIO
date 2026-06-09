@@ -16,7 +16,7 @@ export function SectionHeader({ eyebrow, title, subtitle }: { eyebrow: string; t
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay: 0.1 }}
-        className="text-4xl font-semibold tracking-tight md:text-5xl text-gradient"
+        className="text-4xl font-display font-semibold tracking-tight md:text-5xl text-gradient"
       >
         {title}
       </motion.h2>

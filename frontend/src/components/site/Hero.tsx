@@ -25,7 +25,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl"
+            className="text-5xl font-display font-semibold leading-[1.05] tracking-tight md:text-7xl"
           >
             <span className="text-gradient">Build.</span>{" "}
             <span className="text-gradient-primary">Learn.</span>{" "}
