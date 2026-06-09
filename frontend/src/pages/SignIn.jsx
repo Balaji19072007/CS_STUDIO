@@ -296,23 +296,23 @@ const SignIn = () => {
               </form>
             ) : (
             <form onSubmit={handleLoginSubmit} className="space-y-5">
-              {/* Email Field */}
+              {/* Email or Username Field */}
               <div>
-                <label htmlFor="email" className="sr-only">Email</label>
+                <label htmlFor="email" className="sr-only">Email or Username</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-400">
-                    <i data-feather="mail" className="w-5 h-5"></i>
+                    <i data-feather="user" className="w-5 h-5"></i>
                   </span>
                   <input
-                    type="email"
+                    type="text"
                     id="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     className="form-input w-full pl-12 pr-4 py-3.5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
-                    placeholder="Email Address"
+                    placeholder="Email or Username"
                     disabled={loading}
-                    autoComplete="email"
+                    autoComplete="username email"
                   />
                 </div>
               </div>

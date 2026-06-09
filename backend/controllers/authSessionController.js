@@ -7,7 +7,7 @@ const logAuthEvent = (event, email, ip, status, details = '') => {
 
 // Validation schemas
 exports.loginValidation = [
-  body('email').isEmail().withMessage('Please enter a valid email address'),
+  body('email').notEmpty().withMessage('Email or Username is required'),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
@@ -20,20 +20,30 @@ exports.login = async (req, res) => {
     return res.status(401).json({ success: false, msg: 'Invalid credentials' });
   }
 
-  const { email, password, captchaToken } = req.body;
+    const { email, password, captchaToken } = req.body;
+    let authEmail = email;
 
-  try {
-    // 2. Authenticate with Supabase
-    const options = {};
-    if (captchaToken) {
-        options.captchaToken = captchaToken;
-    }
+    try {
+        if (!email.includes('@')) {
+            const { data: userRow, error: userError } = await supabase.from('users').select('email').eq('username', email).single();
+            if (userError || !userRow || !userRow.email) {
+                 logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'FAILED', 'Username not found');
+                 return res.status(401).json({ success: false, msg: 'Invalid credentials' });
+            }
+            authEmail = userRow.email;
+        }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-      ...(Object.keys(options).length > 0 && { options })
-    });
+        // 2. Authenticate with Supabase
+        const options = {};
+        if (captchaToken) {
+            options.captchaToken = captchaToken;
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: authEmail,
+          password,
+          ...(Object.keys(options).length > 0 && { options })
+        });
 
     if (error) {
       logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'FAILED', error.message);
@@ -74,10 +84,20 @@ exports.login = async (req, res) => {
 };
 
 exports.signup = async (req, res) => {
-  const { email, password, firstName, lastName, captchaToken } = req.body;
+  const { email, password, firstName, lastName, username, captchaToken } = req.body;
   try {
+    if (!username) {
+        return res.status(400).json({ success: false, msg: 'Username is required' });
+    }
+
+    // Check if username exists
+    const { data: existingUser } = await supabase.from('users').select('id').eq('username', username).single();
+    if (existingUser) {
+        return res.status(400).json({ success: false, msg: 'Username already exists' });
+    }
+
     const options = {
-      data: { first_name: firstName, last_name: lastName }
+      data: { first_name: firstName, last_name: lastName, username }
     };
     if (captchaToken) {
       options.captchaToken = captchaToken;

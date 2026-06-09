@@ -18,6 +18,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -56,9 +57,9 @@ const SignUp = () => {
     setLoading(true);
     setMessage({ type: null, text: '' });
 
-    const { firstName, lastName, email, password, confirmPassword } = formData;
+    const { firstName, lastName, username, email, password, confirmPassword } = formData;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
       showMessage('error', 'Please fill in all fields');
       setLoading(false);
       return;
@@ -88,6 +89,7 @@ const SignUp = () => {
         password, 
         firstName, 
         lastName, 
+        username,
         captchaToken: formData.captchaToken 
       });
       
@@ -272,6 +274,26 @@ const SignUp = () => {
                     className="form-input w-full px-4 py-3.5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
                     placeholder="Last Name"
                     disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Username */}
+              <div>
+                <label htmlFor="username" className="sr-only">Username</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-400">
+                    <i data-feather="at-sign" className="w-5 h-5"></i>
+                  </span>
+                  <input
+                    type="text"
+                    id="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="form-input w-full pl-12 px-4 py-3.5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                    placeholder="Username"
+                    disabled={loading}
+                    autoComplete="username"
                   />
                 </div>
               </div>
