@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Code2, Globe, Terminal } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Aurora } from "./Aurora";
 import { Particles } from "./Particles";
 import { CodeMockup } from "./CodeMockup";
@@ -45,13 +46,13 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mt-8 flex flex-wrap gap-3"
           >
-            <button className="group inline-flex items-center gap-2 rounded-2xl bg-[#00D2FF] px-6 py-3 text-sm font-medium text-black shadow-[0_0_20px_rgba(0,210,255,0.3)] transition hover:bg-[#00b8e6] hover:scale-[1.02]">
+            <Link to="/signup" className="group inline-flex items-center gap-2 rounded-2xl bg-[#00D2FF] px-6 py-3 text-sm font-medium text-black shadow-[0_0_20px_rgba(0,210,255,0.3)] transition hover:bg-[#00b8e6] hover:scale-[1.02]">
               Start Learning
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </button>
-            <button className="rounded-2xl border border-white/5 bg-[#0A0F1A] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#111827]">
+            </Link>
+            <Link to="/problems" className="rounded-2xl border border-white/5 bg-[#0A0F1A] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#111827]">
               Explore Challenges
-            </button>
+            </Link>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}

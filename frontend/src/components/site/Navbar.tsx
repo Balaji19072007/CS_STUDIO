@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Code2, Sun, Moon } from "lucide-react";
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 // @ts-ignore
 import { ThemeContext } from "../../contexts/ThemeContext";
 
@@ -36,10 +37,10 @@ export function Navbar() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <button className="hidden text-sm text-muted-foreground hover:text-foreground md:block">Sign in</button>
-            <button className="rounded-lg bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow transition hover:opacity-90">
+            <Link to="/signin" className="hidden text-sm text-muted-foreground hover:text-foreground md:block">Sign in</Link>
+            <Link to="/signup" className="rounded-lg bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow transition hover:opacity-90">
               Get started
-            </button>
+            </Link>
           </div>
         </div>
       </motion.header>
