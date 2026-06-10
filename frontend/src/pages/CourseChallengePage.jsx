@@ -77,7 +77,9 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     const lockedOutputRef = useRef('');
     const inputBufferRef = useRef('');
     const isInputActiveRef = useRef(false);
+    const inputReadyTimerRef = useRef(null);
     const [userTyping, setUserTyping] = useState('');
+    const [isInputReady, setIsInputReady] = useState(false);
     
     const [error, setError] = useState(null);
     const [outputError, setOutputError] = useState(false);
@@ -186,35 +188,45 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
         };
     }, []);
 
-    // Focus terminal textarea and lock output boundary when waiting for input
+    // Debounced lock: waits 150ms after last output chunk before locking boundary.
+    // Also watches `output` so multi-input programs re-lock for subsequent prompts.
     useEffect(() => {
         if (isWaitingForInput) {
-            lockedOutputRef.current = output;
+            if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+            setIsInputReady(false);
             setUserTyping('');
-            setTimeout(() => {
+            inputReadyTimerRef.current = setTimeout(() => {
                 if (terminalRef.current) {
+                    const currentVal = terminalRef.current.value;
+                    lockedOutputRef.current = currentVal;
+                    setIsInputReady(true);
                     terminalRef.current.focus();
-                    const len = terminalRef.current.value.length;
-                    terminalRef.current.setSelectionRange(len, len);
+                    terminalRef.current.setSelectionRange(currentVal.length, currentVal.length);
                 }
-            }, 50);
+            }, 150);
         } else {
+            if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+            setIsInputReady(false);
             setUserTyping('');
         }
-    }, [isWaitingForInput]);
+        return () => {
+            if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isWaitingForInput, output]);
 
     // Inline terminal textarea handlers
     const handleTerminalChange = useCallback((e) => {
-        if (!isWaitingForInput) return;
+        if (!isWaitingForInput || !isInputReady) return;
         const newVal = e.target.value;
         const locked = lockedOutputRef.current;
         if (newVal.startsWith(locked)) {
             setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
         }
-    }, [isWaitingForInput]);
+    }, [isWaitingForInput, isInputReady]);
 
     const handleTerminalKeyDown = useCallback((e) => {
-        if (!isWaitingForInput) return;
+        if (!isWaitingForInput || !isInputReady) return;
         if (e.key === 'Enter') {
             e.preventDefault();
             const input = userTyping;
@@ -226,15 +238,9 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                 setUserTyping('');
                 inputBufferRef.current = '';
                 isInputActiveRef.current = true;
-                setTimeout(() => {
-                    if (terminalRef.current) {
-                        const len = terminalRef.current.value.length;
-                        terminalRef.current.setSelectionRange(len, len);
-                    }
-                }, 0);
             }
         }
-    }, [isWaitingForInput, userTyping]);
+    }, [isWaitingForInput, isInputReady, userTyping]);
 
 
     const handleOutput = (nextOutput, isError) => {
@@ -743,12 +749,12 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                         </div>
                         <textarea
                             ref={terminalRef}
-                            value={output + (isWaitingForInput ? userTyping : '')}
-                            readOnly={!isWaitingForInput}
+                            value={output + (isWaitingForInput && isInputReady ? userTyping : '')}
+                            readOnly={!isWaitingForInput || !isInputReady}
                             onChange={handleTerminalChange}
                             onKeyDown={handleTerminalKeyDown}
                             onClick={() => {
-                                if (isWaitingForInput && terminalRef.current) {
+                                if (isWaitingForInput && isInputReady && terminalRef.current) {
                                     terminalRef.current.focus();
                                     const len = terminalRef.current.value.length;
                                     terminalRef.current.setSelectionRange(len, len);
@@ -761,10 +767,10 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                             enterKeyHint="send"
                             className={`custom-scrollbar flex-1 w-full p-4 text-left font-mono text-sm resize-none outline-none
                                 ${outputError ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-400'}
-                                ${isWaitingForInput ? 'ring-1 ring-yellow-500' : ''}
+                                ${isWaitingForInput && isInputReady ? 'ring-1 ring-yellow-500' : ''}
                                 bg-transparent`}
                             style={{
-                                caretColor: isWaitingForInput ? '#fbbf24' : 'transparent',
+                                caretColor: isWaitingForInput && isInputReady ? '#fbbf24' : 'transparent',
                             }}
                         />
 

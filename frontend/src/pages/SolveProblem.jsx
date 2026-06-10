@@ -136,7 +136,9 @@ const SolveProblem = () => {
   const consoleRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const lockedOutputRef = useRef('');
+  const inputReadyTimerRef = useRef(null);
   const [userTyping, setUserTyping] = useState('');
+  const [isInputReady, setIsInputReady] = useState(false);
 
   const language = (problem && problem.language) || 'C';
   const nextProblemId = Number.isFinite(problemId) && problemId < (ProblemManager.TOTAL_PROBLEMS || 1000) ? problemId + 1 : null;
@@ -438,35 +440,45 @@ const SolveProblem = () => {
     setOutputError(Boolean(isError));
   }, []);
 
-  // Lock output boundary and auto-focus console textarea when waiting for input
+  // Debounced lock: waits 150ms after last output chunk before locking the boundary.
+  // Also watches `output` so multi-input programs re-lock for subsequent prompts.
   useEffect(() => {
     if (isWaitingForInput) {
-      lockedOutputRef.current = output.replace(/\\n/g, '\n');
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+      setIsInputReady(false);
       setUserTyping('');
-      setTimeout(() => {
+      inputReadyTimerRef.current = setTimeout(() => {
         if (consoleRef.current) {
+          const currentVal = consoleRef.current.value;
+          lockedOutputRef.current = currentVal;
+          setIsInputReady(true);
           consoleRef.current.focus();
-          const len = consoleRef.current.value.length;
-          consoleRef.current.setSelectionRange(len, len);
+          consoleRef.current.setSelectionRange(currentVal.length, currentVal.length);
         }
-      }, 50);
+      }, 150);
     } else {
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+      setIsInputReady(false);
       setUserTyping('');
     }
-  }, [isWaitingForInput]);
+    return () => {
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWaitingForInput, output]);
 
   // Inline console textarea handlers
   const handleConsoleChange = useCallback((e) => {
-    if (!isWaitingForInput) return;
+    if (!isWaitingForInput || !isInputReady) return;
     const newVal = e.target.value;
     const locked = lockedOutputRef.current;
     if (newVal.startsWith(locked)) {
       setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
     }
-  }, [isWaitingForInput]);
+  }, [isWaitingForInput, isInputReady]);
 
   const handleConsoleKeyDown = useCallback((e) => {
-    if (!isWaitingForInput) return;
+    if (!isWaitingForInput || !isInputReady) return;
     if (e.key === 'Enter') {
       e.preventDefault();
       const input = userTyping;
@@ -475,14 +487,8 @@ const SolveProblem = () => {
       lockedOutputRef.current = newOutput;
       setOutput(newOutput);
       setUserTyping('');
-      setTimeout(() => {
-        if (consoleRef.current) {
-          const len = consoleRef.current.value.length;
-          consoleRef.current.setSelectionRange(len, len);
-        }
-      }, 0);
     }
-  }, [isWaitingForInput, userTyping]);
+  }, [isWaitingForInput, isInputReady, userTyping]);
 
 
 
@@ -1139,12 +1145,12 @@ const SolveProblem = () => {
 
                   <textarea
                     ref={consoleRef}
-                    value={(output.replace(/\\n/g, '\n')) + (isWaitingForInput ? userTyping : '')}
-                    readOnly={!isWaitingForInput}
+                    value={(output.replace(/\\n/g, '\n')) + (isWaitingForInput && isInputReady ? userTyping : '')}
+                    readOnly={!isWaitingForInput || !isInputReady}
                     onChange={handleConsoleChange}
                     onKeyDown={handleConsoleKeyDown}
                     onClick={() => {
-                      if (isWaitingForInput && consoleRef.current) {
+                      if (isWaitingForInput && isInputReady && consoleRef.current) {
                         consoleRef.current.focus();
                         const len = consoleRef.current.value.length;
                         consoleRef.current.setSelectionRange(len, len);
@@ -1158,9 +1164,9 @@ const SolveProblem = () => {
                     className={`flex-1 w-full p-4 font-mono text-sm text-left resize-none outline-none
                       ${isDark ? 'text-gray-300 bg-gray-800' : 'text-gray-800 bg-white'}
                       ${outputError ? 'text-red-400' : ''}
-                      ${isWaitingForInput ? 'ring-2 ring-yellow-500/50' : ''}`}
+                      ${isWaitingForInput && isInputReady ? 'ring-2 ring-yellow-500/50' : ''}`}
                     style={{
-                      caretColor: isWaitingForInput ? '#f59e0b' : 'transparent',
+                      caretColor: isWaitingForInput && isInputReady ? '#f59e0b' : 'transparent',
                     }}
                   />
                 </div>

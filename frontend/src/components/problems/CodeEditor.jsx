@@ -51,10 +51,12 @@ const CodeEditor = forwardRef(({
   const [isWaitingForInput, setIsWaitingForInput] = useState(false);
   const [error, setError] = useState('');
   const [userTyping, setUserTyping] = useState('');
+  const [isInputReady, setIsInputReady] = useState(false);
 
   const editorRef = useRef(null);
   const terminalRef = useRef(null);
   const lockedOutputRef = useRef('');
+  const inputReadyTimerRef = useRef(null);
   const inputBufferRef = useRef('');
   const isInputActiveRef = useRef(false);
 
@@ -76,6 +78,8 @@ const CodeEditor = forwardRef(({
         setIsRunning(false);
         setIsWaitingForInput(false);
         setUserTyping('');
+        setIsInputReady(false);
+        if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
         lockedOutputRef.current = '';
         inputBufferRef.current = '';
         isInputActiveRef.current = false;
@@ -144,37 +148,48 @@ const CodeEditor = forwardRef(({
     };
   }, []);
 
-  // Focus terminal textarea when waiting for input, lock the output boundary
+  // Debounced lock: wait for ALL pending socket output to render before locking.
+  // Watches both isWaitingForInput AND output so that multi-input programs
+  // (second/third prompts) also re-lock correctly without flicker.
   useEffect(() => {
     if (isWaitingForInput && !error) {
-      lockedOutputRef.current = output;
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+      setIsInputReady(false);
       setUserTyping('');
-      setTimeout(() => {
+      inputReadyTimerRef.current = setTimeout(() => {
         if (terminalRef.current) {
+          // Read the ACTUAL displayed value — guaranteed to include the prompt
+          const currentVal = terminalRef.current.value;
+          lockedOutputRef.current = currentVal;
+          setIsInputReady(true);
           terminalRef.current.focus();
-          const len = terminalRef.current.value.length;
-          terminalRef.current.setSelectionRange(len, len);
+          terminalRef.current.setSelectionRange(currentVal.length, currentVal.length);
         }
-      }, 50);
+      }, 150);
     } else {
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+      setIsInputReady(false);
       setUserTyping('');
     }
-  }, [isWaitingForInput]);
+    return () => {
+      if (inputReadyTimerRef.current) clearTimeout(inputReadyTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWaitingForInput, output, error]);
 
   // Inline terminal textarea handlers
   const handleTerminalChange = (e) => {
-    if (!isWaitingForInput || error) return;
+    if (!isWaitingForInput || !isInputReady || error) return;
     const newVal = e.target.value;
     const locked = lockedOutputRef.current;
     if (newVal.startsWith(locked)) {
-      // Only update the user-typed portion, no newlines mid-typing
       setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
     }
-    // else: don't update state → React reverts to controlled value
+    // else: React reverts the controlled value
   };
 
   const handleTerminalKeyDown = (e) => {
-    if (!isWaitingForInput || error) return;
+    if (!isWaitingForInput || !isInputReady || error) return;
     if (e.key === 'Enter') {
       e.preventDefault();
       const input = userTyping;
@@ -186,19 +201,12 @@ const CodeEditor = forwardRef(({
         setUserTyping('');
         inputBufferRef.current = '';
         isInputActiveRef.current = true;
-        // Move cursor to end after state update
-        setTimeout(() => {
-          if (terminalRef.current) {
-            const len = terminalRef.current.value.length;
-            terminalRef.current.setSelectionRange(len, len);
-          }
-        }, 0);
       }
     }
   };
 
   const handleTerminalClick = () => {
-    if (isWaitingForInput && terminalRef.current) {
+    if (isWaitingForInput && isInputReady && terminalRef.current) {
       terminalRef.current.focus();
       const len = terminalRef.current.value.length;
       terminalRef.current.setSelectionRange(len, len);
@@ -476,7 +484,7 @@ const CodeEditor = forwardRef(({
                   <span className={`ml-2 ${error ? errorTextClass :
                     isWaitingForInput ? inputPromptClass : textSecondary
                     }`}>
-                    ({error ? 'Error' : isWaitingForInput ? '▌ type here...' : 'Live'})
+                ({error ? 'Error' : isWaitingForInput ? (isInputReady ? '▌ type here...' : 'waiting...') : 'Live'})
                   </span>
                 )}
               </div>
@@ -486,16 +494,15 @@ const CodeEditor = forwardRef(({
                 <span>Console Output</span>
                 {(error || isRunning || isWaitingForInput) && (
                   <span className={`${error ? errorTextClass : isWaitingForInput ? inputPromptClass : textSecondary}`}>
-                    {error ? 'Error' : isWaitingForInput ? '▌ type here...' : 'Live'}
+                    {error ? 'Error' : isWaitingForInput ? (isInputReady ? '▌ type here...' : 'waiting...') : 'Live'}
                   </span>
                 )}
               </div>
 
-              {/* Inline Terminal Textarea — type directly here on mobile & desktop */}
               <textarea
                 ref={terminalRef}
                 value={terminalValue}
-                readOnly={!isWaitingForInput || !!error}
+                readOnly={!isWaitingForInput || !isInputReady || !!error}
                 onChange={handleTerminalChange}
                 onKeyDown={handleTerminalKeyDown}
                 onClick={handleTerminalClick}
@@ -506,10 +513,10 @@ const CodeEditor = forwardRef(({
                 enterKeyHint="send"
                 className={`flex-1 w-full px-4 py-2 ${ioBodyBg} font-mono text-sm resize-none outline-none text-left
                   ${error ? errorTextClass : outputTextClass}
-                  ${isWaitingForInput && !error ? `ring-1 ${isDarkTheme ? 'ring-yellow-500' : 'ring-yellow-400'}` : ''}
+                  ${isWaitingForInput && isInputReady && !error ? `ring-1 ${isDarkTheme ? 'ring-yellow-500' : 'ring-yellow-400'}` : ''}
                 `}
                 style={{
-                  caretColor: isWaitingForInput && !error ? (isDarkTheme ? '#fbbf24' : '#d97706') : 'transparent',
+                  caretColor: isWaitingForInput && isInputReady && !error ? (isDarkTheme ? '#fbbf24' : '#d97706') : 'transparent',
                   textAlign: 'left',
                 }}
               />
