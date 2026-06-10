@@ -134,9 +134,9 @@ const SolveProblem = () => {
   // refs
   const editorRef = useRef(null);
   const consoleRef = useRef(null);
-  const mobileInputRef = useRef(null);
   const timerIntervalRef = useRef(null);
-  const [mobileInputValue, setMobileInputValue] = useState('');
+  const lockedOutputRef = useRef('');
+  const [userTyping, setUserTyping] = useState('');
 
   const language = (problem && problem.language) || 'C';
   const nextProblemId = Number.isFinite(problemId) && problemId < (ProblemManager.TOTAL_PROBLEMS || 1000) ? problemId + 1 : null;
@@ -422,14 +422,7 @@ const SolveProblem = () => {
     setIsWaitingForInput(isWaitingInput);
 
     if (isWaitingInput) {
-      setTimeout(() => {
-        // Focus mobile input first (to trigger virtual keyboard on mobile)
-        if (mobileInputRef.current) {
-          mobileInputRef.current.focus();
-        } else {
-          consoleRef.current?.focus?.();
-        }
-      }, 0);
+      // Focus will be handled by the isWaitingForInput useEffect
       return;
     }
 
@@ -445,22 +438,51 @@ const SolveProblem = () => {
     setOutputError(Boolean(isError));
   }, []);
 
-  // Mobile input handlers for SolveProblem console
-  const handleMobileConsoleSend = useCallback(() => {
-    const value = mobileInputValue.trim();
-    if (value !== '') {
-      sendInputToProgram(value);
-      setOutput(prev => processBackspaces(prev, value + '\n'));
-      setMobileInputValue('');
+  // Lock output boundary and auto-focus console textarea when waiting for input
+  useEffect(() => {
+    if (isWaitingForInput) {
+      lockedOutputRef.current = output.replace(/\\n/g, '\n');
+      setUserTyping('');
+      setTimeout(() => {
+        if (consoleRef.current) {
+          consoleRef.current.focus();
+          const len = consoleRef.current.value.length;
+          consoleRef.current.setSelectionRange(len, len);
+        }
+      }, 50);
+    } else {
+      setUserTyping('');
     }
-  }, [mobileInputValue]);
+  }, [isWaitingForInput]);
 
-  const handleMobileConsoleKeyDown = useCallback((e) => {
+  // Inline console textarea handlers
+  const handleConsoleChange = useCallback((e) => {
+    if (!isWaitingForInput) return;
+    const newVal = e.target.value;
+    const locked = lockedOutputRef.current;
+    if (newVal.startsWith(locked)) {
+      setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
+    }
+  }, [isWaitingForInput]);
+
+  const handleConsoleKeyDown = useCallback((e) => {
+    if (!isWaitingForInput) return;
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleMobileConsoleSend();
+      const input = userTyping;
+      sendInputToProgram(input);
+      const newOutput = lockedOutputRef.current + input + '\n';
+      lockedOutputRef.current = newOutput;
+      setOutput(newOutput);
+      setUserTyping('');
+      setTimeout(() => {
+        if (consoleRef.current) {
+          const len = consoleRef.current.value.length;
+          consoleRef.current.setSelectionRange(len, len);
+        }
+      }, 0);
     }
-  }, [handleMobileConsoleSend]);
+  }, [isWaitingForInput, userTyping]);
 
 
 
@@ -1115,54 +1137,32 @@ const SolveProblem = () => {
                     <Icon name="x" className="w-4 h-4" />
                   </button>
 
-                  <div
-                    className={`p-4 font-mono text-sm text-left overflow-y-auto whitespace-pre-wrap outline-none cursor-text flex-1 ${isDark ? 'text-gray-300' : 'text-gray-800'} ${outputError ? 'text-red-400' : ''} ${isWaitingForInput ? 'ring-2 ring-yellow-500/50' : ''}`}
+                  <textarea
                     ref={consoleRef}
-                    tabIndex={0}
+                    value={(output.replace(/\\n/g, '\n')) + (isWaitingForInput ? userTyping : '')}
+                    readOnly={!isWaitingForInput}
+                    onChange={handleConsoleChange}
+                    onKeyDown={handleConsoleKeyDown}
                     onClick={() => {
-                      if (mobileInputRef.current) {
-                        mobileInputRef.current.focus();
-                      } else {
-                        consoleRef.current?.focus();
+                      if (isWaitingForInput && consoleRef.current) {
+                        consoleRef.current.focus();
+                        const len = consoleRef.current.value.length;
+                        consoleRef.current.setSelectionRange(len, len);
                       }
                     }}
+                    spellCheck={false}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    enterKeyHint="send"
+                    className={`flex-1 w-full p-4 font-mono text-sm text-left resize-none outline-none
+                      ${isDark ? 'text-gray-300 bg-gray-800' : 'text-gray-800 bg-white'}
+                      ${outputError ? 'text-red-400' : ''}
+                      ${isWaitingForInput ? 'ring-2 ring-yellow-500/50' : ''}`}
                     style={{
-                      caretColor: 'transparent'
+                      caretColor: isWaitingForInput ? '#f59e0b' : 'transparent',
                     }}
-                  >
-                    {output.replace(/\\n/g, '\n')}
-                    {isWaitingForInput && (
-                      <span className="inline-block w-2 h-5 align-middle bg-yellow-500 animate-pulse ml-1"></span>
-                    )}
-                  </div>
-
-                  {/* Mobile Input Bar - visible when program awaits input */}
-                  {isWaitingForInput && (
-                    <div className={`flex items-center gap-2 px-3 py-2 border-t ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'} shrink-0`}>
-                      <span className="text-xs font-bold text-yellow-500 shrink-0">{'>'}</span>
-                      <input
-                        ref={mobileInputRef}
-                        type="text"
-                        value={mobileInputValue}
-                        onChange={(e) => setMobileInputValue(e.target.value)}
-                        onKeyDown={handleMobileConsoleKeyDown}
-                        placeholder="Type input and press Enter or Send..."
-                        autoFocus
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        spellCheck={false}
-                        enterKeyHint="send"
-                        className={`flex-1 bg-transparent font-mono text-sm outline-none ${isDark ? 'text-yellow-300 placeholder-gray-500' : 'text-yellow-700 placeholder-gray-400'}`}
-                      />
-                      <button
-                        onClick={handleMobileConsoleSend}
-                        className="shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors"
-                      >
-                        Send
-                      </button>
-                    </div>
-                  )}
+                  />
                 </div>
               )}
             </div>

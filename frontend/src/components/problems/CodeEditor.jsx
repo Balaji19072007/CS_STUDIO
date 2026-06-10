@@ -50,14 +50,13 @@ const CodeEditor = forwardRef(({
   const [isRunning, setIsRunning] = useState(false);
   const [isWaitingForInput, setIsWaitingForInput] = useState(false);
   const [error, setError] = useState('');
-
+  const [userTyping, setUserTyping] = useState('');
 
   const editorRef = useRef(null);
   const terminalRef = useRef(null);
-  const mobileInputRef = useRef(null);
+  const lockedOutputRef = useRef('');
   const inputBufferRef = useRef('');
   const isInputActiveRef = useRef(false);
-  const [mobileInputValue, setMobileInputValue] = useState('');
 
   // Sync props to internal state
   useEffect(() => {
@@ -70,14 +69,14 @@ const CodeEditor = forwardRef(({
   // Update code when language changes
   useEffect(() => {
     if (!isProblemSolver) {
-      // Only reset to default code if the user manually changed the language
-      // (i.e., current language is different from the prop passed language)
       if (language !== propLanguage) {
         setCode(DEFAULT_CODE[language] || '');
         setOutput('Output will appear here.');
         setError('');
         setIsRunning(false);
         setIsWaitingForInput(false);
+        setUserTyping('');
+        lockedOutputRef.current = '';
         inputBufferRef.current = '';
         isInputActiveRef.current = false;
       }
@@ -145,88 +144,64 @@ const CodeEditor = forwardRef(({
     };
   }, []);
 
-  // Handle terminal key presses for input
+  // Focus terminal textarea when waiting for input, lock the output boundary
   useEffect(() => {
-    const handleTerminalKeyPress = (e) => {
-      if (!isWaitingForInput || !terminalRef.current) return;
-
-      // Only handle if terminal is focused
-      if (document.activeElement !== terminalRef.current) return;
-
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        // Send the input buffer
-        if (inputBufferRef.current.trim() !== '') {
-          if (socketService.isConnected) {
-            sendInputToProgram(inputBufferRef.current);
-            // Add the input to output with a newline
-            setOutput(prev => prev + inputBufferRef.current + '\n');
-            inputBufferRef.current = '';
-            // setIsWaitingForInput(false); // Keep input active
-            isInputActiveRef.current = true; // Keep active
-          }
+    if (isWaitingForInput && !error) {
+      lockedOutputRef.current = output;
+      setUserTyping('');
+      setTimeout(() => {
+        if (terminalRef.current) {
+          terminalRef.current.focus();
+          const len = terminalRef.current.value.length;
+          terminalRef.current.setSelectionRange(len, len);
         }
-      } else if (e.key === 'Backspace') {
-        e.preventDefault();
-        // Remove last character from input buffer
-        if (inputBufferRef.current.length > 0) {
-          inputBufferRef.current = inputBufferRef.current.slice(0, -1);
-          setOutput(prev => {
-            // Remove the last visible character from output
-            const lines = prev.split('\n');
-            if (lines.length > 0) {
-              const lastLine = lines[lines.length - 1];
-              // Only modify if we're in active input mode
-              if (isInputActiveRef.current && lastLine.length > 0) {
-                lines[lines.length - 1] = lastLine.slice(0, -1);
-                return lines.join('\n');
-              }
-            }
-            return prev;
-          });
-        }
-      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        // Add character to input buffer
-        inputBufferRef.current += e.key;
-        setOutput(prev => prev + e.key);
-      }
-    };
-
-    document.addEventListener('keydown', handleTerminalKeyPress);
-    return () => {
-      document.removeEventListener('keydown', handleTerminalKeyPress);
-    };
-  }, [isWaitingForInput]);
-
-  // Focus terminal / mobile input when waiting for input
-  useEffect(() => {
-    if (isWaitingForInput) {
-      // On mobile, focus the dedicated input element to trigger the virtual keyboard
-      if (mobileInputRef.current) {
-        mobileInputRef.current.focus();
-      } else if (terminalRef.current) {
-        terminalRef.current.focus();
-      }
+      }, 50);
+    } else {
+      setUserTyping('');
     }
   }, [isWaitingForInput]);
 
-  // Handle mobile input field submit (Enter key or send button)
-  const handleMobileInputSend = () => {
-    const value = mobileInputValue.trim();
-    if (value !== '' && socketService.isConnected) {
-      sendInputToProgram(value);
-      setOutput(prev => prev + value + '\n');
-      inputBufferRef.current = '';
-      isInputActiveRef.current = true;
-      setMobileInputValue('');
+  // Inline terminal textarea handlers
+  const handleTerminalChange = (e) => {
+    if (!isWaitingForInput || error) return;
+    const newVal = e.target.value;
+    const locked = lockedOutputRef.current;
+    if (newVal.startsWith(locked)) {
+      // Only update the user-typed portion, no newlines mid-typing
+      setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
+    }
+    // else: don't update state → React reverts to controlled value
+  };
+
+  const handleTerminalKeyDown = (e) => {
+    if (!isWaitingForInput || error) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const input = userTyping;
+      if (socketService.isConnected) {
+        sendInputToProgram(input);
+        const newOutput = lockedOutputRef.current + input + '\n';
+        lockedOutputRef.current = newOutput;
+        setOutput(newOutput);
+        setUserTyping('');
+        inputBufferRef.current = '';
+        isInputActiveRef.current = true;
+        // Move cursor to end after state update
+        setTimeout(() => {
+          if (terminalRef.current) {
+            const len = terminalRef.current.value.length;
+            terminalRef.current.setSelectionRange(len, len);
+          }
+        }, 0);
+      }
     }
   };
 
-  const handleMobileInputKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleMobileInputSend();
+  const handleTerminalClick = () => {
+    if (isWaitingForInput && terminalRef.current) {
+      terminalRef.current.focus();
+      const len = terminalRef.current.value.length;
+      terminalRef.current.setSelectionRange(len, len);
     }
   };
 
@@ -292,6 +267,8 @@ const CodeEditor = forwardRef(({
     setError('');
     setIsRunning(false);
     setIsWaitingForInput(false);
+    setUserTyping('');
+    lockedOutputRef.current = '';
     inputBufferRef.current = '';
     isInputActiveRef.current = false;
   };
@@ -319,30 +296,10 @@ const CodeEditor = forwardRef(({
   const finalLanguage = language;
   const finalTheme = theme;
 
-  // --- Terminal Output Rendering Logic ---
-  const renderTerminalOutput = () => {
-    if (error) {
-      return <pre className={`${errorTextClass} font-mono text-sm whitespace-pre-wrap text-left`}>{error}</pre>;
-    }
-
-    let displayOutput = output;
-
-    return (
-      <pre className={`font-mono text-sm whitespace-pre-wrap ${outputTextClass} text-left`}>
-        {displayOutput}
-        {isWaitingForInput && (
-          <span className={`${inputPromptClass} blink`}>█</span>
-        )}
-      </pre>
-    );
-  };
-
-  // Handle terminal click to focus
-  const handleTerminalClick = () => {
-    if (terminalRef.current) {
-      terminalRef.current.focus();
-    }
-  };
+  // Compute textarea value: locked output + what user is currently typing
+  const terminalValue = error
+    ? error
+    : (output + (isWaitingForInput ? userTyping : ''));
 
   return (
     <div className={`flex flex-col h-full ${ioBodyBg} ${showControls ? `rounded-lg border ${borderClass}` : 'border-none'} overflow-hidden`}>
@@ -519,67 +476,43 @@ const CodeEditor = forwardRef(({
                   <span className={`ml-2 ${error ? errorTextClass :
                     isWaitingForInput ? inputPromptClass : textSecondary
                     }`}>
-                    ({error ? 'Error' : isWaitingForInput ? 'Waiting for input' : 'Live'})
+                    ({error ? 'Error' : isWaitingForInput ? '▌ type here...' : 'Live'})
                   </span>
                 )}
               </div>
 
-              {/* Mobile Terminal Header just to show status if needed, or hide it to maximize space */}
+              {/* Mobile Terminal Header */}
               <div className={`px-4 py-2 ${ioHeaderBg} font-semibold text-sm ${textMain} lg:hidden flex justify-between`}>
                 <span>Console Output</span>
                 {(error || isRunning || isWaitingForInput) && (
                   <span className={`${error ? errorTextClass : isWaitingForInput ? inputPromptClass : textSecondary}`}>
-                    {error ? 'Error' : isWaitingForInput ? 'Waiting for input' : 'Live'}
+                    {error ? 'Error' : isWaitingForInput ? '▌ type here...' : 'Live'}
                   </span>
                 )}
               </div>
 
-              <div className={`h-full flex flex-col`}>
-
-                {/* Terminal Display - Clickable and focusable */}
-                <div
-                  ref={terminalRef}
-                  tabIndex={0}
-                  onClick={handleTerminalClick}
-                  className={`flex-1 px-4 py-2 ${ioBodyBg} overflow-auto font-mono text-sm whitespace-pre-wrap outline-none cursor-text text-left ${isWaitingForInput ? 'ring-1 ring-yellow-500' : ''
-                    }`}
-                  style={{
-                    caretColor: isWaitingForInput ? (isDarkTheme ? '#fbbf24' : '#d97706') : 'transparent',
-                    textAlign: 'left'
-                  }}
-                >
-                  {renderTerminalOutput()}
-                </div>
-
-                {/* Mobile Input Bar - shown when program is waiting for input */}
-                {isWaitingForInput && (
-                  <div className={`flex items-center gap-2 px-3 py-2 border-t ${borderClass} ${isDarkTheme ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                    <span className={`text-xs font-bold ${inputPromptClass} shrink-0`}>{'>'}</span>
-                    <input
-                      ref={mobileInputRef}
-                      type="text"
-                      value={mobileInputValue}
-                      onChange={(e) => setMobileInputValue(e.target.value)}
-                      onKeyDown={handleMobileInputKeyDown}
-                      placeholder="Type input and press Enter..."
-                      autoFocus
-                      autoComplete="off"
-                      autoCorrect="off"
-                      autoCapitalize="off"
-                      spellCheck={false}
-                      enterKeyHint="send"
-                      className={`flex-1 bg-transparent font-mono text-sm outline-none ${isDarkTheme ? 'text-yellow-300 placeholder-gray-500' : 'text-yellow-700 placeholder-gray-400'}`}
-                    />
-                    <button
-                      onClick={handleMobileInputSend}
-                      className={`shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors`}
-                    >
-                      Send
-                    </button>
-                  </div>
-                )}
-
-              </div>
+              {/* Inline Terminal Textarea — type directly here on mobile & desktop */}
+              <textarea
+                ref={terminalRef}
+                value={terminalValue}
+                readOnly={!isWaitingForInput || !!error}
+                onChange={handleTerminalChange}
+                onKeyDown={handleTerminalKeyDown}
+                onClick={handleTerminalClick}
+                spellCheck={false}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                enterKeyHint="send"
+                className={`flex-1 w-full px-4 py-2 ${ioBodyBg} font-mono text-sm resize-none outline-none text-left
+                  ${error ? errorTextClass : outputTextClass}
+                  ${isWaitingForInput && !error ? `ring-1 ${isDarkTheme ? 'ring-yellow-500' : 'ring-yellow-400'}` : ''}
+                `}
+                style={{
+                  caretColor: isWaitingForInput && !error ? (isDarkTheme ? '#fbbf24' : '#d97706') : 'transparent',
+                  textAlign: 'left',
+                }}
+              />
             </div>
           </div>
         </div>

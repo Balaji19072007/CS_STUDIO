@@ -98,58 +98,8 @@ const CodeEditorForSolvePage = forwardRef(({
     };
   }, [onOutputReceived]);
 
-  // --- Handle keyboard input when waiting for input (FIXED) ---
-  useEffect(() => {
-    const handleConsoleKeyPress = (e) => {
-      if (!isWaitingForInput) return;
-      // Ensure the active element is the console itself before processing keys
-      if (!consoleDomRef.current || document.activeElement !== consoleDomRef.current) return;
 
-      // Prevent default browser behavior for common keys
-      if (['Enter', 'Backspace'].includes(e.key) || e.key.length === 1) {
-        e.preventDefault();
-      }
 
-      if (e.key === 'Enter') {
-        const inputToSend = inputBufferRef.current;
-
-        // 1. Send the input via the problemApi helper
-        sendInputToProgram(inputToSend);
-
-        // 2. Notify parent to append a newline after the echoed input
-        if (onOutputReceived) onOutputReceived('\n', false, true);
-
-        // 3. Reset buffer but KEEP waiting for input (for multi-line inputs)
-        inputBufferRef.current = '';
-        // setIsWaitingForInput(false); // <-- REMOVED to allow continuous input
-        return;
-      }
-
-      if (e.key === 'Backspace') {
-        // Remove last char from buffer and update parent's console display
-        if (inputBufferRef.current.length > 0) {
-          inputBufferRef.current = inputBufferRef.current.slice(0, -1);
-          if (onOutputReceived) {
-            // Send backspace control sequence to parent for visual removal
-            onOutputReceived('\b', false, true);
-          }
-        }
-        return;
-      }
-
-      // normal printable character
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-        inputBufferRef.current += e.key;
-        // Echo the character immediately to the parent's console display
-        if (onOutputReceived) onOutputReceived(e.key, false, true);
-      }
-    };
-
-    document.addEventListener('keydown', handleConsoleKeyPress);
-    return () => {
-      document.removeEventListener('keydown', handleConsoleKeyPress);
-    };
-  }, [isWaitingForInput, onOutputReceived]);
 
 
   const handleRunCode = useCallback((codeToRun) => {

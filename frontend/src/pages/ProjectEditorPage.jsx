@@ -72,10 +72,10 @@ const ProjectEditorPage = () => {
     // Terminal execution states
     const [isWaitingForInput, setIsWaitingForInput] = useState(false);
     const terminalRef = useRef(null);
-    const mobileInputRef = useRef(null);
+    const lockedOutputRef = useRef('');
     const inputBufferRef = useRef('');
     const isInputActiveRef = useRef(false);
-    const [mobileInputValue, setMobileInputValue] = useState('');
+    const [userTyping, setUserTyping] = useState('');
     
     const [error, setError] = useState(null);
     const [outputError, setOutputError] = useState(false);
@@ -168,82 +168,55 @@ const ProjectEditorPage = () => {
         };
     }, []);
 
-    // Terminal Key Press Handler
-    useEffect(() => {
-        const handleTerminalKeyPress = (e) => {
-            if (!isWaitingForInput || !terminalRef.current) return;
-            
-            // Only handle if terminal is focused
-            if (document.activeElement !== terminalRef.current) return;
-
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (inputBufferRef.current.trim() !== '') {
-                    if (socketService.isConnected) {
-                        sendInputToProgram(inputBufferRef.current);
-                        setOutput(prev => prev + inputBufferRef.current + '\n');
-                        inputBufferRef.current = '';
-                        isInputActiveRef.current = true;
-                    }
-                }
-            } else if (e.key === 'Backspace') {
-                e.preventDefault();
-                if (inputBufferRef.current.length > 0) {
-                    inputBufferRef.current = inputBufferRef.current.slice(0, -1);
-                    setOutput(prev => {
-                        const lines = prev.split('\n');
-                        if (lines.length > 0) {
-                            const lastLine = lines[lines.length - 1];
-                            if (isInputActiveRef.current && lastLine.length > 0) {
-                                lines[lines.length - 1] = lastLine.slice(0, -1);
-                                return lines.join('\n');
-                            }
-                        }
-                        return prev;
-                    });
-                }
-            } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-                e.preventDefault();
-                inputBufferRef.current += e.key;
-                setOutput(prev => prev + e.key);
-            }
-        };
-
-        document.addEventListener('keydown', handleTerminalKeyPress);
-        return () => {
-            document.removeEventListener('keydown', handleTerminalKeyPress);
-        };
-    }, [isWaitingForInput]);
-
-    // Focus terminal / mobile input when waiting for input
+    // Focus terminal textarea and lock output boundary when waiting for input
     useEffect(() => {
         if (isWaitingForInput) {
-            if (mobileInputRef.current) {
-                mobileInputRef.current.focus();
-            } else if (terminalRef.current) {
-                terminalRef.current.focus();
-            }
+            lockedOutputRef.current = output;
+            setUserTyping('');
+            setTimeout(() => {
+                if (terminalRef.current) {
+                    terminalRef.current.focus();
+                    const len = terminalRef.current.value.length;
+                    terminalRef.current.setSelectionRange(len, len);
+                }
+            }, 50);
+        } else {
+            setUserTyping('');
         }
     }, [isWaitingForInput]);
 
-    // Mobile input handlers
-    const handleMobileInputSend = useCallback(() => {
-        const value = mobileInputValue.trim();
-        if (value !== '' && socketService.isConnected) {
-            sendInputToProgram(value);
-            setOutput(prev => prev + value + '\n');
-            setMobileInputValue('');
-            inputBufferRef.current = '';
-            isInputActiveRef.current = true;
+    // Inline terminal textarea handlers
+    const handleTerminalChange = useCallback((e) => {
+        if (!isWaitingForInput) return;
+        const newVal = e.target.value;
+        const locked = lockedOutputRef.current;
+        if (newVal.startsWith(locked)) {
+            setUserTyping(newVal.slice(locked.length).replace(/\n/g, ''));
         }
-    }, [mobileInputValue]);
+    }, [isWaitingForInput]);
 
-    const handleMobileInputKeyDown = useCallback((e) => {
+    const handleTerminalKeyDown = useCallback((e) => {
+        if (!isWaitingForInput) return;
         if (e.key === 'Enter') {
             e.preventDefault();
-            handleMobileInputSend();
+            const input = userTyping;
+            if (socketService.isConnected) {
+                sendInputToProgram(input);
+                const newOutput = lockedOutputRef.current + input + '\n';
+                lockedOutputRef.current = newOutput;
+                setOutput(newOutput);
+                setUserTyping('');
+                inputBufferRef.current = '';
+                isInputActiveRef.current = true;
+                setTimeout(() => {
+                    if (terminalRef.current) {
+                        const len = terminalRef.current.value.length;
+                        terminalRef.current.setSelectionRange(len, len);
+                    }
+                }, 0);
+            }
         }
-    }, [handleMobileInputSend]);
+    }, [isWaitingForInput, userTyping]);
 
     const handleOutput = (nextOutput, isError) => {
         setOutput((previous) => {
@@ -649,54 +622,32 @@ const ProjectEditorPage = () => {
                                     <span className="text-yellow-600 dark:text-yellow-400 text-xs font-bold animate-pulse">Waiting for input...</span>
                                 )}
                             </div>
-                            <div 
+                            <textarea
                                 ref={terminalRef}
-                                tabIndex={0}
+                                value={output + (isWaitingForInput ? userTyping : '')}
+                                readOnly={!isWaitingForInput}
+                                onChange={handleTerminalChange}
+                                onKeyDown={handleTerminalKeyDown}
                                 onClick={() => {
-                                    if (mobileInputRef.current) {
-                                        mobileInputRef.current.focus();
-                                    } else if (terminalRef.current) {
+                                    if (isWaitingForInput && terminalRef.current) {
                                         terminalRef.current.focus();
+                                        const len = terminalRef.current.value.length;
+                                        terminalRef.current.setSelectionRange(len, len);
                                     }
                                 }}
-                                className={`custom-scrollbar flex-1 overflow-y-auto p-5 text-left font-mono text-[13px] leading-relaxed whitespace-pre-wrap outline-none cursor-text ${outputError ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'} ${isWaitingForInput ? 'ring-2 ring-yellow-500/50 ring-inset' : ''}`}
+                                spellCheck={false}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                autoCapitalize="off"
+                                enterKeyHint="send"
+                                className={`custom-scrollbar flex-1 w-full p-5 text-left font-mono text-[13px] leading-relaxed resize-none outline-none
+                                    ${outputError ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}
+                                    ${isWaitingForInput ? 'ring-2 ring-yellow-500/50 ring-inset' : ''}
+                                    bg-transparent`}
                                 style={{
                                     caretColor: isWaitingForInput ? '#fbbf24' : 'transparent',
                                 }}
-                            >
-                                {output}
-                                {isWaitingForInput && (
-                                    <span className="text-yellow-500 blink font-bold">█</span>
-                                )}
-                            </div>
-
-                            {/* Mobile Input Bar - visible when program awaits input */}
-                            {isWaitingForInput && (
-                                <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0 rounded-b-2xl">
-                                    <span className="text-xs font-bold text-yellow-500 shrink-0">{'>'}</span>
-                                    <input
-                                        ref={mobileInputRef}
-                                        type="text"
-                                        value={mobileInputValue}
-                                        onChange={(e) => setMobileInputValue(e.target.value)}
-                                        onKeyDown={handleMobileInputKeyDown}
-                                        placeholder="Type input and press Enter or Send..."
-                                        autoFocus
-                                        autoComplete="off"
-                                        autoCorrect="off"
-                                        autoCapitalize="off"
-                                        spellCheck={false}
-                                        enterKeyHint="send"
-                                        className="flex-1 bg-transparent font-mono text-sm outline-none text-yellow-600 dark:text-yellow-300 placeholder-gray-400 dark:placeholder-gray-500"
-                                    />
-                                    <button
-                                        onClick={handleMobileInputSend}
-                                        className="shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors"
-                                    >
-                                        Send
-                                    </button>
-                                </div>
-                            )}
+                            />
                         </div>
 
 
