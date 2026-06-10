@@ -59,6 +59,8 @@ const CodeEditor = forwardRef(({
   const inputReadyTimerRef = useRef(null);
   const inputBufferRef = useRef('');
   const isInputActiveRef = useRef(false);
+  // Track previous language to detect actual user-driven changes
+  const prevLanguageRef = useRef(propLanguage);
 
   // Sync props to internal state
   useEffect(() => {
@@ -67,11 +69,11 @@ const CodeEditor = forwardRef(({
     setLanguage(propLanguage);
   }, [initialCode, propTheme, propLanguage]);
 
-  // Update code when language changes
-  // Update code when language changes
+  // Update code when language changes (tracks actual previous value via ref
+  // so switching back to the initial language also resets the code correctly)
   useEffect(() => {
     if (!isProblemSolver) {
-      if (language !== propLanguage) {
+      if (prevLanguageRef.current !== language) {
         setCode(DEFAULT_CODE[language] || '');
         setOutput('Output will appear here.');
         setError('');
@@ -84,8 +86,9 @@ const CodeEditor = forwardRef(({
         inputBufferRef.current = '';
         isInputActiveRef.current = false;
       }
+      prevLanguageRef.current = language;
     }
-  }, [language, isProblemSolver, propLanguage]);
+  }, [language, isProblemSolver]);
 
   // --- Theme-aware classes ---
   const isDarkTheme = theme === 'vs-dark' || theme === 'hc-black';
