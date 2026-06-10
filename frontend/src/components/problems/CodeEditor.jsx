@@ -54,8 +54,10 @@ const CodeEditor = forwardRef(({
 
   const editorRef = useRef(null);
   const terminalRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const inputBufferRef = useRef('');
   const isInputActiveRef = useRef(false);
+  const [mobileInputValue, setMobileInputValue] = useState('');
 
   // Sync props to internal state
   useEffect(() => {
@@ -197,12 +199,36 @@ const CodeEditor = forwardRef(({
     };
   }, [isWaitingForInput]);
 
-  // Focus terminal when waiting for input
+  // Focus terminal / mobile input when waiting for input
   useEffect(() => {
-    if (isWaitingForInput && terminalRef.current) {
-      terminalRef.current.focus();
+    if (isWaitingForInput) {
+      // On mobile, focus the dedicated input element to trigger the virtual keyboard
+      if (mobileInputRef.current) {
+        mobileInputRef.current.focus();
+      } else if (terminalRef.current) {
+        terminalRef.current.focus();
+      }
     }
   }, [isWaitingForInput]);
+
+  // Handle mobile input field submit (Enter key or send button)
+  const handleMobileInputSend = () => {
+    const value = mobileInputValue.trim();
+    if (value !== '' && socketService.isConnected) {
+      sendInputToProgram(value);
+      setOutput(prev => prev + value + '\n');
+      inputBufferRef.current = '';
+      isInputActiveRef.current = true;
+      setMobileInputValue('');
+    }
+  };
+
+  const handleMobileInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleMobileInputSend();
+    }
+  };
 
   // Use proper execution language mapping
   const handleRunCode = useCallback((codeToRun) => {
@@ -524,6 +550,34 @@ const CodeEditor = forwardRef(({
                 >
                   {renderTerminalOutput()}
                 </div>
+
+                {/* Mobile Input Bar - shown when program is waiting for input */}
+                {isWaitingForInput && (
+                  <div className={`flex items-center gap-2 px-3 py-2 border-t ${borderClass} ${isDarkTheme ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                    <span className={`text-xs font-bold ${inputPromptClass} shrink-0`}>{'>'}</span>
+                    <input
+                      ref={mobileInputRef}
+                      type="text"
+                      value={mobileInputValue}
+                      onChange={(e) => setMobileInputValue(e.target.value)}
+                      onKeyDown={handleMobileInputKeyDown}
+                      placeholder="Type input and press Enter..."
+                      autoFocus
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      enterKeyHint="send"
+                      className={`flex-1 bg-transparent font-mono text-sm outline-none ${isDarkTheme ? 'text-yellow-300 placeholder-gray-500' : 'text-yellow-700 placeholder-gray-400'}`}
+                    />
+                    <button
+                      onClick={handleMobileInputSend}
+                      className={`shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors`}
+                    >
+                      Send
+                    </button>
+                  </div>
+                )}
 
               </div>
             </div>

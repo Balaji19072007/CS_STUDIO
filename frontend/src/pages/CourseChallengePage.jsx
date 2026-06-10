@@ -7,6 +7,8 @@ import { ChallengeSkeleton } from '../components/common/SkeletonLoader';
 import { setupCompilerSocket, sendCodeForExecution, sendInputToProgram, stopCodeExecution } from '../api/problemApi.js';
 import socketService from '../services/socketService.js';
 
+
+
 const getSolvedTopicKey = (topicId) => `course_challenge_solved_${topicId}`;
 
 const useFloatingNotification = () => {
@@ -72,8 +74,10 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     // Terminal execution states
     const [isWaitingForInput, setIsWaitingForInput] = useState(false);
     const terminalRef = useRef(null);
+    const mobileInputRef = useRef(null);
     const inputBufferRef = useRef('');
     const isInputActiveRef = useRef(false);
+    const [mobileInputValue, setMobileInputValue] = useState('');
     
     const [error, setError] = useState(null);
     const [outputError, setOutputError] = useState(false);
@@ -229,12 +233,35 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
         };
     }, [isWaitingForInput]);
 
-    // Focus terminal when waiting for input
+    // Focus terminal / mobile input when waiting for input
     useEffect(() => {
-        if (isWaitingForInput && terminalRef.current) {
-            terminalRef.current.focus();
+        if (isWaitingForInput) {
+            if (mobileInputRef.current) {
+                mobileInputRef.current.focus();
+            } else if (terminalRef.current) {
+                terminalRef.current.focus();
+            }
         }
     }, [isWaitingForInput]);
+
+    // Mobile input handlers
+    const handleMobileInputSend = useCallback(() => {
+        const value = mobileInputValue.trim();
+        if (value !== '' && socketService.isConnected) {
+            sendInputToProgram(value);
+            setOutput(prev => prev + value + '\n');
+            setMobileInputValue('');
+            inputBufferRef.current = '';
+            isInputActiveRef.current = true;
+        }
+    }, [mobileInputValue]);
+
+    const handleMobileInputKeyDown = useCallback((e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleMobileInputSend();
+        }
+    }, [handleMobileInputSend]);
 
     const handleOutput = (nextOutput, isError) => {
         setOutput((previous) => {
@@ -743,7 +770,13 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                         <div 
                             ref={terminalRef}
                             tabIndex={0}
-                            onClick={() => terminalRef.current && terminalRef.current.focus()}
+                            onClick={() => {
+                                if (mobileInputRef.current) {
+                                    mobileInputRef.current.focus();
+                                } else if (terminalRef.current) {
+                                    terminalRef.current.focus();
+                                }
+                            }}
                             className={`custom-scrollbar flex-1 overflow-y-auto p-4 text-left font-mono text-sm whitespace-pre-wrap outline-none cursor-text ${outputError ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-400'} ${isWaitingForInput ? 'ring-1 ring-yellow-500' : ''}`}
                             style={{
                                 caretColor: isWaitingForInput ? '#fbbf24' : 'transparent',
@@ -754,6 +787,35 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                                 <span className="text-yellow-500 blink font-bold">█</span>
                             )}
                         </div>
+
+                        {/* Mobile Input Bar - visible when program awaits input */}
+                        {isWaitingForInput && (
+                            <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
+                                <span className="text-xs font-bold text-yellow-500 shrink-0">{'>'}</span>
+                                <input
+                                    ref={mobileInputRef}
+                                    type="text"
+                                    value={mobileInputValue}
+                                    onChange={(e) => setMobileInputValue(e.target.value)}
+                                    onKeyDown={handleMobileInputKeyDown}
+                                    placeholder="Type input and press Enter or Send..."
+                                    autoFocus
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    autoCapitalize="off"
+                                    spellCheck={false}
+                                    enterKeyHint="send"
+                                    className="flex-1 bg-transparent font-mono text-sm outline-none text-yellow-600 dark:text-yellow-300 placeholder-gray-400 dark:placeholder-gray-500"
+                                />
+                                <button
+                                    onClick={handleMobileInputSend}
+                                    className="shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        )}
+
                         <div className="lg:hidden p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                              <button
                                 onClick={handleSubmit}

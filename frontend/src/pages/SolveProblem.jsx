@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import * as feather from 'feather-icons';
-import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases, fetchProblemProgress, updateProblemProgress } from '../api/problemApi.js';
+import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases, fetchProblemProgress, updateProblemProgress, sendInputToProgram } from '../api/problemApi.js';
 // import { testAPI } from '../config/api.js';
 import Loader from '../components/common/Loader.jsx';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
@@ -134,7 +134,9 @@ const SolveProblem = () => {
   // refs
   const editorRef = useRef(null);
   const consoleRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const timerIntervalRef = useRef(null);
+  const [mobileInputValue, setMobileInputValue] = useState('');
 
   const language = (problem && problem.language) || 'C';
   const nextProblemId = Number.isFinite(problemId) && problemId < (ProblemManager.TOTAL_PROBLEMS || 1000) ? problemId + 1 : null;
@@ -420,7 +422,14 @@ const SolveProblem = () => {
     setIsWaitingForInput(isWaitingInput);
 
     if (isWaitingInput) {
-      setTimeout(() => consoleRef.current?.focus?.(), 0);
+      setTimeout(() => {
+        // Focus mobile input first (to trigger virtual keyboard on mobile)
+        if (mobileInputRef.current) {
+          mobileInputRef.current.focus();
+        } else {
+          consoleRef.current?.focus?.();
+        }
+      }, 0);
       return;
     }
 
@@ -435,6 +444,23 @@ const SolveProblem = () => {
 
     setOutputError(Boolean(isError));
   }, []);
+
+  // Mobile input handlers for SolveProblem console
+  const handleMobileConsoleSend = useCallback(() => {
+    const value = mobileInputValue.trim();
+    if (value !== '') {
+      sendInputToProgram(value);
+      setOutput(prev => processBackspaces(prev, value + '\n'));
+      setMobileInputValue('');
+    }
+  }, [mobileInputValue]);
+
+  const handleMobileConsoleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleMobileConsoleSend();
+    }
+  }, [handleMobileConsoleSend]);
 
 
 
@@ -1090,10 +1116,16 @@ const SolveProblem = () => {
                   </button>
 
                   <div
-                    className={`p-4 font-mono text-sm text-left h-full overflow-y-auto whitespace-pre-wrap outline-none cursor-text ${isDark ? 'text-gray-300' : 'text-gray-800'} ${outputError ? 'text-red-400' : ''} ${isWaitingForInput ? 'ring-2 ring-yellow-500/50' : ''}`}
+                    className={`p-4 font-mono text-sm text-left overflow-y-auto whitespace-pre-wrap outline-none cursor-text flex-1 ${isDark ? 'text-gray-300' : 'text-gray-800'} ${outputError ? 'text-red-400' : ''} ${isWaitingForInput ? 'ring-2 ring-yellow-500/50' : ''}`}
                     ref={consoleRef}
                     tabIndex={0}
-                    onClick={() => consoleRef.current?.focus()}
+                    onClick={() => {
+                      if (mobileInputRef.current) {
+                        mobileInputRef.current.focus();
+                      } else {
+                        consoleRef.current?.focus();
+                      }
+                    }}
                     style={{
                       caretColor: 'transparent'
                     }}
@@ -1103,6 +1135,34 @@ const SolveProblem = () => {
                       <span className="inline-block w-2 h-5 align-middle bg-yellow-500 animate-pulse ml-1"></span>
                     )}
                   </div>
+
+                  {/* Mobile Input Bar - visible when program awaits input */}
+                  {isWaitingForInput && (
+                    <div className={`flex items-center gap-2 px-3 py-2 border-t ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'} shrink-0`}>
+                      <span className="text-xs font-bold text-yellow-500 shrink-0">{'>'}</span>
+                      <input
+                        ref={mobileInputRef}
+                        type="text"
+                        value={mobileInputValue}
+                        onChange={(e) => setMobileInputValue(e.target.value)}
+                        onKeyDown={handleMobileConsoleKeyDown}
+                        placeholder="Type input and press Enter or Send..."
+                        autoFocus
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
+                        enterKeyHint="send"
+                        className={`flex-1 bg-transparent font-mono text-sm outline-none ${isDark ? 'text-yellow-300 placeholder-gray-500' : 'text-yellow-700 placeholder-gray-400'}`}
+                      />
+                      <button
+                        onClick={handleMobileConsoleSend}
+                        className="shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors"
+                      >
+                        Send
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

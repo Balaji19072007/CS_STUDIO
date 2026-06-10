@@ -72,8 +72,10 @@ const ProjectEditorPage = () => {
     // Terminal execution states
     const [isWaitingForInput, setIsWaitingForInput] = useState(false);
     const terminalRef = useRef(null);
+    const mobileInputRef = useRef(null);
     const inputBufferRef = useRef('');
     const isInputActiveRef = useRef(false);
+    const [mobileInputValue, setMobileInputValue] = useState('');
     
     const [error, setError] = useState(null);
     const [outputError, setOutputError] = useState(false);
@@ -213,12 +215,35 @@ const ProjectEditorPage = () => {
         };
     }, [isWaitingForInput]);
 
-    // Focus terminal when waiting for input
+    // Focus terminal / mobile input when waiting for input
     useEffect(() => {
-        if (isWaitingForInput && terminalRef.current) {
-            terminalRef.current.focus();
+        if (isWaitingForInput) {
+            if (mobileInputRef.current) {
+                mobileInputRef.current.focus();
+            } else if (terminalRef.current) {
+                terminalRef.current.focus();
+            }
         }
     }, [isWaitingForInput]);
+
+    // Mobile input handlers
+    const handleMobileInputSend = useCallback(() => {
+        const value = mobileInputValue.trim();
+        if (value !== '' && socketService.isConnected) {
+            sendInputToProgram(value);
+            setOutput(prev => prev + value + '\n');
+            setMobileInputValue('');
+            inputBufferRef.current = '';
+            isInputActiveRef.current = true;
+        }
+    }, [mobileInputValue]);
+
+    const handleMobileInputKeyDown = useCallback((e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleMobileInputSend();
+        }
+    }, [handleMobileInputSend]);
 
     const handleOutput = (nextOutput, isError) => {
         setOutput((previous) => {
@@ -627,7 +652,13 @@ const ProjectEditorPage = () => {
                             <div 
                                 ref={terminalRef}
                                 tabIndex={0}
-                                onClick={() => terminalRef.current && terminalRef.current.focus()}
+                                onClick={() => {
+                                    if (mobileInputRef.current) {
+                                        mobileInputRef.current.focus();
+                                    } else if (terminalRef.current) {
+                                        terminalRef.current.focus();
+                                    }
+                                }}
                                 className={`custom-scrollbar flex-1 overflow-y-auto p-5 text-left font-mono text-[13px] leading-relaxed whitespace-pre-wrap outline-none cursor-text ${outputError ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'} ${isWaitingForInput ? 'ring-2 ring-yellow-500/50 ring-inset' : ''}`}
                                 style={{
                                     caretColor: isWaitingForInput ? '#fbbf24' : 'transparent',
@@ -638,7 +669,36 @@ const ProjectEditorPage = () => {
                                     <span className="text-yellow-500 blink font-bold">█</span>
                                 )}
                             </div>
+
+                            {/* Mobile Input Bar - visible when program awaits input */}
+                            {isWaitingForInput && (
+                                <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0 rounded-b-2xl">
+                                    <span className="text-xs font-bold text-yellow-500 shrink-0">{'>'}</span>
+                                    <input
+                                        ref={mobileInputRef}
+                                        type="text"
+                                        value={mobileInputValue}
+                                        onChange={(e) => setMobileInputValue(e.target.value)}
+                                        onKeyDown={handleMobileInputKeyDown}
+                                        placeholder="Type input and press Enter or Send..."
+                                        autoFocus
+                                        autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="off"
+                                        spellCheck={false}
+                                        enterKeyHint="send"
+                                        className="flex-1 bg-transparent font-mono text-sm outline-none text-yellow-600 dark:text-yellow-300 placeholder-gray-400 dark:placeholder-gray-500"
+                                    />
+                                    <button
+                                        onClick={handleMobileInputSend}
+                                        className="shrink-0 px-3 py-1 rounded text-xs font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition-colors"
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+                            )}
                         </div>
+
 
                         {/* Download & Run Full Project Buttons */}
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
