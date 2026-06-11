@@ -10,7 +10,7 @@ import { fetchDailyProblem, fetchRecommendedProblems } from '../api/problemApi.j
 import { getEnrolledCourses } from '../api/courseApi.js';
 import { buildApiUrl } from '../config/api.js';
 import TopUserStats from '../components/TopUserStats.jsx';
-import { DashboardSkeleton } from '../components/common/SkeletonLoader';
+import FullPageLoader from '../components/common/FullPageLoader.jsx';
 
 // Inline SVG Activity Graph Component
 const ActivityGraph = ({ history }) => {
@@ -170,6 +170,7 @@ const UserHomePage = () => {
     const [userStats, setUserStats] = useState(null);
     const [difficultyStats, setDifficultyStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showDashLoader, setShowDashLoader] = useState(true);
 
     // New Data States
     // const [dailyProblem, setDailyProblem] = useState(null);
@@ -309,8 +310,16 @@ const UserHomePage = () => {
 
     if (!user) return null;
 
-    if (loading) {
-        return <DashboardSkeleton />;
+    // Keep FullPageLoader mounted (as position:fixed overlay) until its
+    // animation completes — then it fades out and we render the dashboard
+    if (showDashLoader) {
+        return (
+            <FullPageLoader
+                message="Loading Dashboard..."
+                isReady={!loading}
+                onComplete={() => setShowDashLoader(false)}
+            />
+        );
     }
 
     // --- STREAK CALCULATION ---
@@ -385,9 +394,7 @@ const UserHomePage = () => {
                     <div className="lg:col-span-8 space-y-6 sm:space-y-8">
 
                         {/* 1. Daily Practice Card */}
-                        {loading ? (
-                            <div className="h-40 sm:h-48 rounded-2xl sm:rounded-3xl bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
-                        ) : hasSolvedToday ? (
+                        {hasSolvedToday ? (
                             // Render COMPLETED State
                             <div className="block relative group overflow-hidden rounded-2xl sm:rounded-3xl transition-all shadow-lg shadow-green-900/10 hover:scale-[1.01]">
                                 <div className="absolute inset-0 bg-gradient-to-br from-green-600 to-emerald-700 opacity-95 transition-opacity"></div>
@@ -582,12 +589,9 @@ const UserHomePage = () => {
                     <div className="lg:col-span-4 space-y-6 sm:space-y-8">
 
                         {/* 1. Rank Card */}
-                        {loading ? (
-                            <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-2xl sm:rounded-3xl animate-pulse"></div>
+                        {rankData ? (
+                            <TopUserStats rankData={rankData} />
                         ) : (
-                            rankData ? (
-                                <TopUserStats rankData={rankData} />
-                            ) : (
                                 <div className="bg-white dark:dark-glass rounded-2xl sm:rounded-3xl p-6 border border-gray-200 dark:border-white/10 text-center shadow-sm dark:shadow-none">
                                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
                                         <BarChart2 className="w-8 h-8 text-gray-400 dark:text-gray-500" />
