@@ -8818,3 +8818,4304 @@ The program then displays a confirmation message.
 Output
 Array Initialized Successfully
 
+Topic 3: Accessing Array Elements
+Topic Introduction
+
+In the previous topic, we learned how to:
+
+Declare Arrays
+Create Arrays
+Initialize Arrays
+
+Creating an array is useful, but the real power of arrays comes from accessing and using the stored values.
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+Now the question is:
+
+How do we retrieve 85?
+How do we retrieve 90?
+How do we retrieve 95?
+
+The answer is:
+
+Using Indexes
+
+Every element inside an array has an index position.
+
+Definition
+
+Accessing Array Elements means retrieving or reading values stored inside an array using their index positions.
+
+Understanding Indexes
+
+Arrays always start indexing from:
+
+0
+
+not:
+
+1
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+Index	Value
+0	85
+1	90
+2	78
+3	95
+4	88
+Visual Representation
+marks
+
+ ┌────┬────┬────┬────┬────┐
+ │85  │90  │78  │95  │88  │
+ └────┴────┴────┴────┴────┘
+
+   0    1    2    3    4
+Syntax
+arrayName[index]
+
+Example:
+
+marks[0]
+
+returns:
+
+85
+Accessing Individual Elements
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+First Element
+marks[0]
+
+Output:
+
+85
+Second Element
+marks[1]
+
+Output:
+
+90
+Third Element
+marks[2]
+
+Output:
+
+78
+Fourth Element
+marks[3]
+
+Output:
+
+95
+Fifth Element
+marks[4]
+
+Output:
+
+88
+Example 1: Print First Element
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30
+        };
+
+        System.out.println(numbers[0]);
+
+    }
+
+}
+Output
+10
+Example 2: Print Multiple Elements
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        System.out.println(marks[0]);
+        System.out.println(marks[2]);
+        System.out.println(marks[4]);
+
+    }
+
+}
+Output
+85
+78
+88
+Example 3: String Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        System.out.println(names[1]);
+
+    }
+
+}
+Output
+Rahul
+Example 4: Boolean Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        boolean[] status =
+        {
+            true,
+            false,
+            true
+        };
+
+        System.out.println(status[2]);
+
+    }
+
+}
+Output
+true
+Using Variables to Access Elements
+
+Indexes can also come from variables.
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+int index = 1;
+
+System.out.println(numbers[index]);
+
+Output:
+
+20
+Accessing Last Element
+
+Suppose:
+
+int[] numbers =
+{
+    10,
+    20,
+    30,
+    40,
+    50
+};
+
+Last index:
+
+4
+
+Access:
+
+numbers[4]
+
+Output:
+
+50
+Array Length
+
+Java provides:
+
+arrayName.length
+
+Example:
+
+System.out.println(numbers.length);
+
+Output:
+
+5
+Access Last Element Dynamically
+
+Instead of:
+
+numbers[4]
+
+Use:
+
+numbers[numbers.length - 1]
+
+Example:
+
+System.out.println(
+        numbers[numbers.length - 1]
+);
+
+Output:
+
+50
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] marks =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        int index = sc.nextInt();
+
+        System.out.println(marks[index]);
+
+    }
+
+}
+Input
+2
+Output
+78
+ArrayIndexOutOfBoundsException
+
+One of the most common array errors.
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+System.out.println(numbers[5]);
+
+Error:
+
+ArrayIndexOutOfBoundsException
+Why?
+
+Valid indexes:
+
+0
+1
+2
+
+But:
+
+numbers[5]
+
+does not exist.
+
+Real World Usage
+Student Marks
+marks[0]
+
+First student.
+
+Product List
+products[3]
+
+Fourth product.
+
+Employee Names
+names[1]
+
+Second employee.
+
+Game Scores
+scores[0]
+
+Top score.
+
+Common Mistakes
+Mistake 1
+
+Thinking Arrays Start From 1
+
+Wrong:
+
+marks[1]
+
+for first element.
+
+Correct:
+
+marks[0]
+Mistake 2
+
+Using Invalid Index
+
+Wrong:
+
+numbers[10]
+
+when array size is:
+
+5
+Mistake 3
+
+Using Length as Index
+
+Wrong:
+
+numbers[numbers.length]
+
+For array size 5:
+
+length = 5
+
+Valid indexes:
+
+0
+1
+2
+3
+4
+
+Correct:
+
+numbers[numbers.length - 1]
+Mistake 4
+
+Negative Index
+
+Wrong:
+
+numbers[-1]
+
+Not allowed.
+
+Best Practices
+Verify Index Range
+
+Always ensure:
+
+0 ≤ index < length
+Use length for Dynamic Access
+
+Good:
+
+numbers[numbers.length - 1]
+Use Meaningful Array Names
+
+Good:
+
+studentMarks
+employeeNames
+productPrices
+Key Points
+Array elements are accessed using indexes.
+Indexing starts from 0.
+Syntax:
+arrayName[index]
+Invalid indexes cause:
+ArrayIndexOutOfBoundsException
+Array size is obtained using:
+arrayName.length
+Topic 3 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+10
+20
+30
+40
+50
+
+Display:
+
+First element
+Third element
+Last element
+
+Expected Output:
+
+10
+30
+50
+Input Format
+
+No input required.
+
+Output Format
+10
+30
+50
+Sample Output
+10
+30
+50
+Hint 1
+
+Create an integer array.
+
+Hint 2
+
+Use indexes:
+
+0
+2
+Hint 3
+
+Use:
+
+arrayName.length - 1
+
+for the last element.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        // Print required elements
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        System.out.println(numbers[0]);
+        System.out.println(numbers[2]);
+        System.out.println(
+                numbers[numbers.length - 1]
+        );
+
+    }
+
+}
+Code Explanation
+
+The first element is:
+
+numbers[0]
+
+The third element is:
+
+numbers[2]
+
+The last element is:
+
+numbers[numbers.length - 1]
+
+which evaluates to:
+
+numbers[4]
+Output
+10
+30
+50
+
+Topic 4: Updating Array Elements
+Topic Introduction
+
+In the previous topic, we learned how to access array elements using indexes.
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+System.out.println(marks[2]);
+
+Output:
+
+78
+
+Reading values is useful.
+
+But in real-world applications, data often changes.
+
+Examples:
+
+Student marks get corrected
+Product prices change
+Employee salaries increase
+Game scores are updated
+
+To handle these situations, Java allows us to update array elements.
+
+Definition
+
+Updating Array Elements means replacing an existing value stored in an array with a new value using its index.
+
+Syntax
+arrayName[index] = newValue;
+
+Example:
+
+marks[2] = 80;
+Explanation
+
+Before:
+
+Index  Value
+
+0      85
+1      90
+2      78
+3      95
+4      88
+
+Statement:
+
+marks[2] = 80;
+
+After:
+
+Index  Value
+
+0      85
+1      90
+2      80
+3      95
+4      88
+
+The old value:
+
+78
+
+is replaced by:
+
+80
+Visual Representation
+
+Before:
+
+ ┌────┬────┬────┬────┬────┐
+ │85  │90  │78  │95  │88  │
+ └────┴────┴────┴────┴────┘
+
+   0    1    2    3    4
+
+Update:
+
+marks[2] = 80;
+
+After:
+
+ ┌────┬────┬────┬────┬────┐
+ │85  │90  │80  │95  │88  │
+ └────┴────┴────┴────┴────┘
+
+   0    1    2    3    4
+Example 1: Update Student Mark
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        marks[2] = 80;
+
+        System.out.println(marks[2]);
+
+    }
+
+}
+Output
+80
+Example 2: Update Product Price
+public class Main {
+
+    public static void main(String[] args) {
+
+        double[] prices =
+        {
+            100.0,
+            250.0,
+            500.0
+        };
+
+        prices[1] = 275.0;
+
+        System.out.println(prices[1]);
+
+    }
+
+}
+Output
+275.0
+Example 3: Update Employee Name
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        names[0] = "Ravi";
+
+        System.out.println(names[0]);
+
+    }
+
+}
+Output
+Ravi
+Example 4: Update Boolean Value
+public class Main {
+
+    public static void main(String[] args) {
+
+        boolean[] status =
+        {
+            true,
+            false,
+            true
+        };
+
+        status[1] = true;
+
+        System.out.println(status[1]);
+
+    }
+
+}
+Output
+true
+Updating Using Variables
+
+Indexes can come from variables.
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+int index = 1;
+
+numbers[index] = 100;
+
+System.out.println(numbers[1]);
+
+Output:
+
+100
+Updating Based on Existing Value
+
+Example:
+
+int[] marks =
+{
+    80,
+    85,
+    90
+};
+
+marks[0] = marks[0] + 5;
+
+System.out.println(marks[0]);
+
+Output:
+
+85
+Incrementing Values
+
+Example:
+
+int[] scores =
+{
+    10,
+    20,
+    30
+};
+
+scores[1]++;
+
+Before:
+
+20
+
+After:
+
+21
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int index = sc.nextInt();
+        int value = sc.nextInt();
+
+        numbers[index] = value;
+
+        System.out.println(numbers[index]);
+
+    }
+
+}
+Input
+2
+100
+Output
+100
+Real World Usage
+School Management System
+Update corrected marks
+E-Commerce
+Update product price
+Banking
+Update account balance
+Gaming
+Update player score
+Attendance System
+Update attendance status
+Common Mistakes
+Mistake 1
+
+Using Invalid Index
+
+Wrong:
+
+numbers[10] = 50;
+
+when array size is:
+
+5
+
+Results in:
+
+ArrayIndexOutOfBoundsException
+Mistake 2
+
+Using Wrong Data Type
+
+Wrong:
+
+int[] marks =
+{
+    80,
+    90
+};
+
+marks[0] = "Java";
+
+Compilation Error.
+
+Mistake 3
+
+Thinking Update Creates New Element
+
+Wrong assumption:
+
+Update adds a new element
+
+Correct:
+
+Update replaces existing value
+Mistake 4
+
+Negative Index
+
+Wrong:
+
+numbers[-1] = 50;
+
+Not allowed.
+
+Best Practices
+Verify Index Before Updating
+
+Good:
+
+0 <= index < array.length
+Use Meaningful Names
+
+Good:
+
+studentMarks
+productPrices
+employeeNames
+Update Only When Necessary
+
+Avoid unnecessary changes.
+
+Validate User Input
+
+Before updating:
+
+numbers[index]
+
+ensure the index is valid.
+
+Key Points
+Array elements can be modified using indexes.
+Syntax:
+arrayName[index] = newValue;
+Updating replaces an existing value.
+Invalid indexes cause:
+ArrayIndexOutOfBoundsException
+Arrays remain the same size after updates.
+Topic 4 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+10
+20
+30
+40
+50
+
+Update:
+
+30 → 100
+
+Then display all values.
+
+Expected Output:
+
+10
+20
+100
+40
+50
+Input Format
+
+No input required.
+
+Output Format
+10
+20
+100
+40
+50
+Sample Output
+10
+20
+100
+40
+50
+Hint 1
+
+Create an integer array.
+
+Hint 2
+
+Update index:
+
+2
+Hint 3
+
+Use a loop to print all elements.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        // Update array here
+
+        // Print array
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        numbers[2] = 100;
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Code Explanation
+
+Initially:
+
+10
+20
+30
+40
+50
+
+Statement:
+
+numbers[2] = 100;
+
+replaces:
+
+30
+
+with:
+
+100
+
+The enhanced for loop prints all updated values.
+
+Output
+10
+20
+100
+40
+50
+
+Phase 4 - Quiz 1
+Topics Covered
+
+✅ Topic 1: Introduction to Arrays
+✅ Topic 2: Creating and Initializing Arrays
+✅ Topic 3: Accessing Array Elements
+✅ Topic 4: Updating Array Elements
+
+Question 1
+
+What is an Array?
+
+A. A single variable storing one value
+
+B. A collection of elements of the same data type
+
+C. A loop
+
+D. A method
+
+✅ Correct Answer: B
+
+Explanation
+
+Arrays store multiple values of the same data type in a single variable.
+
+Question 2
+
+What is the starting index of an array?
+
+A. 1
+
+B. -1
+
+C. 0
+
+D. Depends on size
+
+✅ Correct Answer: C
+
+Explanation
+
+Java arrays always start indexing from:
+
+0
+Question 3
+
+Which keyword allocates memory for an array?
+
+A. create
+
+B. make
+
+C. array
+
+D. new
+
+✅ Correct Answer: D
+
+Explanation
+
+Example:
+
+int[] numbers = new int[5];
+Question 4
+
+Which property gives the size of an array?
+
+A. size
+
+B. count
+
+C. length
+
+D. total
+
+✅ Correct Answer: C
+
+Explanation
+
+Example:
+
+numbers.length
+Question 5
+
+Which statement correctly accesses the first element?
+
+A.
+
+numbers[1]
+
+B.
+
+numbers[0]
+
+C.
+
+numbers[-1]
+
+D.
+
+numbers[length]
+
+✅ Correct Answer: B
+
+Question 6
+
+How do you update an array element?
+
+A.
+
+numbers.add(10);
+
+B.
+
+numbers[2] = 10;
+
+C.
+
+update(numbers);
+
+D.
+
+numbers.create(10);
+
+✅ Correct Answer: B
+
+Question 7 (Output Prediction)
+
+What will be the output?
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+System.out.println(numbers[1]);
+
+A.
+
+10
+
+B.
+
+20
+
+C.
+
+30
+
+D. Error
+
+✅ Correct Answer: B
+
+Explanation
+
+Index:
+
+0 → 10
+1 → 20
+2 → 30
+Question 8 (Output Prediction)
+
+What will be the output?
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+numbers[2] = 100;
+
+System.out.println(numbers[2]);
+
+A.
+
+30
+
+B.
+
+20
+
+C.
+
+100
+
+D. Error
+
+✅ Correct Answer: C
+
+Question 9 (Error Finding)
+
+Find the error:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+System.out.println(numbers[3]);
+
+A. Missing array
+
+B. Missing semicolon
+
+C. Invalid index
+
+D. Wrong data type
+
+✅ Correct Answer: C
+
+Explanation
+
+Valid indexes:
+
+0
+1
+2
+
+Index:
+
+numbers[3]
+
+does not exist.
+
+Question 10 (Scenario Based)
+
+A school wants to store marks of 500 students.
+
+Which is the best option?
+
+A. 500 separate variables
+
+B. switch statement
+
+C. Array
+
+D. Nested Loop
+
+✅ Correct Answer: C
+
+Explanation
+
+Arrays are designed to store multiple values of the same type efficiently.
+
+Topic 5: Array Traversal
+Topic Introduction
+
+In the previous topics, we learned:
+
+Creating Arrays
+Initializing Arrays
+Accessing Elements
+Updating Elements
+
+Suppose we have:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+If we want to display all elements, we could write:
+
+System.out.println(marks[0]);
+System.out.println(marks[1]);
+System.out.println(marks[2]);
+System.out.println(marks[3]);
+System.out.println(marks[4]);
+
+This works.
+
+But imagine an array with:
+
+1000 elements
+
+Writing 1000 print statements is impossible.
+
+To solve this problem, we use Array Traversal.
+
+Definition
+
+Array Traversal is the process of visiting and accessing every element of an array one by one.
+
+Why We Need Array Traversal
+
+Without traversal:
+
+System.out.println(marks[0]);
+System.out.println(marks[1]);
+System.out.println(marks[2]);
+System.out.println(marks[3]);
+System.out.println(marks[4]);
+
+With traversal:
+
+for(int i = 0; i < marks.length; i++)
+{
+    System.out.println(marks[i]);
+}
+
+Much shorter.
+
+Works for arrays of any size.
+
+Understanding Traversal
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30,
+    40,
+    50
+};
+
+Indexes:
+
+Index	Value
+0	10
+1	20
+2	30
+3	40
+4	50
+
+Traversal means:
+
+Visit Index 0
+Visit Index 1
+Visit Index 2
+Visit Index 3
+Visit Index 4
+Traversal Using for Loop
+
+This is the most common method.
+
+Syntax
+for(int i = 0; i < array.length; i++)
+{
+    System.out.println(array[i]);
+}
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            System.out.println(numbers[i]);
+        }
+
+    }
+
+}
+Output
+10
+20
+30
+40
+50
+How It Works
+Iteration 1
+i = 0
+
+Print:
+
+numbers[0]
+
+Output:
+
+10
+Iteration 2
+i = 1
+
+Output:
+
+20
+Iteration 3
+i = 2
+
+Output:
+
+30
+Iteration 4
+i = 3
+
+Output:
+
+40
+Iteration 5
+i = 4
+
+Output:
+
+50
+Traversal Using while Loop
+
+Arrays can also be traversed using while.
+
+Example:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int i = 0;
+
+        while(i < numbers.length)
+        {
+            System.out.println(numbers[i]);
+
+            i++;
+        }
+
+    }
+
+}
+Output
+10
+20
+30
+40
+50
+Traversal Using Enhanced for Loop
+
+The easiest method.
+
+Example:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Output
+10
+20
+30
+40
+50
+Forward Traversal
+
+Normal traversal.
+
+Example:
+
+for(int i = 0; i < numbers.length; i++)
+{
+    System.out.println(numbers[i]);
+}
+
+Output:
+
+10
+20
+30
+40
+50
+Reverse Traversal
+
+Traverse from last element to first.
+
+Example:
+
+for(int i = numbers.length - 1; i >= 0; i--)
+{
+    System.out.println(numbers[i]);
+}
+Output
+50
+40
+30
+20
+10
+Example 2: Reverse Traversal
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        for(int i = numbers.length - 1; i >= 0; i--)
+        {
+            System.out.println(numbers[i]);
+        }
+
+    }
+
+}
+Example 3: String Array Traversal
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        for(String name : names)
+        {
+            System.out.println(name);
+        }
+
+    }
+
+}
+Output
+Balu
+Rahul
+Anjali
+Example 4: Traversal with Index Display
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30
+        };
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            System.out.println(
+                "Index " + i +
+                " = " +
+                numbers[i]
+            );
+        }
+
+    }
+
+}
+Output
+Index 0 = 10
+Index 1 = 20
+Index 2 = 30
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] arr = new int[5];
+
+        for(int i = 0; i < arr.length; i++)
+        {
+            arr[i] = sc.nextInt();
+        }
+
+        for(int value : arr)
+        {
+            System.out.println(value);
+        }
+
+    }
+
+}
+Input
+10
+20
+30
+40
+50
+Output
+10
+20
+30
+40
+50
+Real World Usage
+Student Marks
+Process every student mark
+Product Prices
+Display all product prices
+Employee Names
+Print all employee names
+Banking
+Process all transactions
+Games
+Display all player scores
+Common Mistakes
+Mistake 1
+
+Using:
+
+i <= numbers.length
+
+Wrong:
+
+for(int i = 0; i <= numbers.length; i++)
+
+Causes:
+
+ArrayIndexOutOfBoundsException
+
+Correct:
+
+i < numbers.length
+Mistake 2
+
+Starting From Index 1
+
+Wrong:
+
+for(int i = 1; i < numbers.length; i++)
+
+Skips first element.
+
+Mistake 3
+
+Forgetting Increment
+
+Wrong:
+
+while(i < numbers.length)
+{
+}
+
+Infinite loop.
+
+Mistake 4
+
+Using Enhanced for Loop When Index Needed
+
+Enhanced for loop provides values only.
+
+Not indexes.
+
+Best Practices
+Use Enhanced for Loop for Reading
+
+Good:
+
+for(int num : numbers)
+{
+}
+Use Traditional for Loop When Index Is Needed
+
+Good:
+
+for(int i = 0; i < numbers.length; i++)
+Always Use length
+
+Good:
+
+numbers.length
+
+Avoid hardcoded values.
+
+Key Points
+Traversal means visiting every array element.
+Most common loop:
+for(int i = 0; i < arr.length; i++)
+Enhanced for loop is simpler.
+Reverse traversal starts from:
+arr.length - 1
+Always use:
+i < arr.length
+
+not:
+
+i <= arr.length
+Topic 5 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+10
+20
+30
+40
+50
+
+Display all elements using array traversal.
+
+Expected Output:
+
+10
+20
+30
+40
+50
+Input Format
+
+No input required.
+
+Output Format
+10
+20
+30
+40
+50
+Sample Output
+10
+20
+30
+40
+50
+Hint 1
+
+Create an array.
+
+Hint 2
+
+Use a for loop.
+
+Hint 3
+
+Use:
+
+arr.length
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        // Traverse array
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            System.out.println(numbers[i]);
+        }
+
+    }
+
+}
+Code Explanation
+
+The loop starts from:
+
+i = 0
+
+and continues until:
+
+i < numbers.length
+
+Each iteration prints:
+
+numbers[i]
+
+which accesses the current array element.
+
+Output
+10
+20
+30
+40
+50
+
+Topic 6: Array Input from User
+Topic Introduction
+
+So far, all array values were hardcoded.
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+This works, but in real-world applications values usually come from users.
+
+Examples:
+
+Student enters marks
+Customer enters product quantities
+Employee enters salary details
+User enters game scores
+
+Therefore, we need a way to take array values from the user at runtime.
+
+This is called Array Input.
+
+Definition
+
+Array Input is the process of reading values from the user and storing them into array elements.
+
+Why We Need Array Input
+
+Hardcoded values:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+Always stores the same values.
+
+User Input:
+
+15
+25
+35
+
+The program becomes dynamic and can work with different inputs every time.
+
+Scanner and Arrays
+
+To take input:
+
+import java.util.Scanner;
+
+Create Scanner object:
+
+Scanner sc = new Scanner(System.in);
+
+Read values:
+
+sc.nextInt();
+
+Store them into array elements.
+
+Basic Process
+Step 1
+
+Create array.
+
+int[] numbers = new int[5];
+Step 2
+
+Use loop.
+
+for(int i = 0; i < numbers.length; i++)
+Step 3
+
+Take input.
+
+numbers[i] = sc.nextInt();
+Syntax
+for(int i = 0; i < arr.length; i++)
+{
+    arr[i] = sc.nextInt();
+}
+Visual Representation
+
+Suppose:
+
+int[] arr = new int[3];
+
+Input:
+
+10
+20
+30
+
+Storage:
+
+ ┌────┬────┬────┐
+ │10  │20  │30  │
+ └────┴────┴────┘
+
+   0    1    2
+Example 1: Input 3 Numbers
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers = new int[3];
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            numbers[i] = sc.nextInt();
+        }
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Input
+10
+20
+30
+Output
+10
+20
+30
+How It Works
+
+Iteration 1:
+
+i = 0
+
+Input:
+
+10
+
+Stored:
+
+numbers[0]
+
+Iteration 2:
+
+i = 1
+
+Input:
+
+20
+
+Stored:
+
+numbers[1]
+
+Iteration 3:
+
+i = 2
+
+Input:
+
+30
+
+Stored:
+
+numbers[2]
+Example 2: Student Marks
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] marks = new int[5];
+
+        for(int i = 0; i < marks.length; i++)
+        {
+            marks[i] = sc.nextInt();
+        }
+
+        System.out.println("Marks Entered");
+
+    }
+
+}
+Input
+85
+90
+78
+95
+88
+Output
+Marks Entered
+Example 3: Input and Display
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers = new int[4];
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            numbers[i] = sc.nextInt();
+        }
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Input
+5
+10
+15
+20
+Output
+5
+10
+15
+20
+Example 4: String Array Input
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String[] names = new String[3];
+
+        for(int i = 0; i < names.length; i++)
+        {
+            names[i] = sc.next();
+        }
+
+        for(String name : names)
+        {
+            System.out.println(name);
+        }
+
+    }
+
+}
+Input
+Balu
+Rahul
+Anjali
+Output
+Balu
+Rahul
+Anjali
+Dynamic Array Size
+
+Array size can also come from the user.
+
+Example:
+
+int size = sc.nextInt();
+
+int[] numbers = new int[size];
+
+Now the user decides the array size.
+
+Example 5: Dynamic Size
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int size = sc.nextInt();
+
+        int[] numbers = new int[size];
+
+        for(int i = 0; i < size; i++)
+        {
+            numbers[i] = sc.nextInt();
+        }
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Input
+3
+10
+20
+30
+Output
+10
+20
+30
+Real World Usage
+Student Management
+Enter student marks
+Banking System
+Enter transaction amounts
+E-Commerce
+Enter product quantities
+Sports Application
+Enter player scores
+Survey Forms
+Store user responses
+Common Mistakes
+Mistake 1
+
+Using Wrong Loop Condition
+
+Wrong:
+
+for(int i = 0; i <= arr.length; i++)
+
+Causes:
+
+ArrayIndexOutOfBoundsException
+
+Correct:
+
+i < arr.length
+Mistake 2
+
+Not Creating Array First
+
+Wrong:
+
+arr[i] = sc.nextInt();
+
+before array creation.
+
+Mistake 3
+
+Wrong Input Method
+
+For String arrays:
+
+Wrong:
+
+nextInt()
+
+Correct:
+
+next()
+Mistake 4
+
+Forgetting Import
+
+Wrong:
+
+Scanner sc = new Scanner(System.in);
+
+without:
+
+import java.util.Scanner;
+Best Practices
+Always Use arr.length
+
+Good:
+
+for(int i = 0; i < arr.length; i++)
+Validate User Input
+
+Ensure values are sensible.
+
+Use Meaningful Names
+
+Good:
+
+studentMarks
+productPrices
+employeeNames
+Use Enhanced for Loop for Display
+
+Good:
+
+for(int num : arr)
+Key Points
+Array input stores user-provided values into array elements.
+Scanner is commonly used.
+Input loop:
+arr[i] = sc.nextInt();
+Dynamic array size is possible.
+Always use:
+i < arr.length
+
+for traversal.
+
+Topic 6 Mastery Challenge
+Problem Statement
+
+Create an integer array of size:
+
+5
+
+Take 5 numbers from the user.
+
+Display all entered numbers.
+
+Input Format
+Five integers
+
+Example:
+
+10
+20
+30
+40
+50
+Output Format
+10
+20
+30
+40
+50
+Sample Input
+10
+20
+30
+40
+50
+Sample Output
+10
+20
+30
+40
+50
+Hint 1
+
+Create an array of size 5.
+
+Hint 2
+
+Use a loop for input.
+
+Hint 3
+
+Use another loop for output.
+
+Code Editor
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers = new int[5];
+
+        // Take input
+
+        // Display output
+
+    }
+
+}
+Solution Code
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers = new int[5];
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            numbers[i] = sc.nextInt();
+        }
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Code Explanation
+
+The first loop stores user input:
+
+numbers[i] = sc.nextInt();
+
+The second loop traverses the array and displays all values.
+
+Output
+
+Input:
+
+10
+20
+30
+40
+50
+
+Output:
+
+10
+20
+30
+40
+50
+
+Topic 7: Finding Sum, Average, Minimum and Maximum in Arrays
+Topic Introduction
+
+In previous topics, we learned how to:
+
+Create Arrays
+Access Elements
+Update Elements
+Traverse Arrays
+Take Input into Arrays
+
+Now we will perform actual calculations on array data.
+
+Suppose:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+Questions we might ask:
+
+What is the total of all marks?
+What is the average mark?
+What is the highest mark?
+What is the lowest mark?
+
+These operations are extremely common in real-world applications.
+
+Examples:
+
+Student Result Systems
+Banking Applications
+Sales Reports
+Analytics Dashboards
+AI Data Processing
+Part 1: Finding Sum of Array Elements
+Definition
+
+The sum is the total obtained by adding all array elements.
+
+Logic
+
+Example:
+
+10 + 20 + 30 + 40 + 50
+
+Result:
+
+150
+Algorithm
+Step 1: Create sum variable = 0
+
+Step 2: Traverse array
+
+Step 3: Add each element to sum
+
+Step 4: Print sum
+Syntax
+int sum = 0;
+
+for(int num : numbers)
+{
+    sum += num;
+}
+Example 1: Find Sum
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int sum = 0;
+
+        for(int num : numbers)
+        {
+            sum += num;
+        }
+
+        System.out.println(sum);
+
+    }
+
+}
+Output
+150
+Part 2: Finding Average
+Definition
+
+Average means:
+
+Total Sum ÷ Number of Elements
+Formula
+
+Average=
+Number of Elements
+Sum
+	​
+
+
+Example
+10 + 20 + 30 + 40 + 50 = 150
+
+150 / 5 = 30
+
+Average:
+
+30
+Example 2: Find Average
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int sum = 0;
+
+        for(int num : numbers)
+        {
+            sum += num;
+        }
+
+        double average =
+                (double) sum / numbers.length;
+
+        System.out.println(average);
+
+    }
+
+}
+Output
+30.0
+Why Use (double)?
+
+Wrong:
+
+int average = sum / numbers.length;
+
+May lose decimal values.
+
+Correct:
+
+(double) sum / numbers.length
+Part 3: Finding Maximum Element
+Definition
+
+The maximum value is the largest element in the array.
+
+Example
+
+Array:
+
+85
+90
+78
+95
+88
+
+Maximum:
+
+95
+Logic
+Assume first element is maximum.
+Compare every element.
+Replace maximum when a larger value is found.
+Syntax
+int max = arr[0];
+
+for(int num : arr)
+{
+    if(num > max)
+    {
+        max = num;
+    }
+}
+Example 3: Find Maximum
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        int max = numbers[0];
+
+        for(int num : numbers)
+        {
+            if(num > max)
+            {
+                max = num;
+            }
+        }
+
+        System.out.println(max);
+
+    }
+
+}
+Output
+95
+Part 4: Finding Minimum Element
+Definition
+
+The minimum value is the smallest element in the array.
+
+Example
+
+Array:
+
+85
+90
+78
+95
+88
+
+Minimum:
+
+78
+Logic
+Assume first element is minimum.
+Compare every element.
+Replace minimum when a smaller value is found.
+Syntax
+int min = arr[0];
+
+for(int num : arr)
+{
+    if(num < min)
+    {
+        min = num;
+    }
+}
+Example 4: Find Minimum
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        int min = numbers[0];
+
+        for(int num : numbers)
+        {
+            if(num < min)
+            {
+                min = num;
+            }
+        }
+
+        System.out.println(min);
+
+    }
+
+}
+Output
+78
+Combined Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        int sum = 0;
+        int max = numbers[0];
+        int min = numbers[0];
+
+        for(int num : numbers)
+        {
+            sum += num;
+
+            if(num > max)
+            {
+                max = num;
+            }
+
+            if(num < min)
+            {
+                min = num;
+            }
+        }
+
+        double avg =
+                (double) sum / numbers.length;
+
+        System.out.println("Sum = " + sum);
+        System.out.println("Average = " + avg);
+        System.out.println("Maximum = " + max);
+        System.out.println("Minimum = " + min);
+
+    }
+
+}
+Output
+Sum = 436
+Average = 87.2
+Maximum = 95
+Minimum = 78
+Real World Usage
+School Management
+Average Marks
+Highest Marks
+Lowest Marks
+Banking
+Highest Transaction
+Lowest Transaction
+E-Commerce
+Most Expensive Product
+Cheapest Product
+Sports
+Highest Score
+Lowest Score
+Average Score
+Analytics
+Maximum Data Point
+Minimum Data Point
+Average Trend
+Common Mistakes
+Mistake 1
+
+Initializing max to 0
+
+Wrong:
+
+int max = 0;
+
+Fails for negative arrays.
+
+Correct:
+
+int max = arr[0];
+Mistake 2
+
+Initializing min to 0
+
+Wrong:
+
+int min = 0;
+
+Correct:
+
+int min = arr[0];
+Mistake 3
+
+Integer Division
+
+Wrong:
+
+int avg = sum / arr.length;
+
+Correct:
+
+double avg =
+        (double) sum / arr.length;
+Mistake 4
+
+Forgetting Sum Initialization
+
+Wrong:
+
+int sum;
+
+Correct:
+
+int sum = 0;
+Best Practices
+Use Enhanced for Loop
+
+Good:
+
+for(int num : arr)
+Initialize Max and Min with First Element
+
+Good:
+
+int max = arr[0];
+int min = arr[0];
+Use Double for Average
+
+Good:
+
+double avg
+Combine Calculations in One Traversal
+
+Efficient:
+
+sum
+max
+min
+
+inside a single loop.
+
+Key Points
+Sum = Total of all elements.
+Average = Sum ÷ Number of Elements.
+Maximum = Largest value.
+Minimum = Smallest value.
+Enhanced for loop simplifies calculations.
+Use first element for max and min initialization.
+Topic 7 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+10
+20
+30
+40
+50
+
+Find and display:
+
+Sum
+Average
+Maximum
+Minimum
+
+Expected Output:
+
+Sum = 150
+Average = 30.0
+Maximum = 50
+Minimum = 10
+Input Format
+
+No input required.
+
+Output Format
+Sum = 150
+Average = 30.0
+Maximum = 50
+Minimum = 10
+Sample Output
+Sum = 150
+Average = 30.0
+Maximum = 50
+Minimum = 10
+Hint 1
+
+Create variables:
+
+sum
+max
+min
+Hint 2
+
+Traverse the array once.
+
+Hint 3
+
+Use:
+
+if(num > max)
+
+and
+
+if(num < min)
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        // Write logic here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int sum = 0;
+        int max = numbers[0];
+        int min = numbers[0];
+
+        for(int num : numbers)
+        {
+            sum += num;
+
+            if(num > max)
+            {
+                max = num;
+            }
+
+            if(num < min)
+            {
+                min = num;
+            }
+        }
+
+        double avg =
+                (double) sum / numbers.length;
+
+        System.out.println("Sum = " + sum);
+        System.out.println("Average = " + avg);
+        System.out.println("Maximum = " + max);
+        System.out.println("Minimum = " + min);
+
+    }
+
+}
+Code Explanation
+
+The loop visits every element.
+
+During traversal:
+
+sum += num;
+
+calculates total.
+
+if(num > max)
+
+finds the largest value.
+
+if(num < min)
+
+finds the smallest value.
+
+Finally:
+
+(double) sum / numbers.length
+
+calculates the average.
+
+Output
+Sum = 150
+Average = 30.0
+Maximum = 50
+Minimum = 10
+
+Topic 8: Searching Elements (Linear Search)
+Topic Introduction
+
+Imagine you have an array:
+
+int[] numbers =
+{
+    10,
+    20,
+    30,
+    40,
+    50
+};
+
+Now someone asks:
+
+Is 30 present in the array?
+
+or
+
+At which index is 40 stored?
+
+To answer these questions, we need Searching.
+
+Searching is one of the most important operations in programming.
+
+Real-world examples:
+
+Search a student by roll number.
+Search a product by ID.
+Search a contact by phone number.
+Search a user by username.
+Definition
+
+Searching is the process of finding whether a specific element exists in a collection of data.
+
+What is Linear Search?
+
+Linear Search is the simplest searching technique.
+
+It checks elements one by one from the beginning until:
+
+Element Found
+
+or
+
+End of Array Reached
+How Linear Search Works
+
+Array:
+
+10 20 30 40 50
+
+Search:
+
+40
+
+Process:
+
+Check 10 ❌
+
+Check 20 ❌
+
+Check 30 ❌
+
+Check 40 ✅ Found
+
+Search stops.
+
+Linear Search Algorithm
+Step 1: Start from index 0
+
+Step 2: Compare current element with target
+
+Step 3: If equal → Found
+
+Step 4: Otherwise move to next element
+
+Step 5: Repeat until end
+
+Step 6: If not found → Element does not exist
+Syntax
+boolean found = false;
+
+for(int num : arr)
+{
+    if(num == target)
+    {
+        found = true;
+        break;
+    }
+}
+Example 1: Search Existing Element
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = 30;
+
+        boolean found = false;
+
+        for(int num : numbers)
+        {
+            if(num == target)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(found)
+        {
+            System.out.println("Found");
+        }
+        else
+        {
+            System.out.println("Not Found");
+        }
+
+    }
+
+}
+Output
+Found
+Example 2: Search Missing Element
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = 100;
+
+        boolean found = false;
+
+        for(int num : numbers)
+        {
+            if(num == target)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(found)
+        {
+            System.out.println("Found");
+        }
+        else
+        {
+            System.out.println("Not Found");
+        }
+
+    }
+
+}
+Output
+Not Found
+Finding the Index
+
+Sometimes we need the position.
+
+Example:
+
+Find index of 40
+Logic
+
+Store the index when found.
+
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = 40;
+
+        int index = -1;
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            if(numbers[i] == target)
+            {
+                index = i;
+                break;
+            }
+        }
+
+        System.out.println(index);
+
+    }
+
+}
+Output
+3
+Why Initialize index = -1?
+
+Because:
+
+Valid indexes:
+0
+1
+2
+3
+4
+
+So:
+
+-1
+
+means:
+
+Element Not Found
+Example 4: Search String
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        String target = "Rahul";
+
+        boolean found = false;
+
+        for(String name : names)
+        {
+            if(name.equals(target))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        System.out.println(found);
+
+    }
+
+}
+Output
+true
+Important: String Comparison
+
+Wrong:
+
+if(name == target)
+
+Correct:
+
+if(name.equals(target))
+
+Always use:
+
+equals()
+
+for strings.
+
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = sc.nextInt();
+
+        boolean found = false;
+
+        for(int num : numbers)
+        {
+            if(num == target)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(found)
+        {
+            System.out.println("Found");
+        }
+        else
+        {
+            System.out.println("Not Found");
+        }
+
+    }
+
+}
+Input
+40
+Output
+Found
+Time Complexity (Basic)
+
+Suppose:
+
+Array Size = n
+
+Worst case:
+
+Need to check every element
+
+Linear Search Complexity:
+
+O(n)
+
+Meaning:
+
+Time grows linearly with array size
+Real World Usage
+Student Search
+Find Roll Number
+Banking
+Find Account Number
+E-Commerce
+Find Product ID
+Contact List
+Find Phone Number
+Attendance System
+Find Student Record
+Common Mistakes
+Mistake 1
+
+Forgetting break
+
+Wrong:
+
+if(arr[i] == target)
+{
+    found = true;
+}
+
+May continue unnecessary searching.
+
+Mistake 2
+
+Using == for Strings
+
+Wrong:
+
+name == target
+
+Correct:
+
+name.equals(target)
+Mistake 3
+
+Using index = 0
+
+Wrong:
+
+int index = 0;
+
+If element isn't found:
+
+0
+
+looks valid.
+
+Use:
+
+int index = -1;
+Mistake 4
+
+Not Checking Result
+
+Wrong:
+
+System.out.println(index);
+
+without verifying.
+
+Better:
+
+if(index != -1)
+Best Practices
+Use break After Finding
+
+Good:
+
+break;
+Use -1 for Not Found
+
+Good:
+
+int index = -1;
+Use equals() for Strings
+
+Good:
+
+name.equals(target)
+Display Clear Messages
+
+Good:
+
+Found
+Not Found
+Key Points
+Linear Search checks elements one by one.
+Works on any array.
+Time Complexity:
+O(n)
+Use:
+boolean found
+
+or
+
+int index = -1
+Use:
+equals()
+
+for String searching.
+
+Topic 8 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+10
+20
+30
+40
+50
+
+Search for:
+
+40
+
+Display:
+
+Found at Index 3
+Input Format
+
+No input required.
+
+Output Format
+Found at Index 3
+Sample Output
+Found at Index 3
+Hint 1
+
+Use a loop.
+
+Hint 2
+
+Compare:
+
+numbers[i] == target
+Hint 3
+
+Store index when found.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = 40;
+
+        // Write search logic here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        int target = 40;
+
+        int index = -1;
+
+        for(int i = 0; i < numbers.length; i++)
+        {
+            if(numbers[i] == target)
+            {
+                index = i;
+                break;
+            }
+        }
+
+        if(index != -1)
+        {
+            System.out.println(
+                "Found at Index " + index
+            );
+        }
+        else
+        {
+            System.out.println("Not Found");
+        }
+
+    }
+
+}
+Code Explanation
+
+The loop checks every element.
+
+When:
+
+numbers[i] == target
+
+becomes true,
+
+the current index is stored and the loop stops using:
+
+break;
+
+Output:
+
+Found at Index 3
+Output
+Found at Index 3
+
+Phase 4 - Quiz 2
+Topics Covered
+
+✅ Topic 5: Array Traversal
+✅ Topic 6: Array Input from User
+✅ Topic 7: Sum, Average, Minimum & Maximum
+✅ Topic 8: Linear Search
+
+Question 1
+
+What is Array Traversal?
+
+A. Creating an array
+
+B. Updating an array
+
+C. Visiting every element one by one
+
+D. Deleting an array
+
+✅ Correct Answer: C
+
+Explanation
+
+Traversal means accessing every element of an array sequentially.
+
+Question 2
+
+Which loop is most commonly used for array traversal?
+
+A. switch
+
+B. if
+
+C. for loop
+
+D. try-catch
+
+✅ Correct Answer: C
+
+Question 3
+
+Which statement correctly takes integer input into an array?
+
+A.
+
+arr[i] = sc.nextInt();
+
+B.
+
+arr[i] = sc.next();
+
+C.
+
+arr[i] = input();
+
+D.
+
+arr.add();
+
+✅ Correct Answer: A
+
+Question 4
+
+Which variable should be initialized before calculating sum?
+
+A.
+
+int sum = 1;
+
+B.
+
+int sum = -1;
+
+C.
+
+int sum = 0;
+
+D.
+
+int sum;
+
+✅ Correct Answer: C
+
+Question 5
+
+What is the correct formula for Average?
+
+A. Sum × Number of Elements
+
+B. Sum - Number of Elements
+
+C. Sum + Number of Elements
+
+D. Sum ÷ Number of Elements
+
+✅ Correct Answer: D
+
+Question 6
+
+For finding maximum element, the best initialization is:
+
+A.
+
+int max = 0;
+
+B.
+
+int max = arr[0];
+
+C.
+
+int max = -1;
+
+D.
+
+int max = 100;
+
+✅ Correct Answer: B
+
+Question 7 (Output Prediction)
+
+What will be the output?
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+for(int num : numbers)
+{
+    System.out.println(num);
+}
+
+A.
+
+10
+20
+30
+
+B.
+
+0
+1
+2
+
+C.
+
+30
+20
+10
+
+D. Error
+
+✅ Correct Answer: A
+
+Question 8 (Output Prediction)
+
+What will be the output?
+
+int[] numbers =
+{
+    10,
+    20,
+    30,
+    40
+};
+
+int sum = 0;
+
+for(int num : numbers)
+{
+    sum += num;
+}
+
+System.out.println(sum);
+
+A.
+
+40
+
+B.
+
+100
+
+C.
+
+10
+
+D. Error
+
+✅ Correct Answer: B
+
+Explanation
+10 + 20 + 30 + 40 = 100
+Question 9 (Error Finding)
+
+Find the error:
+
+for(int i = 0; i <= arr.length; i++)
+{
+    System.out.println(arr[i]);
+}
+
+A. Missing loop
+
+B. Wrong variable
+
+C. Wrong condition
+
+D. Missing semicolon
+
+✅ Correct Answer: C
+
+Explanation
+
+Correct:
+
+i < arr.length
+
+Using:
+
+i <= arr.length
+
+causes:
+
+ArrayIndexOutOfBoundsException
+Question 10 (Scenario Based)
+
+A school system wants to find whether a roll number exists in an array.
+
+Which algorithm should be used?
+
+A. Bubble Sort
+
+B. Linear Search
+
+C. Nested Loop
+
+D. Recursion
+
+✅ Correct Answer: B
+
+Explanation
+
+Linear Search checks elements one by one until the target is found.
+
+Phase 4 Final Quiz (20 Questions)
+Topics Covered
+
+✅ Introduction to Arrays
+✅ Creating & Initializing Arrays
+✅ Accessing Array Elements
+✅ Updating Array Elements
+✅ Array Traversal
+✅ Array Input from User
+✅ Sum, Average, Minimum & Maximum
+✅ Linear Search
+
+Question 1
+
+What is an Array?
+
+A. A loop
+
+B. A collection of same data type elements
+
+C. A method
+
+D. A class
+
+✅ Correct Answer: B
+
+Question 2
+
+What is the starting index of a Java array?
+
+A. 1
+
+B. -1
+
+C. 0
+
+D. Depends on size
+
+✅ Correct Answer: C
+
+Question 3
+
+Which keyword allocates memory for an array?
+
+A. create
+
+B. make
+
+C. new
+
+D. array
+
+✅ Correct Answer: C
+
+Question 4
+
+Which property returns the size of an array?
+
+A. size
+
+B. count
+
+C. total
+
+D. length
+
+✅ Correct Answer: D
+
+Question 5
+
+Which statement accesses the first element?
+
+A.
+
+arr[1]
+
+B.
+
+arr[0]
+
+C.
+
+arr[-1]
+
+D.
+
+arr[length]
+
+✅ Correct Answer: B
+
+Question 6
+
+Which statement updates an array value?
+
+A.
+
+arr.add(10);
+
+B.
+
+arr[2] = 10;
+
+C.
+
+arr.create(10);
+
+D.
+
+update(arr);
+
+✅ Correct Answer: B
+
+Question 7
+
+What is Array Traversal?
+
+A. Creating array
+
+B. Updating array
+
+C. Visiting every element
+
+D. Deleting array
+
+✅ Correct Answer: C
+
+Question 8
+
+Which Scanner method reads integers?
+
+A.
+
+next()
+
+B.
+
+nextLine()
+
+C.
+
+nextInt()
+
+D.
+
+nextDouble()
+
+✅ Correct Answer: C
+
+Question 9
+
+The correct formula for Average is:
+
+A.
+
+Sum × Count
+
+B.
+
+Sum ÷ Count
+
+C.
+
+Sum + Count
+
+D.
+
+Sum - Count
+
+✅ Correct Answer: B
+
+Question 10
+
+For finding maximum value, initialize:
+
+A.
+
+int max = 0;
+
+B.
+
+int max = -1;
+
+C.
+
+int max = arr[0];
+
+D.
+
+int max = 100;
+
+✅ Correct Answer: C
+
+Question 11 (Output Prediction)
+int[] arr =
+{
+    10,
+    20,
+    30
+};
+
+System.out.println(arr[2]);
+
+Output?
+
+A.
+
+10
+
+B.
+
+20
+
+C.
+
+30
+
+D. Error
+
+✅ Correct Answer: C
+
+Question 12 (Output Prediction)
+int[] arr =
+{
+    10,
+    20,
+    30
+};
+
+arr[1] = 100;
+
+System.out.println(arr[1]);
+
+Output?
+
+A.
+
+20
+
+B.
+
+30
+
+C.
+
+100
+
+D. Error
+
+✅ Correct Answer: C
+
+Question 13 (Output Prediction)
+int[] arr =
+{
+    10,
+    20,
+    30
+};
+
+for(int num : arr)
+{
+    System.out.println(num);
+}
+
+Output?
+
+A.
+
+10
+20
+30
+
+B.
+
+0
+1
+2
+
+C.
+
+30
+20
+10
+
+D. Error
+
+✅ Correct Answer: A
+
+Question 14 (Output Prediction)
+int[] arr =
+{
+    10,
+    20,
+    30,
+    40
+};
+
+int sum = 0;
+
+for(int num : arr)
+{
+    sum += num;
+}
+
+System.out.println(sum);
+
+Output?
+
+A.
+
+40
+
+B.
+
+60
+
+C.
+
+100
+
+D.
+
+120
+
+✅ Correct Answer: C
+
+Question 15 (Output Prediction)
+int[] arr =
+{
+    10,
+    20,
+    30,
+    40,
+    50
+};
+
+System.out.println(
+arr[arr.length - 1]
+);
+
+Output?
+
+A.
+
+10
+
+B.
+
+20
+
+C.
+
+40
+
+D.
+
+50
+
+✅ Correct Answer: D
+
+Question 16 (Error Finding)
+int[] arr =
+{
+    10,
+    20,
+    30
+};
+
+System.out.println(arr[3]);
+
+What is wrong?
+
+A. Missing semicolon
+
+B. Invalid index
+
+C. Wrong data type
+
+D. Missing array
+
+✅ Correct Answer: B
+
+Question 17 (Error Finding)
+for(int i = 0; i <= arr.length; i++)
+{
+    System.out.println(arr[i]);
+}
+
+What is wrong?
+
+A. Wrong condition
+
+B. Wrong loop
+
+C. Missing increment
+
+D. Missing braces
+
+✅ Correct Answer: A
+
+Question 18 (Scenario Based)
+
+A school wants to store marks of 1000 students.
+
+Best choice?
+
+A. 1000 variables
+
+B. Array
+
+C. Nested Loop
+
+D. Method
+
+✅ Correct Answer: B
+
+Question 19 (Scenario Based)
+
+An e-commerce system wants to display all product prices.
+
+Best concept?
+
+A. Traversal
+
+B. break
+
+C. continue
+
+D. switch
+
+✅ Correct Answer: A
+
+Question 20 (Scenario Based)
+
+A banking system wants to find whether account number:
+
+5001
+
+exists in an array.
+
+Best algorithm?
+
+A. Bubble Sort
+
+B. Selection Sort
+
+C. Linear Search
+
+D. Recursion
+
+✅ Correct Answer: C
+
