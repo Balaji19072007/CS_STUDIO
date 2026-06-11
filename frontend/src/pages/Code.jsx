@@ -164,6 +164,7 @@ const Code = () => {
                 {/* Editor fills the height of the container */}
                 <div className="flex-grow min-h-0 h-[calc(100vh-14rem)] lg:h-[calc(100vh-10rem)]">
                     <CodeEditor
+                        key={initialLanguage}
                         theme={monacoTheme}
                         initialCode={initialCode}
                         language={initialLanguage}
