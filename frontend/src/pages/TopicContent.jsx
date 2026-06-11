@@ -402,7 +402,9 @@ const TopicContent = ({
                                 <button
                                     onClick={() => {
                                         if (presentation.playgroundLanguage) {
-                                            navigate(`/code?lang=${presentation.playgroundLanguage}&source=${encodeURIComponent(displayCodeText)}`);
+                                            navigate(`/code?lang=${presentation.playgroundLanguage}&source=${encodeURIComponent(displayCodeText)}`, {
+                                                state: { source: displayCodeText, lang: presentation.playgroundLanguage }
+                                            });
                                             return;
                                         }
                                         navigator.clipboard.writeText(displayCodeText);

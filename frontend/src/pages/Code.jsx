@@ -1,19 +1,20 @@
 // src/pages/Code.jsx
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import CodeEditor from '../components/problems/CodeEditor.jsx';
 import * as feather from 'feather-icons';
 import socketService from '../services/socketService.js';
 
 const Code = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams] = useSearchParams();
     const [isDark, setIsDark] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState('connecting');
 
-    // Parse query params
-    const sourceParam = searchParams.get('source');
-    const langParam = searchParams.get('lang');
+    // Parse query params and route state
+    const sourceParam = searchParams.get('source') || location.state?.source;
+    const langParam = searchParams.get('lang') || location.state?.lang;
 
     // Helper to map URL lang param to Editor supported language
     const getLanguageFromParam = (param) => {

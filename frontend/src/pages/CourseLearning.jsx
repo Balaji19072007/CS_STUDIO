@@ -140,7 +140,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                             let items = [];
                             const isCCourse = (courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming');
                             const isJavaCourse = (courseData?.title?.toLowerCase().includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
-                            if (isCCourse && phase.order_index !== 18) {
+                            if ((isCCourse && phase.order_index !== 18) || (isJavaCourse && phase.order_index !== 22)) {
                                 const topicItems = topics.map(t => ({ ...t, type: 'topic' }));
                                 const quizItems = quizzes.map(q => ({ ...q, type: 'quiz' })).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
                                 
