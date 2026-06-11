@@ -1,64 +1,430 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 
-const FullPageLoader = ({ message = 'CS Studio' }) => {
-    const { isDark } = useTheme();
+/* ─── Tiny canvas-based code-rain (green chars falling) ─── */
+function CodeRainCanvas({ isDark }) {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const chars = '01アイウエオカキクケコ#$%&CS{}[]<>;()';
+        const fontSize = 13;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(1);
+
+        const draw = () => {
+            ctx.fillStyle = isDark ? 'rgba(10,14,39,0.12)' : 'rgba(240,245,255,0.12)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = `${fontSize}px monospace`;
+            drops.forEach((y, i) => {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const alpha = Math.random() * 0.5 + 0.1;
+                ctx.fillStyle = isDark
+                    ? `rgba(99,179,237,${alpha})`
+                    : `rgba(59,130,246,${alpha})`;
+                ctx.fillText(char, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            });
+        };
+
+        const interval = setInterval(draw, 50);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('resize', resize);
+        };
+    }, [isDark]);
 
     return (
-        <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-colors duration-500 ${isDark ? 'bg-[#0F172A]' : 'bg-white'
-            }`}>
+        <canvas
+            ref={canvasRef}
+            style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: isDark ? 0.35 : 0.2,
+                pointerEvents: 'none',
+            }}
+        />
+    );
+}
 
-            {/* Morphing Shape Animation */}
-            <div className="relative mb-10">
-                {/* Visual Glow/Blur */}
-                <div className={`absolute inset-0 blur-2xl opacity-50 ${isDark ? 'bg-blue-600' : 'bg-blue-200'
-                    } animate-pulse rounded-full`}></div>
+/* ─── Floating particle dots ─── */
+function Particles({ isDark }) {
+    const particles = Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        size: Math.random() * 4 + 2,
+        delay: Math.random() * 6,
+        duration: Math.random() * 8 + 6,
+    }));
 
-                {/* The Shape */}
-                <div className={`w-16 h-16 relative z-10 animate-morph-spin ${isDark ? 'bg-gradient-to-tr from-blue-500 to-indigo-500' : 'bg-gradient-to-tr from-blue-600 to-indigo-600'
-                    } shadow-2xl`}></div>
-            </div>
+    return (
+        <>
+            {particles.map((p) => (
+                <div
+                    key={p.id}
+                    style={{
+                        position: 'absolute',
+                        left: p.left,
+                        top: p.top,
+                        width: p.size,
+                        height: p.size,
+                        borderRadius: '50%',
+                        background: isDark
+                            ? 'radial-gradient(circle, #60a5fa, #818cf8)'
+                            : 'radial-gradient(circle, #3b82f6, #6366f1)',
+                        opacity: 0,
+                        animation: `floatParticle ${p.duration}s ${p.delay}s ease-in-out infinite`,
+                        boxShadow: isDark
+                            ? '0 0 8px #60a5fa'
+                            : '0 0 6px #3b82f6',
+                    }}
+                />
+            ))}
+        </>
+    );
+}
 
-            {/* Minimalist Professional Text */}
-            <div className="text-center">
-                <h1 className={`text-sm font-bold tracking-[0.3em] uppercase ${isDark ? 'text-gray-200' : 'text-gray-800'
-                    }`}>
-                    {message}
-                </h1>
-                <p className={`mt-2 text-[10px] tracking-widest uppercase opacity-50 ${isDark ? 'text-white' : 'text-black'
-                    }`}>
-                    Loading Environment
-                </p>
-            </div>
+/* ─── Loading status messages ─── */
+const STATUS_MSGS = [
+    'Compiling modules...',
+    'Loading environment...',
+    'Fetching user data...',
+    'Optimizing performance...',
+    'Almost ready...',
+];
 
-            {/* Custom Keyframes */}
+const FullPageLoader = ({ message = 'Initializing CS Studio...' }) => {
+    const { isDark } = useTheme();
+    const [progress, setProgress] = useState(0);
+    const [statusIdx, setStatusIdx] = useState(0);
+    const [fadeIn, setFadeIn] = useState(false);
+
+    useEffect(() => {
+        setFadeIn(true);
+
+        // Simulate a smooth progress bar
+        const target = 90;
+        let current = 0;
+        const step = () => {
+            current += Math.random() * 4 + 1;
+            if (current > target) current = target;
+            setProgress(Math.floor(current));
+            if (current < target) setTimeout(step, 120);
+        };
+        setTimeout(step, 200);
+
+        // Cycle status messages
+        const msgInterval = setInterval(() => {
+            setStatusIdx((prev) => (prev + 1) % STATUS_MSGS.length);
+        }, 1800);
+
+        return () => clearInterval(msgInterval);
+    }, []);
+
+    const bg = isDark
+        ? 'linear-gradient(135deg, #0A0E27 0%, #0D1B3E 50%, #0A0E27 100%)'
+        : 'linear-gradient(135deg, #EFF6FF 0%, #E0EAFF 50%, #EFF6FF 100%)';
+
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: bg,
+                opacity: fadeIn ? 1 : 0,
+                transition: 'opacity 0.6s ease',
+                overflow: 'hidden',
+            }}
+        >
+            {/* Keyframe styles */}
             <style>{`
-                @keyframes morphSpin {
-                    0% {
-                        transform: rotate(0deg);
-                        border-radius: 50%;
-                    }
-                    25% {
-                        transform: rotate(90deg);
-                        border-radius: 0%;
-                    }
-                    50% {
-                        transform: rotate(180deg);
-                        border-radius: 50%;
-                    }
-                    75% {
-                        transform: rotate(270deg);
-                        border-radius: 0%;
-                    }
-                    100% {
-                        transform: rotate(360deg);
-                        border-radius: 50%;
-                    }
+                @keyframes floatParticle {
+                    0%   { transform: translateY(0px) scale(1); opacity: 0; }
+                    20%  { opacity: 0.8; }
+                    50%  { transform: translateY(-60px) scale(1.3); opacity: 0.6; }
+                    80%  { opacity: 0.4; }
+                    100% { transform: translateY(-120px) scale(0.8); opacity: 0; }
                 }
-                .animate-morph-spin {
-                    animation: morphSpin 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                @keyframes orbitOuter {
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(360deg); }
+                }
+                @keyframes orbitInner {
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(-360deg); }
+                }
+                @keyframes corePulse {
+                    0%, 100% { transform: scale(1);   box-shadow: 0 0 40px #3b82f6, 0 0 80px #6366f140; }
+                    50%      { transform: scale(1.08); box-shadow: 0 0 60px #60a5fa, 0 0 120px #818cf860; }
+                }
+                @keyframes glowRing {
+                    0%, 100% { opacity: 0.4; }
+                    50%      { opacity: 0.9; }
+                }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes statusFade {
+                    0%   { opacity: 0; transform: translateY(6px); }
+                    15%  { opacity: 1; transform: translateY(0); }
+                    85%  { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-6px); }
+                }
+                @keyframes progressShine {
+                    0%   { transform: translateX(-100%); }
+                    100% { transform: translateX(300%); }
+                }
+                @keyframes bgPulse {
+                    0%, 100% { opacity: 0.4; transform: scale(1); }
+                    50%      { opacity: 0.7; transform: scale(1.1); }
                 }
             `}</style>
+
+            {/* Canvas code rain */}
+            <CodeRainCanvas isDark={isDark} />
+
+            {/* Floating particles */}
+            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+                <Particles isDark={isDark} />
+            </div>
+
+            {/* Radial glow blobs */}
+            <div style={{
+                position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
+            }}>
+                <div style={{
+                    position: 'absolute', top: '25%', left: '20%',
+                    width: 400, height: 400, borderRadius: '50%',
+                    background: isDark
+                        ? 'radial-gradient(circle, #3b82f660, transparent 70%)'
+                        : 'radial-gradient(circle, #bfdbfe80, transparent 70%)',
+                    animation: 'bgPulse 5s ease-in-out infinite',
+                }} />
+                <div style={{
+                    position: 'absolute', top: '50%', right: '15%',
+                    width: 320, height: 320, borderRadius: '50%',
+                    background: isDark
+                        ? 'radial-gradient(circle, #6366f150, transparent 70%)'
+                        : 'radial-gradient(circle, #c7d2fe80, transparent 70%)',
+                    animation: 'bgPulse 6s 2s ease-in-out infinite',
+                }} />
+            </div>
+
+            {/* ── Main card ── */}
+            <div style={{
+                position: 'relative',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '2rem',
+                padding: '3rem 4rem',
+                borderRadius: '2rem',
+                background: isDark
+                    ? 'rgba(15, 23, 50, 0.6)'
+                    : 'rgba(255, 255, 255, 0.5)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: isDark
+                    ? '1px solid rgba(99,179,237,0.15)'
+                    : '1px solid rgba(59,130,246,0.2)',
+                boxShadow: isDark
+                    ? '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,179,237,0.08)'
+                    : '0 24px 80px rgba(59,130,246,0.15), 0 0 0 1px rgba(255,255,255,0.8)',
+                animation: 'slideUp 0.7s ease both',
+            }}>
+
+                {/* ── Orbital animation ── */}
+                <div style={{ position: 'relative', width: 140, height: 140 }}>
+
+                    {/* Outer ring */}
+                    <div style={{
+                        position: 'absolute', inset: 0,
+                        borderRadius: '50%',
+                        border: `2px solid ${isDark ? 'rgba(99,179,237,0.25)' : 'rgba(59,130,246,0.25)'}`,
+                        animation: 'orbitOuter 4s linear infinite',
+                    }}>
+                        {/* Orbiting dot outer */}
+                        <div style={{
+                            position: 'absolute', top: -5, left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: 10, height: 10, borderRadius: '50%',
+                            background: isDark
+                                ? 'linear-gradient(135deg,#60a5fa,#818cf8)'
+                                : 'linear-gradient(135deg,#3b82f6,#6366f1)',
+                            boxShadow: isDark ? '0 0 12px #60a5fa' : '0 0 10px #3b82f6',
+                        }} />
+                    </div>
+
+                    {/* Middle ring */}
+                    <div style={{
+                        position: 'absolute', inset: 20,
+                        borderRadius: '50%',
+                        border: `1.5px solid ${isDark ? 'rgba(129,140,248,0.3)' : 'rgba(99,102,241,0.3)'}`,
+                        animation: 'orbitInner 3s linear infinite',
+                        animationDelay: '-1s',
+                    }}>
+                        {/* Orbiting dot inner */}
+                        <div style={{
+                            position: 'absolute', bottom: -4, left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: 8, height: 8, borderRadius: '50%',
+                            background: isDark
+                                ? 'linear-gradient(135deg,#a78bfa,#f472b6)'
+                                : 'linear-gradient(135deg,#6366f1,#ec4899)',
+                            boxShadow: isDark ? '0 0 10px #a78bfa' : '0 0 8px #6366f1',
+                        }} />
+                    </div>
+
+                    {/* Inner ring */}
+                    <div style={{
+                        position: 'absolute', inset: 38,
+                        borderRadius: '50%',
+                        border: `1px dashed ${isDark ? 'rgba(248,200,100,0.25)' : 'rgba(234,179,8,0.3)'}`,
+                        animation: 'orbitOuter 6s linear infinite',
+                        animationDelay: '-2s',
+                    }} />
+
+                    {/* Core logo */}
+                    <div style={{
+                        position: 'absolute', inset: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <div style={{
+                            width: 58, height: 58, borderRadius: '1rem',
+                            background: isDark
+                                ? 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)'
+                                : 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            animation: 'corePulse 2.5s ease-in-out infinite',
+                            boxShadow: '0 0 40px #3b82f6, 0 0 80px #6366f140',
+                            fontSize: 22, fontWeight: 900, color: '#fff',
+                            letterSpacing: '-0.5px',
+                            fontFamily: '"Segoe UI", system-ui, sans-serif',
+                            userSelect: 'none',
+                        }}>
+                            CS
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Text section ── */}
+                <div style={{ textAlign: 'center' }}>
+                    <h1 style={{
+                        margin: 0,
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.25em',
+                        textTransform: 'uppercase',
+                        background: isDark
+                            ? 'linear-gradient(135deg,#e2e8f0,#93c5fd)'
+                            : 'linear-gradient(135deg,#1e3a8a,#4f46e5)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        fontFamily: '"Segoe UI", system-ui, sans-serif',
+                    }}>
+                        {message}
+                    </h1>
+
+                    {/* Animated status message */}
+                    <p
+                        key={statusIdx}
+                        style={{
+                            margin: '0.4rem 0 0',
+                            fontSize: '0.68rem',
+                            letterSpacing: '0.15em',
+                            textTransform: 'uppercase',
+                            color: isDark ? 'rgba(148,163,184,0.8)' : 'rgba(71,85,105,0.7)',
+                            fontFamily: 'monospace',
+                            animation: 'statusFade 1.8s ease both',
+                        }}
+                    >
+                        {STATUS_MSGS[statusIdx]}
+                    </p>
+                </div>
+
+                {/* ── Progress bar ── */}
+                <div style={{ width: '100%', maxWidth: 280 }}>
+                    <div style={{
+                        display: 'flex', justifyContent: 'space-between',
+                        marginBottom: '0.4rem',
+                    }}>
+                        <span style={{
+                            fontSize: '0.6rem', letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            color: isDark ? 'rgba(148,163,184,0.5)' : 'rgba(100,116,139,0.6)',
+                            fontFamily: 'monospace',
+                        }}>Loading</span>
+                        <span style={{
+                            fontSize: '0.6rem', letterSpacing: '0.05em',
+                            color: isDark ? 'rgba(96,165,250,0.8)' : 'rgba(59,130,246,0.9)',
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                        }}>{progress}%</span>
+                    </div>
+                    {/* Track */}
+                    <div style={{
+                        width: '100%', height: 4, borderRadius: 99,
+                        background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(59,130,246,0.1)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                    }}>
+                        {/* Fill */}
+                        <div style={{
+                            height: '100%',
+                            width: `${progress}%`,
+                            borderRadius: 99,
+                            background: isDark
+                                ? 'linear-gradient(90deg,#3b82f6,#818cf8,#a78bfa)'
+                                : 'linear-gradient(90deg,#2563eb,#6366f1)',
+                            transition: 'width 0.3s ease',
+                            position: 'relative',
+                            overflow: 'hidden',
+                        }}>
+                            {/* Shine sweep */}
+                            <div style={{
+                                position: 'absolute', top: 0, left: 0,
+                                width: '40%', height: '100%',
+                                background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent)',
+                                animation: 'progressShine 1.8s ease-in-out infinite',
+                            }} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Bottom dots ── */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    {[0, 1, 2].map((i) => (
+                        <div key={i} style={{
+                            width: 6, height: 6, borderRadius: '50%',
+                            background: isDark ? '#60a5fa' : '#3b82f6',
+                            opacity: 0.4,
+                            animation: `corePulse 1.4s ${i * 0.2}s ease-in-out infinite`,
+                        }} />
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
