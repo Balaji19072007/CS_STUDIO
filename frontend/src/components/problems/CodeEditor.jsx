@@ -293,9 +293,16 @@ const CodeEditor = forwardRef(({
     setCode(value || '');
   };
 
-  const handleEditorDidMount = (editor) => {
+  const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     editor.focus();
+    if (!isProblemSolver) {
+      const model = editor.getModel();
+      if (model) {
+        const targetMonacoLang = MONACO_LANGUAGE_MAP[finalLanguage] || 'python';
+        monaco.editor.setModelLanguage(model, targetMonacoLang);
+      }
+    }
   };
 
   const handleLanguageChange = (newLanguage) => {
