@@ -1,0 +1,8820 @@
+java default page
+
+After successfully completing this course, learners will be able to:
+
+Build complete web applications from scratch.
+Develop secure REST APIs using Spring Boot.
+Create responsive frontend applications using React.
+Design and manage databases.
+Deploy applications to production.
+Work with modern software development tools and workflows.
+Prepare confidently for Java Full Stack Developer interviews.
+Career Target
+
+This course prepares learners for roles ranging from Java Developer to Java Full Stack Developer, with skills aligned to industry requirements for freshers and entry-level software engineers.
+
+This is for my cs studio I working to update these content in my cs studio Java course
+
+For CS Studio, you should make it more professional and outcome-focused. You can use this course description directly on your website:
+
+Java Full Stack Developer Master Program
+Become an Industry-Ready Java Full Stack Developer
+
+Master modern software development by learning everything from Java fundamentals to advanced Spring Boot, React, Microservices, Cloud, and System Design. This comprehensive program is designed to take you from beginner to job-ready developer through structured learning, hands-on coding, real-world projects, and interview preparation.
+
+What You Will Learn
+Core Programming
+Java Programming
+Object-Oriented Programming (OOP)
+Collections Framework
+Exception Handling
+Multithreading
+Java 8+ Features
+Data Structures & Algorithms
+Arrays
+Strings
+Hashing
+Linked Lists
+Stacks & Queues
+Trees & Graphs
+Dynamic Programming
+Problem Solving Techniques
+Database Development
+SQL
+MySQL
+PostgreSQL
+Database Design
+Query Optimization
+Joins & Transactions
+Frontend Development
+HTML5
+CSS3
+JavaScript (ES6+)
+React.js
+Responsive Web Design
+API Integration
+Backend Development
+Spring Framework
+Spring Boot
+REST APIs
+Spring Security
+JWT Authentication
+Spring Data JPA
+Hibernate
+Advanced Backend
+Redis Caching
+Email & OTP Authentication
+File Uploads
+Logging & Monitoring
+Testing with JUnit & Mockito
+DevOps & Deployment
+Git & GitHub
+Docker
+CI/CD Basics
+Production Deployment
+Environment Variables
+PostgreSQL Deployment
+System Design & Cloud
+Microservices Architecture
+API Gateway
+Service Discovery
+RabbitMQ & Kafka Basics
+AWS Fundamentals
+System Design Fundamentals
+Real-World Project
+
+Build a complete production-ready platform featuring:
+
+Authentication & Authorization
+User Management
+Course Management
+Coding Problems Module
+Submission System
+Admin Dashboard
+File Upload System
+Production Deployment
+Career Outcomes
+
+After completing this program, you will be able to:
+
+Build full-stack web applications from scratch
+Develop secure and scalable REST APIs
+Design and manage relational databases
+Deploy applications to production environments
+Work with industry-standard tools and workflows
+Crack Java Full Stack Developer interviews confidently
+Job Roles You Can Apply For
+Java Developer
+Java Full Stack Developer
+Full Stack Developer
+Backend Developer
+Spring Boot Developer
+Software Engineer
+Associate Software Engineer
+Web Application Developer
+Software Developer Intern
+Full Stack Developer Intern
+Who Should Join?
+Students
+Fresh Graduates
+Job Seekers
+Career Switchers
+Beginners with no prior coding experience
+Certificate of Completion
+
+Earn a CS Studio Certificate upon successful completion of the course and project work.
+
+
+
+
+Phase 1: Java Fundamentals & Getting Started
+Phase Introduction
+
+Java is one of the most widely used programming languages in the software industry. It powers web applications, banking systems, Android applications, cloud services, enterprise software, and many large-scale platforms.
+
+Java follows the principle:
+
+Write Once, Run Anywhere (WORA)
+
+This means a Java program can run on any operating system that has a Java Virtual Machine (JVM).
+
+In this phase, you will learn the foundation of Java programming. Every advanced Java concept depends on the topics covered here.
+
+Real World Usage
+
+Java is used in:
+
+Banking Applications
+E-commerce Platforms
+Android Applications
+Enterprise Software
+Cloud Systems
+Backend Development
+
+Examples:
+
+Amazon
+Netflix
+Uber
+
+all use Java extensively in different parts of their systems.
+
+Learning Outcomes
+
+After completing this phase, students will be able to:
+
+Understand Java architecture
+Write Java programs
+Understand Java program structure
+Use variables and data types
+Perform calculations using operators
+Take user input using Scanner
+
+
+Topic 1: Introduction to Java
+Topic Introduction
+
+Before writing code, it is important to understand what Java is, why it exists, and how Java programs execute on a computer.
+
+Definition
+
+Java is a high-level, object-oriented, platform-independent programming language developed by Sun Microsystems in 1995.
+
+Why We Need Java
+
+Programming languages help humans communicate with computers.
+
+Java was designed to:
+
+Be easy to learn
+Be secure
+Be platform independent
+Support large applications
+Reduce system dependency
+Java Architecture
+JDK (Java Development Kit)
+
+Provides tools required to develop Java applications.
+
+Examples:
+
+Compiler
+Debugger
+Documentation tools
+JRE (Java Runtime Environment)
+
+Provides the environment required to run Java applications.
+
+JVM (Java Virtual Machine)
+
+Responsible for executing Java bytecode.
+
+Execution Flow
+Java Source Code (.java)
+
+↓
+Compiler (javac)
+
+↓
+Bytecode (.class)
+
+↓
+JVM
+
+↓
+Output
+Real World Example
+
+Imagine writing a letter in English.
+
+Different people may speak different languages, but a translator converts the letter into a common format.
+
+Similarly:
+
+Java Code = English Letter
+Bytecode = Common Format
+JVM = Translator
+Output = Final Result
+Example 1
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello Java");
+    }
+}
+Output
+Hello Java
+Example 2
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Welcome to Java");
+    }
+}
+Output
+Welcome to Java
+Common Mistakes
+Mistake 1
+System.out.println("Hello")
+
+Missing semicolon.
+
+Correct:
+
+System.out.println("Hello");
+Mistake 2
+
+Wrong file name.
+
+If class name is:
+
+public class Main
+
+File name must be:
+
+Main.java
+Best Practices
+Use meaningful class names.
+Follow Java naming conventions.
+Keep code properly indented.
+Add comments when necessary.
+Key Points
+Java is platform independent.
+JVM executes bytecode.
+JDK is used for development.
+JRE is used for execution.
+Java follows WORA.
+Topic 1 Mastery Challenge
+Problem Statement
+
+Write a Java program that prints the following information exactly as shown:
+
+Welcome to Java
+Java is Platform Independent
+Learning Java is Fun
+Input Format
+
+No input required.
+
+Output Format
+
+Print the three lines exactly as specified.
+
+Sample Output
+Welcome to Java
+Java is Platform Independent
+Learning Java is Fun
+Hint 1
+
+Use System.out.println().
+
+Hint 2
+
+Each statement should be printed separately.
+
+Hint 3
+
+Remember to use semicolons.
+
+Code Editor
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Write your code here
+
+    }
+
+}
+
+Solution Code
+public class Main {
+    public static void main(String[] args) {
+
+        System.out.println("Welcome to Java");
+        System.out.println("Java is Platform Independent");
+        System.out.println("Learning Java is Fun");
+
+    }
+}
+Code Explanation
+
+The program uses three System.out.println() statements to print three different lines.
+
+Output
+Welcome to Java
+Java is Platform Independent
+Learning Java is Fun
+
+
+
+Topic 2: Structure of a Java Program
+Topic Introduction
+
+Every programming language follows a specific structure or set of rules. Java is no exception. Before writing complex programs, it is important to understand how a Java program is organized and what each part does.
+
+Think of a Java program like a house:
+
+The class is the house.
+The main() method is the main entrance.
+The statements are the rooms inside the house.
+
+Without proper structure, Java cannot understand or execute the program.
+
+Definition
+
+The structure of a Java program refers to the arrangement of classes, methods, and statements that make up a valid Java application.
+
+Every Java application must contain at least one class, and the execution starts from the main() method.
+
+Why We Need Program Structure
+
+A proper structure helps:
+
+Organize code efficiently
+Improve readability
+Reduce errors
+Allow Java Compiler to understand the program
+Make maintenance easier
+
+Without proper structure, Java programs will fail to compile.
+
+Basic Java Program Structure
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello Java");
+
+    }
+
+}
+Syntax Breakdown
+1. Class Declaration
+public class Main
+Explanation
+public → Access modifier
+class → Keyword used to create a class
+Main → Class name
+
+A class acts as a blueprint that contains code and methods.
+
+2. Main Method
+public static void main(String[] args)
+Explanation
+
+This is the entry point of every Java application.
+
+When a Java program starts:
+
+JVM searches for main()
+Execution begins from main()
+3. Statements
+System.out.println("Hello Java");
+Explanation
+
+A statement performs an action.
+
+This statement prints text on the screen.
+
+4. Curly Braces
+{
+}
+Explanation
+
+Curly braces define blocks of code.
+
+Example:
+
+public class Main {
+
+}
+
+Everything inside belongs to the class.
+
+5. Semicolon
+;
+Explanation
+
+A semicolon marks the end of a statement.
+
+Example:
+
+System.out.println("Hello");
+
+Without it:
+
+System.out.println("Hello")
+
+Compilation Error.
+
+Visual Structure
+Class
+ └── main()
+      ├── Statement 1
+      ├── Statement 2
+      └── Statement 3
+Real World Usage
+
+Imagine a company building a payroll application.
+
+The project may contain:
+
+Employee.java
+Salary.java
+Tax.java
+Main.java
+
+Each file contains one class.
+
+Java combines these classes to form a complete application.
+
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Welcome");
+
+    }
+
+}
+Output
+Welcome
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Java");
+        System.out.println("Programming");
+        System.out.println("Language");
+
+    }
+
+}
+Output
+Java
+Programming
+Language
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Line 1");
+        System.out.println("Line 2");
+
+    }
+
+}
+Output
+Line 1
+Line 2
+Common Mistakes
+Mistake 1: Missing Semicolon
+
+Wrong:
+
+System.out.println("Hello")
+
+Correct:
+
+System.out.println("Hello");
+Mistake 2: Wrong Main Method
+
+Wrong:
+
+public static void start(String[] args)
+
+Correct:
+
+public static void main(String[] args)
+Mistake 3: Missing Curly Brace
+
+Wrong:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello");
+
+}
+
+Correct:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello");
+
+    }
+
+}
+Mistake 4: File Name Mismatch
+
+Wrong:
+
+Student.java
+
+Code:
+
+public class Main
+
+Correct:
+
+Main.java
+Best Practices
+Use Meaningful Class Names
+
+Good:
+
+Student
+Employee
+Calculator
+
+Bad:
+
+A
+B
+X
+Maintain Proper Indentation
+
+Good:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello");
+
+    }
+}
+Use One Public Class Per File
+
+This improves readability and maintainability.
+
+Key Points
+Every Java program contains at least one class.
+Execution starts from main().
+Statements end with semicolons.
+Curly braces define blocks.
+Class name and file name should match.
+JVM searches for main() to start execution.
+Topic 2 Mastery Challenge
+Problem Statement
+
+Write a Java program that prints the following student information exactly as shown:
+
+Student Name: Balu
+Course: Java Programming
+Phase: 1
+Status: Learning
+Input Format
+
+No input required.
+
+Output Format
+
+Print four lines exactly as shown.
+
+Constraints
+Use four separate System.out.println() statements.
+Follow Java program structure correctly.
+Sample Output
+Student Name: Balu
+Course: Java Programming
+Phase: 1
+Status: Learning
+Hint 1
+
+Create a class named Main.
+
+Hint 2
+
+Create the main() method.
+
+Hint 3
+
+Use four System.out.println() statements.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Write your code here
+
+    }
+
+}
+
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Student Name: Balu");
+        System.out.println("Course: Java Programming");
+        System.out.println("Phase: 1");
+        System.out.println("Status: Learning");
+
+    }
+
+}
+Code Explanation
+Step 1
+
+Create a class named Main.
+
+public class Main
+Step 2
+
+Create the main method.
+
+public static void main(String[] args)
+Step 3
+
+Use four print statements.
+
+System.out.println(...)
+
+to display the required information.
+
+Output
+Student Name: Balu
+Course: Java Programming
+Phase: 1
+Status: Learning
+
+
+Topic 3: Variables and Data Types
+Topic Introduction
+
+Imagine storing a student's name, age, marks, or salary in a program.
+
+To store information, Java uses variables.
+
+A variable acts like a container that stores data in memory. Different types of data require different types of containers. These are called data types.
+
+Variables and data types are among the most important concepts in programming because almost every program uses them.
+
+Definition
+
+A variable is a named memory location used to store data.
+
+A data type specifies what kind of data a variable can store.
+
+Why We Need Variables
+
+Without variables:
+
+System.out.println(20);
+System.out.println(20);
+System.out.println(20);
+
+If the value changes, we must update it everywhere.
+
+Using variables:
+
+int age = 20;
+
+System.out.println(age);
+
+Now we only change the value once.
+
+Benefits:
+
+Store data efficiently
+Reuse values
+Improve readability
+Reduce code duplication
+Understanding Memory
+
+When a variable is created:
+
+int age = 20;
+
+Java stores:
+
+Variable Name     Value
+-----------------------
+age               20
+
+Inside computer memory.
+
+Variable Declaration Syntax
+dataType variableName;
+
+Example:
+
+int age;
+Variable Initialization Syntax
+dataType variableName = value;
+
+Example:
+
+int age = 20;
+Types of Data in Java
+Integer
+
+Stores whole numbers.
+
+int age = 20;
+
+Examples:
+
+10
+50
+100
+500
+Double
+
+Stores decimal numbers.
+
+double salary = 25000.75;
+
+Examples:
+
+10.5
+25.75
+99.99
+Character
+
+Stores a single character.
+
+char grade = 'A';
+
+Examples:
+
+'A'
+'B'
+'Z'
+
+Notice single quotes.
+
+Boolean
+
+Stores true or false.
+
+boolean isPassed = true;
+
+Possible values:
+
+true
+false
+String
+
+Stores text.
+
+String name = "Balu";
+
+Examples:
+
+"Java"
+"Programming"
+"Student"
+
+Notice double quotes.
+
+Data Type Table
+Data Type	Description	Example
+int	Whole Numbers	100
+double	Decimal Numbers	10.5
+char	Single Character	'A'
+boolean	True/False	true
+String	Text	"Hello"
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 20;
+
+        System.out.println(age);
+
+    }
+
+}
+Output
+20
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        String name = "Balu";
+        int age = 20;
+
+        System.out.println(name);
+        System.out.println(age);
+
+    }
+
+}
+Output
+Balu
+20
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        double price = 99.99;
+
+        System.out.println(price);
+
+    }
+
+}
+Output
+99.99
+Common Mistakes
+Mistake 1
+int age = "20";
+
+Wrong data type.
+
+Correct:
+
+int age = 20;
+Mistake 2
+char grade = "A";
+
+Wrong quotes.
+
+Correct:
+
+char grade = 'A';
+Mistake 3
+String name = 'Balu';
+
+Wrong quotes.
+
+Correct:
+
+String name = "Balu";
+Mistake 4
+int age;
+System.out.println(age);
+
+Variable not initialized.
+
+Best Practices
+Use Meaningful Names
+
+Good:
+
+studentAge
+employeeSalary
+productPrice
+
+Bad:
+
+a
+b
+x
+Follow Camel Case
+
+Good:
+
+studentName
+totalMarks
+
+Bad:
+
+student_name
+Student_Name
+Initialize Variables When Possible
+
+Good:
+
+int age = 20;
+Key Points
+Variables store data.
+Data types define the kind of data stored.
+Java is strongly typed.
+Variables must be declared before use.
+Strings use double quotes.
+Characters use single quotes.
+Topic 3 Mastery Challenge
+Problem Statement
+
+Create variables to store the following information and print them:
+
+Name: Balu
+Age: 20
+Grade: A
+Percentage: 85.5
+Input Format
+
+No input required.
+
+Output Format
+
+Print the values stored in variables.
+
+Sample Output
+Name: Balu
+Age: 20
+Grade: A
+Percentage: 85.5
+Hint 1
+
+Use String for name.
+
+Hint 2
+
+Use int for age and char for grade.
+
+Hint 3
+
+Use double for percentage.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Declare variables here
+
+        // Print variables here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        String name = "Balu";
+        int age = 20;
+        char grade = 'A';
+        double percentage = 85.5;
+
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Grade: " + grade);
+        System.out.println("Percentage: " + percentage);
+
+    }
+
+}
+Code Explanation
+
+The program creates four variables using different data types and prints their values using System.out.println().
+
+Output
+Name: Balu
+Age: 20
+Grade: A
+Percentage: 85.5
+
+
+Topic 4: Operators in Java
+Topic Introduction
+
+Imagine you are building a calculator application.
+
+To add, subtract, multiply, compare values, or check conditions, Java uses operators.
+
+Operators are special symbols that perform operations on variables and values.
+
+Without operators, we cannot perform calculations, comparisons, or logical decisions in programs.
+
+Operators are heavily used in:
+
+Banking Applications
+E-Commerce Websites
+Student Management Systems
+Games
+Scientific Calculators
+Enterprise Applications
+
+Almost every Java program uses operators.
+
+Definition
+
+An operator is a symbol that performs an operation on one or more operands (values or variables).
+
+Example:
+
+int sum = 10 + 20;
+
+Here:
+
+10 and 20 → Operands
++         → Operator
+Why We Need Operators
+
+Suppose we want to calculate total marks.
+
+Without operators:
+
+System.out.println(90);
+System.out.println(80);
+System.out.println(70);
+
+This only prints values.
+
+Using operators:
+
+int total = 90 + 80 + 70;
+
+Now Java performs calculations automatically.
+
+Benefits:
+
+Perform calculations
+Compare values
+Make decisions
+Create conditions
+Simplify coding
+Types of Operators in Java
+
+Java provides several categories of operators:
+
+Arithmetic Operators
+Relational Operators
+Logical Operators
+Assignment Operators
+Increment and Decrement Operators
+1. Arithmetic Operators
+
+Used for mathematical calculations.
+
+Operator	Meaning
++	Addition
+-	Subtraction
+*	Multiplication
+/	Division
+%	Modulus (Remainder)
+Addition Example
+int a = 10;
+int b = 5;
+
+System.out.println(a + b);
+Output
+15
+Subtraction Example
+int a = 20;
+int b = 8;
+
+System.out.println(a - b);
+Output
+12
+Multiplication Example
+int a = 6;
+int b = 4;
+
+System.out.println(a * b);
+Output
+24
+Division Example
+int a = 20;
+int b = 5;
+
+System.out.println(a / b);
+Output
+4
+Modulus Example
+int a = 17;
+int b = 5;
+
+System.out.println(a % b);
+Output
+2
+
+Explanation:
+
+17 ÷ 5 = 3 remainder 2
+2. Relational Operators
+
+Used to compare values.
+
+Result is always:
+
+true
+or
+false
+Operator	Meaning
+==	Equal To
+!=	Not Equal To
+>	Greater Than
+<	Less Than
+>=	Greater Than Or Equal
+<=	Less Than Or Equal
+Example
+int a = 10;
+int b = 20;
+
+System.out.println(a < b);
+Output
+true
+Example
+int age = 18;
+
+System.out.println(age >= 18);
+Output
+true
+3. Logical Operators
+
+Used to combine conditions.
+
+Operator	Meaning
+&&	AND
+	
+!	NOT
+AND Example
+int age = 20;
+boolean hasID = true;
+
+System.out.println(age >= 18 && hasID);
+Output
+true
+
+Both conditions are true.
+
+OR Example
+boolean rain = false;
+boolean holiday = true;
+
+System.out.println(rain || holiday);
+Output
+true
+
+At least one condition is true.
+
+NOT Example
+boolean passed = true;
+
+System.out.println(!passed);
+Output
+false
+
+NOT reverses the value.
+
+4. Assignment Operators
+
+Used to assign values.
+
+Basic assignment:
+
+int marks = 90;
+Example
+int x = 10;
+
+x += 5;
+
+System.out.println(x);
+Output
+15
+
+Equivalent to:
+
+x = x + 5;
+5. Increment and Decrement Operators
+
+Used to increase or decrease values by 1.
+
+Increment
+int count = 5;
+
+count++;
+
+System.out.println(count);
+Output
+6
+Decrement
+int count = 5;
+
+count--;
+
+System.out.println(count);
+Output
+4
+Real World Usage
+Banking Application
+double balance = 5000;
+
+balance = balance - 1000;
+
+Withdraw money.
+
+Online Shopping
+double total = 1000;
+double discount = 200;
+
+double finalPrice = total - discount;
+
+Calculate discounted price.
+
+Voting System
+int age = 19;
+
+System.out.println(age >= 18);
+
+Check voting eligibility.
+
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        int a = 10;
+        int b = 5;
+
+        System.out.println(a + b);
+        System.out.println(a - b);
+        System.out.println(a * b);
+
+    }
+
+}
+Output
+15
+5
+50
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 20;
+
+        System.out.println(age >= 18);
+
+    }
+
+}
+Output
+true
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        int count = 5;
+
+        count++;
+
+        System.out.println(count);
+
+    }
+
+}
+Output
+6
+Common Mistakes
+Mistake 1
+
+Using = instead of ==
+
+Wrong:
+
+if(age = 18)
+
+Correct:
+
+if(age == 18)
+Mistake 2
+
+Division by Zero
+
+Wrong:
+
+int result = 10 / 0;
+
+Runtime Error.
+
+Mistake 3
+
+Confusing % with /
+
+10 % 3
+
+Output:
+
+1
+
+Not:
+
+3
+Mistake 4
+
+Forgetting Increment Effect
+
+count++;
+
+Actually changes value.
+
+Best Practices
+Use Meaningful Variable Names
+
+Good:
+
+int totalMarks;
+int studentAge;
+
+Bad:
+
+int a;
+int x;
+Add Spaces Around Operators
+
+Good:
+
+int total = marks + bonus;
+
+Bad:
+
+int total=marks+bonus;
+Use Parentheses for Complex Calculations
+
+Good:
+
+int result = (a + b) * c;
+
+Improves readability.
+
+Key Points
+Operators perform actions on values.
+Arithmetic operators perform calculations.
+Relational operators compare values.
+Logical operators combine conditions.
+Assignment operators store values.
+Increment and decrement modify values by 1.
+Topic 4 Mastery Challenge
+Problem Statement
+
+Create a Java program that stores two numbers:
+
+25
+10
+
+Display:
+
+Sum
+Difference
+Product
+Quotient
+Remainder
+
+using operators.
+
+Input Format
+
+No input required.
+
+Output Format
+
+Display all arithmetic operation results.
+
+Sample Output
+Sum = 35
+Difference = 15
+Product = 250
+Quotient = 2
+Remainder = 5
+Constraints
+Use variables.
+Use arithmetic operators.
+Display all five results.
+Hint 1
+
+Create two integer variables.
+
+Hint 2
+
+Use +, -, *, / and % operators.
+
+Hint 3
+
+Print each result separately.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int num1 = 25;
+        int num2 = 10;
+
+        // Write your code here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int num1 = 25;
+        int num2 = 10;
+
+        System.out.println("Sum = " + (num1 + num2));
+        System.out.println("Difference = " + (num1 - num2));
+        System.out.println("Product = " + (num1 * num2));
+        System.out.println("Quotient = " + (num1 / num2));
+        System.out.println("Remainder = " + (num1 % num2));
+
+    }
+
+}
+Code Explanation
+
+The program creates two integer variables and performs arithmetic operations using Java operators.
+
+Each result is displayed using System.out.println().
+
+Output
+Sum = 35
+Difference = 15
+Product = 250
+Quotient = 2
+Remainder = 5
+
+
+Quiz 1: Java Fundamentals Quiz
+Topics Covered
+Topic 1: Introduction to Java
+Topic 2: Structure of Java Program
+Topic 3: Variables and Data Types
+Topic 4: Operators in Java
+Question 1
+
+Which component executes Java bytecode?
+
+A. JDK
+
+B. JRE
+
+C. JVM
+
+D. Compiler
+
+✅ Correct Answer: C. JVM
+
+Explanation
+
+The Java Virtual Machine (JVM) is responsible for executing Java bytecode and producing the final output.
+
+Question 2
+
+Which method is the starting point of every Java application?
+
+A. start()
+
+B. run()
+
+C. execute()
+
+D. main()
+
+✅ Correct Answer: D. main()
+
+Explanation
+
+Execution of every Java program begins from the main() method.
+
+Question 3
+
+Which keyword is used to create a class in Java?
+
+A. object
+
+B. define
+
+C. class
+
+D. create
+
+✅ Correct Answer: C. class
+
+Explanation
+
+The class keyword is used to define a class in Java.
+
+Question 4
+
+Which data type is used to store decimal numbers?
+
+A. int
+
+B. double
+
+C. char
+
+D. boolean
+
+✅ Correct Answer: B. double
+
+Explanation
+
+The double data type stores decimal values such as 10.5 or 99.99.
+
+Question 5
+
+Which data type stores a single character?
+
+A. String
+
+B. char
+
+C. int
+
+D. double
+
+✅ Correct Answer: B. char
+
+Explanation
+
+The char data type stores a single character enclosed in single quotes.
+
+Example:
+
+char grade = 'A';
+Question 6
+
+What will be the output?
+
+int a = 10;
+int b = 5;
+
+System.out.println(a + b);
+
+A. 5
+
+B. 10
+
+C. 15
+
+D. 50
+
+✅ Correct Answer: C. 15
+
+Explanation
+
+The + operator performs addition.
+
+10 + 5 = 15
+Question 7
+
+What will be the output?
+
+int a = 20;
+int b = 3;
+
+System.out.println(a % b);
+
+A. 6
+
+B. 2
+
+C. 3
+
+D. 0
+
+✅ Correct Answer: B. 2
+
+Explanation
+
+The modulus operator % returns the remainder.
+
+20 ÷ 3 = 6 remainder 2
+Question 8
+
+Find the error:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello")
+
+    }
+
+}
+
+A. Wrong class name
+
+B. Missing semicolon
+
+C. Wrong method name
+
+D. Missing braces
+
+✅ Correct Answer: B. Missing semicolon
+
+Explanation
+
+Every Java statement must end with a semicolon.
+
+Correct:
+
+System.out.println("Hello");
+Question 9
+
+Which of the following is a valid variable declaration?
+
+A.
+
+int 10age = 20;
+
+B.
+
+int age = 20;
+
+C.
+
+int age == 20;
+
+D.
+
+age int = 20;
+
+✅ Correct Answer: B. int age = 20;
+
+Explanation
+
+Variable names cannot start with numbers and must follow Java syntax rules.
+
+Question 10
+
+A school wants to store a student's name.
+
+Which data type should be used?
+
+A. int
+
+B. double
+
+C. String
+
+D. boolean
+
+✅ Correct Answer: C. String
+
+Explanation
+
+Names contain text, so the String data type is used.
+
+Example:
+
+String name = "Balu";
+
+Topic 5: Taking User Input using Scanner
+Topic Introduction
+
+Until now, all our programs used fixed values.
+
+Example:
+
+int age = 20;
+
+But real-world applications don't work with fixed values.
+
+Consider:
+
+ATM asks for amount
+Login page asks for username
+Calculator asks for numbers
+Student system asks for marks
+
+To receive data from users, Java provides the Scanner class.
+
+The Scanner class allows programs to take input from the keyboard during execution.
+
+Definition
+
+Scanner is a predefined Java class used to read input from the user.
+
+It belongs to the:
+
+java.util
+
+package.
+
+Why We Need Scanner
+
+Without Scanner:
+
+int age = 20;
+
+The value is fixed.
+
+With Scanner:
+
+Scanner sc = new Scanner(System.in);
+
+int age = sc.nextInt();
+
+Now the user decides the value.
+
+Benefits:
+
+Dynamic programs
+User interaction
+Real-world applications
+Flexible inputs
+Importing Scanner
+
+Before using Scanner, we must import it.
+
+Syntax
+import java.util.Scanner;
+Explanation
+java → Main package
+util → Utility package
+Scanner → Scanner class
+Creating a Scanner Object
+Syntax
+Scanner sc = new Scanner(System.in);
+Syntax Breakdown
+Scanner
+
+Class name.
+
+sc
+
+Object name.
+
+Can be any valid variable name.
+
+Examples:
+
+Scanner input = new Scanner(System.in);
+Scanner scanner = new Scanner(System.in);
+System.in
+
+Represents keyboard input.
+
+Taking Integer Input
+Syntax
+int number = sc.nextInt();
+Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int age = sc.nextInt();
+
+        System.out.println(age);
+
+    }
+
+}
+Input
+20
+Output
+20
+Taking Double Input
+Syntax
+double salary = sc.nextDouble();
+Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        double price = sc.nextDouble();
+
+        System.out.println(price);
+
+    }
+
+}
+Input
+99.99
+Output
+99.99
+Taking Single Word Input
+Syntax
+String name = sc.next();
+Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String name = sc.next();
+
+        System.out.println(name);
+
+    }
+
+}
+Input
+Balu
+Output
+Balu
+Understanding next()
+
+next() reads only one word.
+
+Input:
+
+Balu Krishna
+
+Code:
+
+String name = sc.next();
+
+Output:
+
+Balu
+
+Only the first word is read.
+
+Taking Full Line Input
+Syntax
+String text = sc.nextLine();
+Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String fullName = sc.nextLine();
+
+        System.out.println(fullName);
+
+    }
+
+}
+Input
+Balu Krishna
+Output
+Balu Krishna
+Difference Between next() and nextLine()
+Method	Reads
+next()	Single word
+nextLine()	Entire line
+
+Example:
+
+Input:
+
+Balu Krishna
+
+Using:
+
+sc.next();
+
+Output:
+
+Balu
+
+Using:
+
+sc.nextLine();
+
+Output:
+
+Balu Krishna
+Taking Multiple Inputs
+Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String name = sc.next();
+        int age = sc.nextInt();
+
+        System.out.println(name);
+        System.out.println(age);
+
+    }
+
+}
+Input
+Balu
+20
+Output
+Balu
+20
+Real World Usage
+Login Form
+String username = sc.next();
+String password = sc.next();
+ATM
+double amount = sc.nextDouble();
+Student Management System
+String studentName = sc.nextLine();
+int marks = sc.nextInt();
+Example 1
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int number = sc.nextInt();
+
+        System.out.println(number);
+
+    }
+
+}
+Input
+100
+Output
+100
+Example 2
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String city = sc.next();
+
+        System.out.println(city);
+
+    }
+
+}
+Input
+Hyderabad
+Output
+Hyderabad
+Example 3
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        double marks = sc.nextDouble();
+
+        System.out.println(marks);
+
+    }
+
+}
+Input
+85.5
+Output
+85.5
+Common Mistakes
+Mistake 1
+
+Forgetting Import Statement
+
+Wrong:
+
+Scanner sc = new Scanner(System.in);
+
+Without:
+
+import java.util.Scanner;
+
+Compiler Error.
+
+Mistake 2
+
+Wrong Method
+
+int age = sc.next();
+
+Wrong because next() returns String.
+
+Correct:
+
+int age = sc.nextInt();
+Mistake 3
+
+Entering Text for Integer
+
+Code:
+
+int age = sc.nextInt();
+
+Input:
+
+Balu
+
+Runtime Error.
+
+Mistake 4
+
+Confusing next() and nextLine()
+
+Input:
+
+Balu Krishna
+
+Using:
+
+next()
+
+Only reads:
+
+Balu
+Best Practices
+Use Meaningful Object Names
+
+Good:
+
+Scanner input = new Scanner(System.in);
+Close Scanner When Finished
+sc.close();
+
+(We will discuss this more in advanced phases.)
+
+Use Correct Input Method
+
+Use:
+
+nextInt()
+
+for integers.
+
+Use:
+
+nextDouble()
+
+for decimals.
+
+Use:
+
+nextLine()
+
+for full text.
+
+Key Points
+Scanner is used for user input.
+Scanner belongs to java.util package.
+Must import Scanner before use.
+nextInt() reads integers.
+nextDouble() reads decimals.
+next() reads one word.
+nextLine() reads full lines.
+Scanner enables interactive programs.
+Topic 5 Mastery Challenge
+Problem Statement
+
+Write a Java program that takes the following inputs from the user:
+
+Name
+Age
+
+Then display:
+
+Name: <name>
+Age: <age>
+Input Format
+
+First line:
+
+Name
+
+Second line:
+
+Age
+Output Format
+
+Display the entered name and age.
+
+Sample Input
+Balu
+20
+Sample Output
+Name: Balu
+Age: 20
+Hint 1
+
+Import Scanner.
+
+Hint 2
+
+Create Scanner object.
+
+Hint 3
+
+Use next() and nextInt().
+
+Code Editor
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Take inputs here
+
+        // Print outputs here
+
+    }
+
+}
+Solution Code
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        String name = sc.next();
+        int age = sc.nextInt();
+
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+
+    }
+
+}
+Code Explanation
+
+The program creates a Scanner object and reads:
+
+Name using next()
+Age using nextInt()
+
+Then it displays the values using System.out.println().
+
+Output
+Input
+Balu
+20
+Output
+Name: Balu
+Age: 20
+
+
+Topic 6: Type Casting in Java
+Topic Introduction
+
+In Java, different data types store different kinds of values.
+
+For example:
+
+int age = 20;
+double percentage = 85.5;
+
+Sometimes we need to convert one data type into another.
+
+Examples:
+
+Convert integer marks into decimal percentage
+Convert double value into integer
+Perform calculations between different data types
+Process user input and mathematical operations
+
+Java provides a mechanism called Type Casting to convert data from one type to another.
+
+Definition
+
+Type Casting is the process of converting one data type into another data type.
+
+Example:
+
+int num = 10;
+double value = num;
+
+Here:
+
+int → double
+
+Conversion happens automatically.
+
+Why We Need Type Casting
+
+Suppose we have:
+
+int marks = 95;
+double percentage;
+
+To store marks inside a double variable:
+
+percentage = marks;
+
+Java converts the value automatically.
+
+Type Casting is useful when:
+
+Performing calculations
+Converting user input
+Working with different data types
+Avoiding compilation errors
+Types of Type Casting
+
+Java supports two types:
+
+Widening Casting (Automatic)
+Narrowing Casting (Manual)
+1. Widening Casting (Automatic Casting)
+Definition
+
+Converting a smaller data type into a larger data type automatically.
+
+Conversion Flow
+byte
+ ↓
+short
+ ↓
+int
+ ↓
+long
+ ↓
+float
+ ↓
+double
+Syntax
+double value = number;
+Example 1
+int age = 20;
+
+double ageDouble = age;
+
+System.out.println(ageDouble);
+Output
+20.0
+Example 2
+char grade = 'A';
+
+int ascii = grade;
+
+System.out.println(ascii);
+Output
+65
+
+Explanation:
+
+'A' = ASCII value 65
+Why Widening is Safe
+
+Example:
+
+int num = 100;
+
+double value = num;
+
+A double can store larger values than an int.
+
+No data is lost.
+
+2. Narrowing Casting (Manual Casting)
+Definition
+
+Converting a larger data type into a smaller data type.
+
+This conversion must be done manually.
+
+Syntax
+int number = (int) value;
+Example 1
+double price = 99.99;
+
+int amount = (int) price;
+
+System.out.println(amount);
+Output
+99
+
+Notice:
+
+99.99 → 99
+
+Decimal part is removed.
+
+Example 2
+double marks = 85.75;
+
+int finalMarks = (int) marks;
+
+System.out.println(finalMarks);
+Output
+85
+Why Narrowing is Risky
+
+Example:
+
+double value = 45.99;
+
+int result = (int) value;
+
+Output:
+
+45
+
+The decimal part is lost.
+
+This is called Data Loss.
+
+Automatic Type Conversion
+
+Java automatically converts smaller data types when necessary.
+
+Example:
+
+int a = 10;
+double b = 5.5;
+
+double result = a + b;
+
+System.out.println(result);
+Output
+15.5
+
+Explanation:
+
+int → double
+
+before calculation.
+
+Real World Usage
+Student Percentage System
+int marks = 450;
+
+double percentage = marks / 5.0;
+Banking Application
+int balance = 5000;
+
+double interest = balance * 0.05;
+Shopping Application
+double price = 999.99;
+
+int roundedPrice = (int) price;
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        int number = 25;
+
+        double value = number;
+
+        System.out.println(value);
+
+    }
+
+}
+Output
+25.0
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        double value = 99.99;
+
+        int number = (int) value;
+
+        System.out.println(number);
+
+    }
+
+}
+Output
+99
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        int a = 10;
+        double b = 2.5;
+
+        double result = a + b;
+
+        System.out.println(result);
+
+    }
+
+}
+Output
+12.5
+Common Mistakes
+Mistake 1
+
+Forgetting Casting
+
+Wrong:
+
+double value = 99.99;
+
+int number = value;
+
+Compilation Error.
+
+Correct:
+
+int number = (int) value;
+Mistake 2
+
+Expecting Rounded Values
+
+double value = 8.9;
+
+int num = (int) value;
+
+Output:
+
+8
+
+Not:
+
+9
+
+Casting removes decimals.
+
+Mistake 3
+
+Data Loss Ignorance
+
+double salary = 45000.99;
+
+int finalSalary = (int) salary;
+
+Output:
+
+45000
+
+Decimal part is lost.
+
+Best Practices
+Use Widening Whenever Possible
+
+Safe conversion:
+
+int age = 20;
+double ageValue = age;
+Use Narrowing Only When Needed
+double marks = 99.99;
+int finalMarks = (int) marks;
+Check for Data Loss
+
+Before converting:
+
+double amount = 85.75;
+
+Know that:
+
+85.75 → 85
+Key Points
+Type Casting converts one data type into another.
+Widening Casting is automatic.
+Narrowing Casting is manual.
+Narrowing may cause data loss.
+Java performs automatic conversions in expressions.
+Casting is widely used in calculations and data processing.
+Topic 6 Mastery Challenge
+Problem Statement
+
+Create a Java program that:
+
+Stores a decimal value:
+95.75
+Converts it into an integer using type casting.
+Displays both values.
+Input Format
+
+No input required.
+
+Output Format
+
+Display:
+
+Original Value: 95.75
+Converted Value: 95
+Sample Output
+Original Value: 95.75
+Converted Value: 95
+Hint 1
+
+Create a double variable.
+
+Hint 2
+
+Use narrowing casting.
+
+Hint 3
+
+Use (int) before the variable.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        double value = 95.75;
+
+        // Convert value here
+
+        // Print results here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        double value = 95.75;
+
+        int convertedValue = (int) value;
+
+        System.out.println("Original Value: " + value);
+        System.out.println("Converted Value: " + convertedValue);
+
+    }
+
+}
+Code Explanation
+
+The program stores a decimal number in a double variable.
+
+Using:
+
+(int) value
+
+Java converts the double value into an integer.
+
+The decimal part is removed, resulting in:
+
+95
+Output
+Original Value: 95.75
+Converted Value: 95
+
+
+Topic 7: Comments in Java
+Topic Introduction
+
+Imagine you wrote a Java program 6 months ago.
+
+When you open it again, you may forget:
+
+Why a particular variable was created
+What a calculation does
+Why a condition exists
+
+This is where Comments help.
+
+Comments are notes written inside the code for humans to read.
+
+Java ignores comments during execution.
+
+They help developers:
+
+Understand code
+Maintain projects
+Collaborate with team members
+Document important information
+
+Comments are extremely important in large software projects.
+
+Definition
+
+Comments are non-executable text written inside a Java program to explain code.
+
+The Java compiler ignores comments while compiling.
+
+Example:
+
+int age = 20; // Student age
+
+Here:
+
+// Student age
+
+is a comment.
+
+Why We Need Comments
+
+Consider this code:
+
+int a = 5000;
+double b = a * 0.05;
+
+A beginner may not understand what it does.
+
+With comments:
+
+// Account balance
+int balance = 5000;
+
+// Calculate 5% interest
+double interest = balance * 0.05;
+
+The purpose becomes clear.
+
+Benefits:
+
+Improves readability
+Makes debugging easier
+Helps future maintenance
+Assists team collaboration
+Types of Comments in Java
+
+Java supports three types of comments:
+
+Single-Line Comments
+Multi-Line Comments
+Documentation Comments
+1. Single-Line Comments
+Definition
+
+Used for short explanations.
+
+Everything after:
+
+//
+
+on the same line becomes a comment.
+
+Syntax
+// This is a comment
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Print welcome message
+        System.out.println("Welcome");
+
+    }
+
+}
+Output
+Welcome
+Example 2
+// Store student age
+int age = 20;
+
+The comment explains the variable.
+
+2. Multi-Line Comments
+Definition
+
+Used for large explanations spanning multiple lines.
+
+Syntax
+/*
+This is a
+multi-line
+comment
+*/
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        /*
+         This program prints
+         a welcome message
+        */
+
+        System.out.println("Hello Java");
+
+    }
+
+}
+Output
+Hello Java
+When to Use Multi-Line Comments
+
+Useful for:
+
+Program descriptions
+Algorithm explanations
+Long notes
+
+Example:
+
+/*
+Student Grade Calculator
+
+This program calculates
+student percentage.
+*/
+3. Documentation Comments
+Definition
+
+Documentation comments are used to generate official Java documentation.
+
+They start with:
+
+/**
+
+and end with:
+
+*/
+Syntax
+/**
+ * This is a documentation comment
+ */
+Example
+/**
+ * Main class of the application
+ */
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello");
+
+    }
+
+}
+Output
+Hello
+Real World Usage
+Banking Application
+// Customer account balance
+double balance = 10000;
+Student Management System
+// Store student marks
+int marks = 95;
+E-Commerce Application
+/*
+Calculate discount
+for premium users
+*/
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Display greeting
+        System.out.println("Good Morning");
+
+    }
+
+}
+Output
+Good Morning
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        /*
+         Store employee salary
+        */
+
+        int salary = 50000;
+
+        System.out.println(salary);
+
+    }
+
+}
+Output
+50000
+Example 3
+/**
+ * Employee Management Program
+ */
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Employee System");
+
+    }
+
+}
+Output
+Employee System
+Common Mistakes
+Mistake 1
+
+Not Closing Multi-Line Comment
+
+Wrong:
+
+/*
+This is a comment
+
+Compilation Error.
+
+Correct:
+
+/*
+This is a comment
+*/
+Mistake 2
+
+Writing Too Many Unnecessary Comments
+
+Bad:
+
+// Declare variable
+int age = 20;
+
+The code is already obvious.
+
+Mistake 3
+
+Outdated Comments
+
+Bad:
+
+// Store age
+double salary = 50000;
+
+Comment does not match code.
+
+Best Practices
+Explain Why, Not What
+
+Bad:
+
+// Increment count
+count++;
+
+Good:
+
+// Increase count after successful login
+count++;
+Keep Comments Updated
+
+Whenever code changes:
+
+// Update this comment too
+Use Documentation Comments for Classes
+/**
+ * Student Management Application
+ */
+Key Points
+Comments are ignored by Java compiler.
+Comments improve readability.
+Single-line comments use //.
+Multi-line comments use /* */.
+Documentation comments use /** */.
+Good comments explain purpose and intent.
+Comments help in maintaining large projects.
+Topic 7 Mastery Challenge
+Problem Statement
+
+Create a Java program that:
+
+Uses a single-line comment.
+Uses a multi-line comment.
+Prints:
+Learning Java Comments
+Input Format
+
+No input required.
+
+Output Format
+
+Print:
+
+Learning Java Comments
+Sample Output
+Learning Java Comments
+Hint 1
+
+Use // for a single-line comment.
+
+Hint 2
+
+Use /* */ for a multi-line comment.
+
+Hint 3
+
+Use System.out.println() to display the message.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Add a single-line comment
+
+        /*
+           Add a multi-line comment
+        */
+
+        // Print message here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        // This is a single-line comment
+
+        /*
+           This is a
+           multi-line comment
+        */
+
+        System.out.println("Learning Java Comments");
+
+    }
+
+}
+Code Explanation
+
+The program demonstrates both:
+
+Single-line comments (//)
+Multi-line comments (/* */)
+
+Comments are ignored by Java during execution.
+
+Only the print statement produces output.
+
+Output
+Learning Java Comments
+
+Topic 8: Escape Sequences in Java
+Topic Introduction
+
+Sometimes while printing text in Java, we need special formatting.
+
+For example:
+
+Print text on a new line
+Add spaces/tabs between words
+Print double quotes inside a string
+Print a backslash (\)
+
+Normally Java treats these characters as part of its syntax, so special codes called Escape Sequences are used.
+
+Escape sequences allow us to include special characters inside strings.
+
+They begin with a backslash:
+
+\
+
+followed by another character.
+
+Definition
+
+An Escape Sequence is a special character combination beginning with a backslash (\) that represents a character that cannot be typed directly inside a string.
+
+Example:
+
+System.out.println("Hello\nJava");
+
+Output:
+
+Hello
+Java
+Why We Need Escape Sequences
+
+Without escape sequences:
+
+System.out.println("Hello Java");
+
+Output:
+
+Hello Java
+
+Everything appears on one line.
+
+With escape sequences:
+
+System.out.println("Hello\nJava");
+
+Output:
+
+Hello
+Java
+
+Benefits:
+
+Better formatting
+Cleaner output
+Professional-looking programs
+Easy report generation
+Common Escape Sequences
+Escape Sequence	Meaning
+\n	New Line
+\t	Tab Space
+"	Double Quote
+'	Single Quote
+\	Backslash
+1. New Line Escape Sequence (\n)
+Definition
+
+Moves the cursor to the next line.
+
+Syntax
+System.out.println("Line1\nLine2");
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Java\nProgramming");
+
+    }
+
+}
+Output
+Java
+Programming
+Example 2
+System.out.println("Name: Balu\nAge: 20");
+Output
+Name: Balu
+Age: 20
+2. Tab Escape Sequence (\t)
+Definition
+
+Adds horizontal tab spacing.
+
+Syntax
+System.out.println("Java\tProgramming");
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Name\tAge");
+
+    }
+
+}
+Output
+Name    Age
+Example 2
+System.out.println("Balu\t20");
+Output
+Balu    20
+3. Double Quote Escape Sequence (")
+Definition
+
+Used to print double quotation marks inside a string.
+
+Problem
+
+This is invalid:
+
+System.out.println("Java is "Awesome"");
+
+Java becomes confused.
+
+Correct Syntax
+System.out.println("Java is \"Awesome\"");
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Java is \"Awesome\"");
+
+    }
+
+}
+Output
+Java is "Awesome"
+4. Single Quote Escape Sequence (')
+Definition
+
+Used to print a single quote character.
+
+Example
+System.out.println("It\'s Java");
+Output
+It's Java
+5. Backslash Escape Sequence (\)
+Definition
+
+Used to print a backslash.
+
+Problem
+
+This is invalid:
+
+System.out.println("C:\Java");
+
+Java interprets \J incorrectly.
+
+Correct Syntax
+System.out.println("C:\\Java");
+Example
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("C:\\Java");
+
+    }
+
+}
+Output
+C:\Java
+Combining Multiple Escape Sequences
+
+Example:
+
+System.out.println("Name:\tBalu\nAge:\t20");
+Output
+Name:   Balu
+Age:    20
+Real World Usage
+Student Report
+System.out.println("Name:\tBalu\nMarks:\t95");
+Invoice Printing
+System.out.println("Product\tPrice");
+File Path Display
+System.out.println("C:\\Users\\Balu");
+Quoted Messages
+System.out.println("\"Welcome to Java\"");
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello\nJava");
+
+    }
+
+}
+Output
+Hello
+Java
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Name\tAge");
+
+    }
+
+}
+Output
+Name    Age
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("\"Java Programming\"");
+
+    }
+
+}
+Output
+"Java Programming"
+Common Mistakes
+Mistake 1
+
+Forgetting Backslash
+
+Wrong:
+
+System.out.println("Hello n Java");
+
+Correct:
+
+System.out.println("Hello\nJava");
+Mistake 2
+
+Using Single Backslash for Paths
+
+Wrong:
+
+"C:\Java"
+
+Correct:
+
+"C:\\Java"
+Mistake 3
+
+Printing Quotes Directly
+
+Wrong:
+
+"Java is "Easy""
+
+Correct:
+
+"Java is \"Easy\""
+Best Practices
+Use \n for Readable Output
+
+Good:
+
+System.out.println("Name\nAge");
+Use \t for Tables
+
+Good:
+
+System.out.println("Product\tPrice");
+Escape File Paths Properly
+
+Good:
+
+"C:\\Users\\Balu"
+Combine Escape Sequences When Needed
+
+Example:
+
+System.out.println("Name:\tBalu\nAge:\t20");
+Key Points
+Escape sequences begin with \.
+\n creates a new line.
+\t creates tab spacing.
+\" prints double quotes.
+\' prints single quotes.
+\\ prints a backslash.
+Escape sequences improve output formatting.
+Topic 8 Mastery Challenge
+Problem Statement
+
+Write a Java program that displays the following formatted output using escape sequences:
+
+Student Report
+
+Name:    Balu
+Age:     20
+Course:  Java
+
+"Learning Java is Fun"
+Input Format
+
+No input required.
+
+Output Format
+
+Display the formatted report exactly as shown.
+
+Sample Output
+Student Report
+
+Name:    Balu
+Age:     20
+Course:  Java
+
+"Learning Java is Fun"
+Hint 1
+
+Use \n for new lines.
+
+Hint 2
+
+Use \t for spacing.
+
+Hint 3
+
+Use \" to print quotes.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Use escape sequences here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println(
+            "Student Report\n\n" +
+            "Name:\tBalu\n" +
+            "Age:\t20\n" +
+            "Course:\tJava\n\n" +
+            "\"Learning Java is Fun\""
+        );
+
+    }
+
+}
+Code Explanation
+
+The program uses:
+
+\n to move to a new line
+\t to create spacing
+\" to print quotation marks
+
+These escape sequences help create a properly formatted report.
+
+Output
+Student Report
+
+Name:    Balu
+Age:     20
+Course:  Java
+
+"Learning Java is Fun"
+
+
+Quiz 2: Scanner, Type Casting, Comments & Escape Sequences
+Topics Covered
+Topic 5: Taking User Input using Scanner
+Topic 6: Type Casting in Java
+Topic 7: Comments in Java
+Topic 8: Escape Sequences in Java
+Question 1
+
+Which package contains the Scanner class?
+
+A. java.lang
+
+B. java.io
+
+C. java.util
+
+D. java.math
+
+✅ Correct Answer: C. java.util
+
+Explanation
+
+Scanner belongs to:
+
+java.util.Scanner
+
+Therefore we import it using:
+
+import java.util.Scanner;
+Question 2
+
+Which method reads an integer value from the user?
+
+A. next()
+
+B. nextLine()
+
+C. nextDouble()
+
+D. nextInt()
+
+✅ Correct Answer: D. nextInt()
+
+Explanation
+
+nextInt() is specifically designed to read integer values.
+
+Example:
+
+int age = sc.nextInt();
+Question 3
+
+Which type of casting happens automatically?
+
+A. Narrowing Casting
+
+B. Widening Casting
+
+C. Manual Casting
+
+D. Explicit Casting
+
+✅ Correct Answer: B. Widening Casting
+
+Explanation
+
+When converting a smaller data type into a larger data type, Java performs automatic conversion.
+
+Example:
+
+int num = 10;
+double value = num;
+Question 4
+
+Which symbol starts a single-line comment?
+
+A.
+
+/*
+
+B.
+
+#
+
+C.
+
+//
+
+D.
+
+**
+
+✅ Correct Answer: C. //
+
+Explanation
+
+Single-line comments begin with:
+
+//
+
+Everything after it on the same line is ignored by Java.
+
+Question 5
+
+Which escape sequence creates a new line?
+
+A.
+
+\t
+
+B.
+
+\\
+
+C.
+
+\"
+
+D.
+
+\n
+
+✅ Correct Answer: D. \n
+
+Explanation
+
+\n moves the cursor to the next line.
+
+Example:
+
+System.out.println("Hello\nJava");
+
+Output:
+
+Hello
+Java
+Question 6
+
+Which method reads an entire line of text including spaces?
+
+A. next()
+
+B. nextLine()
+
+C. nextInt()
+
+D. nextDouble()
+
+✅ Correct Answer: B. nextLine()
+
+Explanation
+
+nextLine() reads the complete line entered by the user.
+
+Input:
+
+Balu Krishna
+
+Output:
+
+Balu Krishna
+Question 7 (Output Prediction)
+
+What will be the output?
+
+double value = 95.75;
+int num = (int) value;
+
+System.out.println(num);
+
+A. 95.75
+
+B. 96
+
+C. 95
+
+D. Error
+
+✅ Correct Answer: C. 95
+
+Explanation
+
+Narrowing casting removes the decimal portion.
+
+95.75 → 95
+Question 8 (Output Prediction)
+
+What will be the output?
+
+System.out.println("Java\tProgramming");
+
+A.
+
+JavaProgramming
+
+B.
+
+Java
+Programming
+
+C.
+
+Java    Programming
+
+D. Error
+
+✅ Correct Answer: C. Java Programming
+
+Explanation
+
+\t inserts a tab space between the words.
+
+Question 9 (Error Finding)
+
+Find the error:
+
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int age = sc.next();
+
+    }
+
+}
+
+A. Missing import
+
+B. Wrong Scanner object
+
+C. next() returns String
+
+D. Missing semicolon
+
+✅ Correct Answer: C. next() returns String
+
+Explanation
+
+next() returns a String.
+
+Correct code:
+
+int age = sc.nextInt();
+
+or
+
+String age = sc.next();
+Question 10 (Scenario Based)
+
+A student registration system needs to store a user's full name:
+
+Balu Krishna
+
+Which method should be used?
+
+A. next()
+
+B. nextLine()
+
+C. nextInt()
+
+D. nextDouble()
+
+✅ Correct Answer: B. nextLine()
+
+Explanation
+
+next() reads only one word.
+
+nextLine() reads the entire line including spaces.
+
+Input:
+
+Balu Krishna
+
+Output:
+
+Balu Krishna
+
+
+Phase 1 Final Quiz: Java Fundamentals
+Topics Covered
+
+✅ Introduction to Java
+✅ Structure of Java Program
+✅ Variables and Data Types
+✅ Operators
+✅ Scanner
+✅ Type Casting
+✅ Comments
+✅ Escape Sequences
+
+Question 1
+
+Java was developed in:
+
+A. 1990
+
+B. 1995
+
+C. 2000
+
+D. 2005
+
+✅ Correct Answer: B. 1995
+
+Explanation
+
+Java was developed by Sun Microsystems and officially released in 1995.
+
+Question 2
+
+Which component executes Java bytecode?
+
+A. JDK
+
+B. Compiler
+
+C. JVM
+
+D. IDE
+
+✅ Correct Answer: C. JVM
+
+Explanation
+
+The Java Virtual Machine (JVM) executes Java bytecode.
+
+Question 3
+
+Which method is the entry point of a Java application?
+
+A. start()
+
+B. run()
+
+C. execute()
+
+D. main()
+
+✅ Correct Answer: D. main()
+
+Explanation
+
+Program execution begins from the main() method.
+
+Question 4
+
+Which data type stores decimal values?
+
+A. int
+
+B. char
+
+C. double
+
+D. boolean
+
+✅ Correct Answer: C. double
+
+Explanation
+
+double stores decimal numbers such as 10.5 and 99.99.
+
+Question 5
+
+Which data type stores text?
+
+A. int
+
+B. boolean
+
+C. char
+
+D. String
+
+✅ Correct Answer: D. String
+
+Explanation
+
+String stores sequences of characters (text).
+
+Example:
+
+String name = "Balu";
+Question 6
+
+Which operator returns the remainder?
+
+A. /
+
+B. %
+
+C. *
+
+D. +
+
+✅ Correct Answer: B. %
+
+Explanation
+
+The modulus operator % returns the remainder after division.
+
+Question 7
+
+Which method reads an integer value from the user?
+
+A. next()
+
+B. nextLine()
+
+C. nextInt()
+
+D. nextDouble()
+
+✅ Correct Answer: C. nextInt()
+
+Explanation
+
+nextInt() is used for integer input.
+
+Question 8
+
+Which method reads an entire line including spaces?
+
+A. next()
+
+B. nextLine()
+
+C. nextInt()
+
+D. nextDouble()
+
+✅ Correct Answer: B. nextLine()
+
+Explanation
+
+nextLine() reads the complete line entered by the user.
+
+Question 9
+
+Which type of casting happens automatically?
+
+A. Narrowing Casting
+
+B. Explicit Casting
+
+C. Manual Casting
+
+D. Widening Casting
+
+✅ Correct Answer: D. Widening Casting
+
+Explanation
+
+Smaller data types automatically convert to larger data types.
+
+Question 10
+
+Which comment type is used for Java documentation?
+
+A.
+
+//
+
+B.
+
+/*
+
+C.
+
+/**
+
+D.
+
+#
+
+✅ Correct Answer: C. /**
+
+Explanation
+
+Documentation comments begin with:
+
+/**
+
+and are used by JavaDoc.
+
+Question 11
+
+What will be the output?
+
+int a = 10;
+int b = 20;
+
+System.out.println(a + b);
+
+A. 10
+
+B. 20
+
+C. 30
+
+D. 200
+
+✅ Correct Answer: C. 30
+
+Explanation
+
+10 + 20 = 30
+
+Question 12
+
+What will be the output?
+
+System.out.println("Hello\nJava");
+
+A.
+
+Hello Java
+
+B.
+
+Hello
+Java
+
+C.
+
+HelloJava
+
+D. Error
+
+✅ Correct Answer: B
+
+Explanation
+
+\n moves to a new line.
+
+Question 13
+
+What will be the output?
+
+double value = 25.99;
+int num = (int) value;
+
+System.out.println(num);
+
+A. 25.99
+
+B. 26
+
+C. 25
+
+D. Error
+
+✅ Correct Answer: C. 25
+
+Explanation
+
+Casting removes the decimal part.
+
+Question 14
+
+What will be the output?
+
+System.out.println("Java\tProgramming");
+
+A.
+
+JavaProgramming
+
+B.
+
+Java
+Programming
+
+C.
+
+Java    Programming
+
+D. Error
+
+✅ Correct Answer: C
+
+Explanation
+
+\t creates a tab space.
+
+Question 15
+
+Find the error:
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hello")
+
+    }
+
+}
+
+A. Missing class
+
+B. Missing semicolon
+
+C. Wrong method
+
+D. Missing import
+
+✅ Correct Answer: B
+
+Explanation
+
+Every statement must end with a semicolon.
+
+Question 16
+
+Find the error:
+
+char grade = "A";
+
+A. Missing semicolon
+
+B. Wrong data type
+
+C. Wrong quotes
+
+D. Missing variable name
+
+✅ Correct Answer: C
+
+Explanation
+
+Characters use single quotes.
+
+Correct:
+
+char grade = 'A';
+Question 17
+
+A banking application needs to store account balance:
+
+25000.75
+
+Which data type is most suitable?
+
+A. int
+
+B. boolean
+
+C. double
+
+D. char
+
+✅ Correct Answer: C. double
+
+Explanation
+
+Balances may contain decimal values.
+
+Question 18
+
+A school application needs to store:
+
+Passed / Failed
+
+Which data type should be used?
+
+A. String
+
+B. int
+
+C. char
+
+D. boolean
+
+✅ Correct Answer: D. boolean
+
+Explanation
+
+Boolean stores only:
+
+true
+false
+Question 19
+
+A user enters:
+
+Balu Krishna
+
+Which method should be used to read the full name?
+
+A. next()
+
+B. nextLine()
+
+C. nextInt()
+
+D. nextDouble()
+
+✅ Correct Answer: B
+
+Explanation
+
+nextLine() reads the entire line including spaces.
+
+Question 20
+
+Which escape sequence is used to print double quotation marks?
+
+A.
+
+\t
+
+B.
+
+\n
+
+C.
+
+\\
+
+D.
+
+\"
+
+✅ Correct Answer: D
+
+Explanation
+
+\" allows double quotes inside strings.
+
+
+Phase 2: Decision Making & Control Flow
+Phase Introduction
+
+Until now, every Java program we wrote executed line by line from top to bottom.
+
+Example:
+
+System.out.println("Step 1");
+System.out.println("Step 2");
+System.out.println("Step 3");
+
+Output:
+
+Step 1
+Step 2
+Step 3
+
+But real-world applications don't work this way.
+
+Consider:
+
+ATM checks PIN before allowing withdrawal.
+Instagram checks login credentials.
+Online exam checks marks before assigning grades.
+E-commerce sites check stock availability before placing orders.
+
+These applications make decisions.
+
+Java provides Decision Making Statements that allow programs to choose different paths based on conditions.
+
+Real World Usage
+ATM Machine
+If PIN is correct
+    Allow access
+Else
+    Show error
+Voting System
+If age >= 18
+    Eligible
+Else
+    Not Eligible
+Student Result System
+If marks >= 35
+    Pass
+Else
+    Fail
+Learning Outcomes
+
+After completing this phase, students will be able to:
+
+✅ Make decisions using conditions
+
+✅ Use if statements
+
+✅ Use if-else statements
+
+✅ Use nested if statements
+
+✅ Use else-if ladders
+
+✅ Use switch statements
+
+✅ Use logical operators in conditions
+
+✅ Use ternary operators
+
+✅ Build decision-based programs
+
+Topic 1: Introduction to Decision Making
+Topic Introduction
+
+Imagine a teacher checking student marks.
+
+If marks are above 35:
+
+Pass
+
+Otherwise:
+
+Fail
+
+The result depends on a condition.
+
+This process is called Decision Making.
+
+Decision making allows a program to choose actions based on conditions.
+
+Definition
+
+Decision Making is the process of executing different blocks of code depending on whether a condition is true or false.
+
+Why We Need Decision Making
+
+Without decision making:
+
+System.out.println("Eligible for Voting");
+
+This always prints the message.
+
+Even if the person's age is 10.
+
+With decision making:
+
+if(age >= 18)
+{
+    System.out.println("Eligible");
+}
+
+The message appears only when the condition is true.
+
+Understanding Conditions
+
+A condition is an expression that evaluates to:
+
+true
+
+or
+
+false
+
+Example:
+
+10 > 5
+
+Result:
+
+true
+
+Example:
+
+3 > 10
+
+Result:
+
+false
+Relational Operators Used in Conditions
+Operator	Meaning
+==	Equal To
+!=	Not Equal To
+>	Greater Than
+<	Less Than
+>=	Greater Than Or Equal
+<=	Less Than Or Equal
+Example
+int age = 20;
+
+System.out.println(age >= 18);
+
+Output:
+
+true
+Flow of Decision Making
+Condition
+
+   ↓
+
+True ? 
+
+  / \
+Yes  No
+
+↓      ↓
+
+Execute
+Code
+
+Skip
+Code
+Real World Examples
+ATM
+Balance > Withdrawal Amount
+Login System
+Username and Password Correct
+Online Shopping
+Product Available
+College Admission
+Marks >= Cutoff
+Example 1
+public class Main {
+
+    public static void main(String[] args) {
+
+        int marks = 80;
+
+        System.out.println(marks >= 35);
+
+    }
+
+}
+Output
+true
+Example 2
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 15;
+
+        System.out.println(age >= 18);
+
+    }
+
+}
+Output
+false
+Example 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        int salary = 50000;
+
+        System.out.println(salary > 30000);
+
+    }
+
+}
+Output
+true
+Common Mistakes
+Mistake 1
+
+Using Assignment Operator Instead of Comparison Operator
+
+Wrong:
+
+age = 18
+
+Correct:
+
+age == 18
+Mistake 2
+
+Confusing > and >=
+
+Example:
+
+age >= 18
+
+includes 18.
+
+age > 18
+
+does not include 18.
+
+Mistake 3
+
+Expecting Non-Boolean Results
+
+Condition:
+
+10 > 5
+
+returns:
+
+true
+
+not:
+
+10
+Best Practices
+Use Meaningful Variable Names
+
+Good:
+
+studentMarks
+userAge
+accountBalance
+Write Readable Conditions
+
+Good:
+
+age >= 18
+
+Bad:
+
+18 <= age
+Keep Conditions Simple
+
+Good:
+
+marks >= 35
+Key Points
+Decision making allows programs to choose actions.
+Conditions return true or false.
+Relational operators help create conditions.
+Real-world applications depend heavily on decision making.
+Decision making is the foundation of if, if-else, switch, and loops.
+Topic 1 Mastery Challenge
+Problem Statement
+
+Create a Java program that stores:
+
+Age = 20
+
+Display the result of:
+
+Age >= 18
+
+using a condition.
+
+Input Format
+
+No input required.
+
+Output Format
+
+Display:
+
+true
+Sample Output
+true
+Hint 1
+
+Create an integer variable named age.
+
+Hint 2
+
+Use the >= operator.
+
+Hint 3
+
+Print the condition directly.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 20;
+
+        // Write condition here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 20;
+
+        System.out.println(age >= 18);
+
+    }
+
+}
+Code Explanation
+
+The variable age stores 20.
+
+The condition:
+
+age >= 18
+
+evaluates to:
+
+true
+
+because 20 is greater than 18.
+
+Output
+true
+
+
+Topic 2: if Statement
+Topic Introduction
+
+Imagine an ATM machine.
+
+When a user enters a PIN, the ATM first checks:
+
+Is the PIN correct?
+
+If the answer is:
+
+Yes
+
+the ATM allows access.
+
+Otherwise, it does nothing or shows an error.
+
+This is the simplest form of decision making and is exactly how the if statement works.
+
+The if statement executes a block of code only when a condition is true.
+
+Definition
+
+An if statement is a decision-making statement that executes a block of code only if a specified condition evaluates to true.
+
+Why We Need if Statements
+
+Without an if statement:
+
+System.out.println("Eligible for Voting");
+
+This message always prints.
+
+Even for a person who is 10 years old.
+
+With an if statement:
+
+if(age >= 18)
+{
+    System.out.println("Eligible for Voting");
+}
+
+Now the message only appears when the condition is true.
+
+Syntax
+if(condition)
+{
+    // code to execute
+}
+Syntax Breakdown
+if
+
+A Java keyword used for decision making.
+
+condition
+
+A boolean expression that returns:
+
+true
+
+or
+
+false
+Curly Braces
+{
+}
+
+Contain the code to execute when the condition is true.
+
+Flow of Execution
+Condition
+
+   ↓
+
+True ?
+
+ /    \
+
+Yes    No
+
+↓       ↓
+
+Execute  Skip
+Code     Code
+How if Statement Works
+
+Step 1:
+
+Java checks the condition.
+
+Step 2:
+
+If condition is true:
+
+Execute code block
+
+Step 3:
+
+If condition is false:
+
+Skip code block
+
+Step 4:
+
+Continue executing the remaining program.
+
+Real World Examples
+Voting System
+If age >= 18
+    Allow Voting
+ATM
+If PIN Correct
+    Open Account Menu
+Login System
+If Password Correct
+    Login Successful
+Online Shopping
+If Product Available
+    Place Order
+Example 1: Voting Eligibility
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 20;
+
+        if(age >= 18)
+        {
+            System.out.println("Eligible for Voting");
+        }
+
+    }
+
+}
+Output
+Eligible for Voting
+Example 2: Student Pass Check
+public class Main {
+
+    public static void main(String[] args) {
+
+        int marks = 75;
+
+        if(marks >= 35)
+        {
+            System.out.println("Pass");
+        }
+
+    }
+
+}
+Output
+Pass
+Example 3: Salary Check
+public class Main {
+
+    public static void main(String[] args) {
+
+        int salary = 50000;
+
+        if(salary > 30000)
+        {
+            System.out.println("High Salary");
+        }
+
+    }
+
+}
+Output
+High Salary
+Example 4: Condition is False
+public class Main {
+
+    public static void main(String[] args) {
+
+        int age = 15;
+
+        if(age >= 18)
+        {
+            System.out.println("Eligible");
+        }
+
+        System.out.println("Program Ended");
+
+    }
+
+}
+Output
+Program Ended
+
+Explanation:
+
+The condition is false.
+
+Therefore:
+
+System.out.println("Eligible");
+
+is skipped.
+
+Using User Input with if
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int age = sc.nextInt();
+
+        if(age >= 18)
+        {
+            System.out.println("Eligible for Voting");
+        }
+
+    }
+
+}
+Input
+20
+Output
+Eligible for Voting
+Nested Statements Inside if
+
+Multiple statements can be executed.
+
+if(age >= 18)
+{
+    System.out.println("Eligible");
+    System.out.println("You Can Vote");
+    System.out.println("Welcome");
+}
+Common Mistakes
+Mistake 1
+
+Using = Instead of ==
+
+Wrong:
+
+if(age = 18)
+
+Correct:
+
+if(age == 18)
+Mistake 2
+
+Semicolon After if
+
+Wrong:
+
+if(age >= 18);
+{
+    System.out.println("Eligible");
+}
+
+The semicolon ends the if statement.
+
+Mistake 3
+
+Missing Curly Braces
+
+Although Java allows:
+
+if(age >= 18)
+    System.out.println("Eligible");
+
+Always prefer braces.
+
+Good Practice:
+
+if(age >= 18)
+{
+    System.out.println("Eligible");
+}
+Mistake 4
+
+Expecting Code to Run When Condition is False
+
+if(age >= 18)
+{
+    System.out.println("Eligible");
+}
+
+If age is 10, nothing inside runs.
+
+Best Practices
+Use Meaningful Conditions
+
+Good:
+
+if(age >= 18)
+
+Bad:
+
+if(a >= b)
+Always Use Curly Braces
+
+Good:
+
+if(condition)
+{
+    statement;
+}
+Keep Conditions Simple
+
+Good:
+
+if(marks >= 35)
+Key Points
+if statement executes code only when condition is true.
+Condition must return true or false.
+If condition is false, code block is skipped.
+Curly braces improve readability.
+if statement is the foundation of decision making in Java.
+Topic 2 Mastery Challenge
+Problem Statement
+
+Create a Java program that stores:
+
+Marks = 80
+
+If marks are greater than or equal to:
+
+35
+
+display:
+
+Pass
+Input Format
+
+No input required.
+
+Output Format
+Pass
+Sample Output
+Pass
+Hint 1
+
+Create a variable named marks.
+
+Hint 2
+
+Use an if statement.
+
+Hint 3
+
+Check:
+
+marks >= 35
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int marks = 80;
+
+        // Write your if statement here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int marks = 80;
+
+        if(marks >= 35)
+        {
+            System.out.println("Pass");
+        }
+
+    }
+
+}
+Code Explanation
+
+The program creates a variable:
+
+int marks = 80;
+
+The condition:
+
+marks >= 35
+
+returns:
+
+true
+
+because 80 is greater than 35.
+
+Therefore the code inside the if block executes and prints:
+
+Pass
+Output
+Pass
+
+Phase 3 - Quiz 1
+Topics Covered
+
+✅ Topic 1: Introduction to Loops
+✅ Topic 2: while Loop
+✅ Topic 3: do-while Loop
+✅ Topic 4: for Loop
+
+Question 1
+
+What is the primary purpose of a loop?
+
+A. To take input
+
+B. To store data
+
+C. To repeat a block of code
+
+D. To create classes
+
+✅ Correct Answer: C
+
+Explanation
+
+Loops are used to execute a block of code repeatedly until a condition becomes false.
+
+Question 2
+
+Which of the following are the three common components of a loop?
+
+A. Scanner, Variable, Method
+
+B. Initialization, Condition, Update
+
+C. Class, Object, Method
+
+D. Input, Output, Process
+
+✅ Correct Answer: B
+
+Explanation
+
+Every loop generally contains:
+
+Initialization
+Condition
+Update
+Question 3
+
+Which loop checks the condition before execution?
+
+A. do-while
+
+B. switch
+
+C. if
+
+D. while
+
+✅ Correct Answer: D
+
+Explanation
+
+The while loop checks its condition before executing the loop body.
+
+Question 4
+
+Which loop guarantees at least one execution?
+
+A. while
+
+B. for
+
+C. do-while
+
+D. if
+
+✅ Correct Answer: C
+
+Explanation
+
+The do-while loop executes first and checks the condition afterward.
+
+Question 5
+
+Which loop is most suitable when the number of iterations is known?
+
+A. while
+
+B. do-while
+
+C. for
+
+D. switch
+
+✅ Correct Answer: C
+
+Explanation
+
+The for loop is designed for situations where the number of repetitions is known beforehand.
+
+Question 6
+
+Which loop is called an exit-controlled loop?
+
+A. while
+
+B. do-while
+
+C. for
+
+D. switch
+
+✅ Correct Answer: B
+
+Explanation
+
+The condition in a do-while loop is checked after execution.
+
+Question 7 (Output Prediction)
+
+What will be the output?
+
+int i = 1;
+
+while(i <= 3)
+{
+    System.out.println(i);
+    i++;
+}
+
+A.
+
+1
+2
+3
+
+B.
+
+1
+2
+3
+4
+
+C.
+
+0
+1
+2
+3
+
+D. Infinite Loop
+
+✅ Correct Answer: A
+
+Explanation
+
+The loop runs while:
+
+i <= 3
+
+and prints:
+
+1
+2
+3
+Question 8 (Output Prediction)
+
+What will be the output?
+
+int i = 10;
+
+do
+{
+    System.out.println(i);
+}
+while(i <= 5);
+
+A. No Output
+
+B.
+
+10
+
+C.
+
+5
+
+D. Infinite Loop
+
+✅ Correct Answer: B
+
+Explanation
+
+A do-while loop executes once before checking the condition.
+
+Question 9 (Error Finding)
+
+Find the error:
+
+int i = 1;
+
+while(i <= 5)
+{
+    System.out.println(i);
+}
+
+A. Missing Scanner
+
+B. Missing condition
+
+C. Missing update
+
+D. Missing semicolon
+
+✅ Correct Answer: C
+
+Explanation
+
+Without:
+
+i++;
+
+the value of i never changes, causing an infinite loop.
+
+Question 10 (Scenario Based)
+
+A school system needs to print roll numbers from:
+
+1 to 100
+
+Which loop is most suitable?
+
+A. if
+
+B. switch
+
+C. for
+
+D. Scanner
+
+✅ Correct Answer: C
+
+Explanation
+
+The number of iterations is known (100), making a for loop the best choice.
+
+
+Topic 5: Nested Loops
+Topic Introduction
+
+Until now, we have used a single loop.
+
+Example:
+
+for(int i = 1; i <= 5; i++)
+{
+    System.out.println(i);
+}
+
+Output:
+
+1
+2
+3
+4
+5
+
+But what if we want:
+
+1 2 3
+1 2 3
+1 2 3
+
+or
+
+*
+**
+***
+****
+
+A single loop is not enough.
+
+To solve such problems, Java provides Nested Loops.
+
+Nested loops are one of the most important concepts for:
+
+Pattern Printing
+Matrix Processing
+Tables
+Game Development
+Data Analysis
+Definition
+
+A Nested Loop is a loop placed inside another loop.
+
+The outer loop controls how many times the inner loop runs.
+
+Why We Need Nested Loops
+
+Suppose a classroom has:
+
+3 Rows
+4 Students Per Row
+
+To display every student position:
+
+Row 1 → Student 1,2,3,4
+Row 2 → Student 1,2,3,4
+Row 3 → Student 1,2,3,4
+
+We need:
+
+One loop for rows
+One loop for students
+
+This is exactly what nested loops provide.
+
+Syntax
+for(initialization1; condition1; update1)
+{
+    for(initialization2; condition2; update2)
+    {
+        // code
+    }
+}
+Structure
+Outer Loop
+
+    ↓
+
+Runs Once
+
+    ↓
+
+Inner Loop Executes Completely
+
+    ↓
+
+Outer Loop Runs Again
+
+    ↓
+
+Inner Loop Executes Completely
+Flow of Execution
+
+Example:
+
+for(int i = 1; i <= 2; i++)
+{
+    for(int j = 1; j <= 3; j++)
+    {
+        System.out.println(i + " " + j);
+    }
+}
+Outer Loop Iteration 1
+i = 1
+
+Inner loop executes completely:
+
+1 1
+1 2
+1 3
+Outer Loop Iteration 2
+i = 2
+
+Inner loop executes completely:
+
+2 1
+2 2
+2 3
+Final Output
+1 1
+1 2
+1 3
+2 1
+2 2
+2 3
+Example 1: Simple Nested Loop
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 3; i++)
+        {
+            for(int j = 1; j <= 3; j++)
+            {
+                System.out.print(j + " ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Output
+1 2 3
+1 2 3
+1 2 3
+Example 2: Star Square Pattern
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int row = 1; row <= 4; row++)
+        {
+            for(int col = 1; col <= 4; col++)
+            {
+                System.out.print("* ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Output
+* * * *
+* * * *
+* * * *
+* * * *
+Example 3: Right Triangle Pattern
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int row = 1; row <= 4; row++)
+        {
+            for(int col = 1; col <= row; col++)
+            {
+                System.out.print("* ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Output
+*
+* *
+* * *
+* * * *
+Example 4: Multiplication Table Grid
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 3; i++)
+        {
+            for(int j = 1; j <= 3; j++)
+            {
+                System.out.print((i * j) + " ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Output
+1 2 3
+2 4 6
+3 6 9
+Understanding Outer and Inner Loops
+
+Example:
+
+for(int i = 1; i <= 2; i++)
+{
+    for(int j = 1; j <= 3; j++)
+    {
+        System.out.print("*");
+    }
+
+    System.out.println();
+}
+
+Outer Loop:
+
+2 times
+
+Inner Loop:
+
+3 times
+
+Total executions:
+
+2 × 3 = 6
+
+Output:
+
+***
+***
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int rows = sc.nextInt();
+
+        for(int i = 1; i <= rows; i++)
+        {
+            for(int j = 1; j <= i; j++)
+            {
+                System.out.print("* ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Input
+3
+Output
+*
+* *
+* * *
+Real World Usage
+Classroom Seating
+Rows
+Columns
+Chess Board
+8 Rows
+8 Columns
+Matrix Processing
+Rows
+Columns
+Game Maps
+X Coordinates
+Y Coordinates
+Excel Sheets
+Rows
+Columns
+Common Mistakes
+Mistake 1
+
+Using Same Variable Name
+
+Wrong:
+
+for(int i = 1; i <= 3; i++)
+{
+    for(int i = 1; i <= 3; i++)
+    {
+    }
+}
+
+Compilation error.
+
+Mistake 2
+
+Forgetting println()
+
+Wrong:
+
+System.out.print("*");
+
+Only one line output.
+
+Mistake 3
+
+Wrong Inner Condition
+
+Wrong:
+
+for(int j = 1; j <= 100; j++)
+
+when expecting:
+
+j <= row
+Mistake 4
+
+Confusing Outer and Inner Loop Roles
+
+Remember:
+
+Outer Loop → Rows
+Inner Loop → Columns
+Best Practices
+Use Meaningful Names
+
+Good:
+
+row
+col
+
+Instead of:
+
+i
+j
+
+for patterns.
+
+Format Output Carefully
+
+Use:
+
+System.out.print()
+
+inside.
+
+Use:
+
+System.out.println()
+
+after inner loop.
+
+Understand Execution Count
+
+Formula:
+
+Outer Loop × Inner Loop
+Key Points
+Nested Loop = Loop inside another loop.
+Outer loop controls repetitions.
+Inner loop executes completely every outer iteration.
+Used heavily in patterns, matrices, tables, and games.
+Total executions = Outer Loop × Inner Loop.
+Topic 5 Mastery Challenge
+Problem Statement
+
+Write a Java program that prints the following pattern using nested loops:
+
+*
+* *
+* * *
+* * * *
+* * * * *
+Input Format
+
+No input required.
+
+Output Format
+*
+* *
+* * *
+* * * *
+* * * * *
+Sample Output
+*
+* *
+* * *
+* * * *
+* * * * *
+Hint 1
+
+Use an outer loop for rows.
+
+Hint 2
+
+Use an inner loop for columns.
+
+Hint 3
+
+Inner loop should run up to the current row number.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Write nested loops here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int row = 1; row <= 5; row++)
+        {
+            for(int col = 1; col <= row; col++)
+            {
+                System.out.print("* ");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+}
+Code Explanation
+
+The outer loop controls:
+
+Rows
+
+from:
+
+1 to 5
+
+The inner loop controls:
+
+Columns
+
+and runs up to the current row number.
+
+Therefore:
+
+Row 1 → 1 star
+Row 2 → 2 stars
+Row 3 → 3 stars
+Row 4 → 4 stars
+Row 5 → 5 stars
+Output
+*
+* *
+* * *
+* * * *
+* * * * *
+
+Topic 6: break Statement
+Topic Introduction
+
+Until now, our loops have continued running until their condition became false.
+
+Example:
+
+for(int i = 1; i <= 5; i++)
+{
+    System.out.println(i);
+}
+
+Output:
+
+1
+2
+3
+4
+5
+
+The loop stops only when:
+
+i <= 5
+
+becomes false.
+
+But sometimes we want to stop a loop immediately when a specific condition occurs.
+
+Examples:
+
+Stop searching when an item is found.
+Stop login attempts after success.
+Stop processing when an error occurs.
+Exit a menu when the user chooses Exit.
+
+For such situations, Java provides the break statement.
+
+Definition
+
+The break statement is used to immediately terminate a loop or switch statement.
+
+When Java encounters a break statement, control exits the loop and moves to the next statement after the loop.
+
+Why We Need break
+
+Suppose we are searching for number:
+
+5
+
+inside:
+
+1 2 3 4 5 6 7 8 9 10
+
+Once we find:
+
+5
+
+there is no need to continue searching.
+
+Using break:
+
+if(i == 5)
+{
+    break;
+}
+
+The loop stops immediately.
+
+Syntax
+break;
+Flow of Execution
+Loop Starts
+
+     ↓
+
+Execute
+
+     ↓
+
+break Reached?
+
+   /      \
+
+ Yes      No
+
+ ↓          ↓
+
+Exit      Continue
+Loop      Loop
+Example 1: break in for Loop
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == 5)
+            {
+                break;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Output
+1
+2
+3
+4
+Explanation
+
+When:
+
+i == 5
+
+becomes true,
+
+Java executes:
+
+break;
+
+and exits the loop immediately.
+
+Example 2: break in while Loop
+public class Main {
+
+    public static void main(String[] args) {
+
+        int i = 1;
+
+        while(i <= 10)
+        {
+            if(i == 6)
+            {
+                break;
+            }
+
+            System.out.println(i);
+
+            i++;
+        }
+
+    }
+
+}
+Output
+1
+2
+3
+4
+5
+Example 3: Search Operation
+public class Main {
+
+    public static void main(String[] args) {
+
+        int target = 7;
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == target)
+            {
+                System.out.println("Found");
+
+                break;
+            }
+        }
+
+    }
+
+}
+Output
+Found
+Example 4: break in switch
+public class Main {
+
+    public static void main(String[] args) {
+
+        int choice = 2;
+
+        switch(choice)
+        {
+            case 1:
+                System.out.println("Add");
+                break;
+
+            case 2:
+                System.out.println("Subtract");
+                break;
+
+            case 3:
+                System.out.println("Multiply");
+                break;
+        }
+
+    }
+
+}
+Output
+Subtract
+How break Works Internally
+
+Example:
+
+for(int i = 1; i <= 10; i++)
+{
+    if(i == 4)
+    {
+        break;
+    }
+
+    System.out.println(i);
+}
+
+Execution:
+
+i = 1 → Print
+i = 2 → Print
+i = 3 → Print
+i = 4 → break
+
+Loop exits.
+
+Output:
+
+1
+2
+3
+break in Nested Loops
+
+Example:
+
+for(int i = 1; i <= 3; i++)
+{
+    for(int j = 1; j <= 3; j++)
+    {
+        if(j == 2)
+        {
+            break;
+        }
+
+        System.out.print(j + " ");
+    }
+
+    System.out.println();
+}
+
+Output:
+
+1
+1
+1
+Why?
+
+The break only terminates the:
+
+Inner Loop
+
+not the outer loop.
+
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        while(true)
+        {
+            int number = sc.nextInt();
+
+            if(number == 0)
+            {
+                break;
+            }
+
+            System.out.println(number);
+        }
+
+    }
+
+}
+Input
+5
+8
+3
+0
+Output
+5
+8
+3
+Real World Usage
+Search Systems
+Stop when item found
+Login Systems
+Stop after successful login
+ATM Menu
+Exit when user chooses Exit
+Game Over
+Stop game loop when player loses
+Data Processing
+Stop when invalid data appears
+Common Mistakes
+Mistake 1
+
+Thinking break Stops Entire Program
+
+Wrong assumption:
+
+break stops program
+
+Correct:
+
+break stops only the current loop or switch
+Mistake 2
+
+Using break Outside Loop
+
+Wrong:
+
+break;
+
+outside loop/switch.
+
+Compilation Error.
+
+Mistake 3
+
+Confusing break and continue
+
+break
+
+means:
+
+Stop Loop
+continue
+
+means:
+
+Skip Current Iteration
+Mistake 4
+
+Expecting break to Exit All Nested Loops
+
+Default behavior:
+
+Only exits nearest loop
+Best Practices
+Use break When Work Is Complete
+
+Example:
+
+if(found)
+{
+    break;
+}
+Avoid Excessive break Usage
+
+Too many break statements can make code harder to understand.
+
+Use Meaningful Conditions
+
+Good:
+
+if(itemFound)
+{
+    break;
+}
+Key Points
+break immediately exits a loop or switch.
+Used for early termination.
+Saves unnecessary processing.
+Commonly used in search, login, and menu systems.
+In nested loops, break exits only the nearest loop.
+Topic 6 Mastery Challenge
+Problem Statement
+
+Write a Java program that prints numbers from:
+
+1 to 10
+
+but stops when:
+
+5
+
+is reached.
+
+Output should be:
+
+1
+2
+3
+4
+Input Format
+
+No input required.
+
+Output Format
+1
+2
+3
+4
+Sample Output
+1
+2
+3
+4
+Hint 1
+
+Use a for loop.
+
+Hint 2
+
+Check:
+
+i == 5
+Hint 3
+
+Use break before printing 5.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Write loop here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == 5)
+            {
+                break;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Code Explanation
+
+The loop starts from:
+
+i = 1
+
+When:
+
+i == 5
+
+becomes true,
+
+Java executes:
+
+break;
+
+and exits the loop immediately.
+
+Therefore only:
+
+1
+2
+3
+4
+
+are printed.
+
+Output
+1
+2
+3
+4
+
+Topic 7: continue Statement
+Topic Introduction
+
+In the previous topic, we learned the break statement.
+
+The break statement completely stops a loop.
+
+Example:
+
+for(int i = 1; i <= 10; i++)
+{
+    if(i == 5)
+    {
+        break;
+    }
+
+    System.out.println(i);
+}
+
+Output:
+
+1
+2
+3
+4
+
+The loop ends when 5 is reached.
+
+But sometimes we don't want to stop the loop.
+
+Instead, we only want to skip a specific iteration and continue with the remaining iterations.
+
+Example:
+
+Print numbers:
+
+1 2 3 4 6 7 8 9 10
+
+Skip:
+
+5
+
+This is where the continue statement is useful.
+
+Definition
+
+The continue statement is used to skip the current iteration of a loop and immediately move to the next iteration.
+
+Unlike break, it does not terminate the loop.
+
+Why We Need continue
+
+Suppose we want to print numbers:
+
+1 to 10
+
+except:
+
+5
+
+Without continue:
+
+We would need complicated conditions.
+
+With continue:
+
+if(i == 5)
+{
+    continue;
+}
+
+The loop simply skips that iteration.
+
+Syntax
+continue;
+Flow of Execution
+Loop Starts
+
+      ↓
+
+Condition
+
+      ↓
+
+continue Reached?
+
+   /        \
+
+ Yes        No
+
+ ↓            ↓
+
+Skip      Execute
+Iteration  Remaining Code
+
+ ↓
+
+Next Iteration
+Difference Between break and continue
+Feature	break	continue
+Stops Loop	Yes	No
+Skips Iteration	No	Yes
+Continues Loop	No	Yes
+Common Usage	Exit Early	Skip Specific Values
+Example 1: Skip Number 5
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == 5)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Output
+1
+2
+3
+4
+6
+7
+8
+9
+10
+Explanation
+
+When:
+
+i == 5
+
+Java executes:
+
+continue;
+
+and skips:
+
+System.out.println(i);
+
+for that iteration only.
+
+Example 2: Print Odd Numbers
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i % 2 == 0)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Output
+1
+3
+5
+7
+9
+Explanation
+
+Even numbers satisfy:
+
+i % 2 == 0
+
+and are skipped.
+
+Only odd numbers are printed.
+
+Example 3: Skip Multiples of 3
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 15; i++)
+        {
+            if(i % 3 == 0)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Output
+1
+2
+4
+5
+7
+8
+10
+11
+13
+14
+Example 4: continue in while Loop
+public class Main {
+
+    public static void main(String[] args) {
+
+        int i = 0;
+
+        while(i < 10)
+        {
+            i++;
+
+            if(i == 5)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Output
+1
+2
+3
+4
+6
+7
+8
+9
+10
+Important Note for while Loop
+
+Wrong:
+
+int i = 1;
+
+while(i <= 10)
+{
+    if(i == 5)
+    {
+        continue;
+    }
+
+    i++;
+}
+
+Problem:
+
+Infinite Loop
+
+Because:
+
+i++
+
+never executes when:
+
+i == 5
+Correct Version
+int i = 1;
+
+while(i <= 10)
+{
+    i++;
+
+    if(i == 5)
+    {
+        continue;
+    }
+}
+
+Always update before continue when necessary.
+
+continue in Nested Loops
+
+Example:
+
+for(int i = 1; i <= 3; i++)
+{
+    for(int j = 1; j <= 3; j++)
+    {
+        if(j == 2)
+        {
+            continue;
+        }
+
+        System.out.print(j + " ");
+    }
+
+    System.out.println();
+}
+
+Output:
+
+1 3
+1 3
+1 3
+Why?
+
+When:
+
+j == 2
+
+the inner loop skips only that iteration.
+
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        for(int i = 1; i <= n; i++)
+        {
+            if(i % 2 == 0)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Input
+10
+Output
+1
+3
+5
+7
+9
+Real World Usage
+Attendance System
+Skip absent students
+Process present students
+E-Commerce
+Skip out-of-stock products
+Display available products
+Exam Evaluation
+Skip invalid answers
+Evaluate remaining answers
+Data Processing
+Ignore corrupted records
+Process valid records
+Common Mistakes
+Mistake 1
+
+Confusing break and continue
+
+break
+
+means:
+
+Stop Loop
+continue
+
+means:
+
+Skip Current Iteration
+Mistake 2
+
+Using continue Before Update in while Loop
+
+Can cause:
+
+Infinite Loop
+Mistake 3
+
+Expecting continue to Stop Loop
+
+Wrong assumption:
+
+continue ends loop
+
+Correct:
+
+continue skips only one iteration
+Mistake 4
+
+Using continue Outside Loop
+
+Wrong:
+
+continue;
+
+outside a loop.
+
+Compilation Error.
+
+Best Practices
+Use continue for Filtering
+
+Good:
+
+if(productOutOfStock)
+{
+    continue;
+}
+Keep Conditions Clear
+
+Good:
+
+if(i % 2 == 0)
+{
+    continue;
+}
+Avoid Overusing continue
+
+Too many continue statements can reduce readability.
+
+Key Points
+continue skips the current iteration.
+Loop execution continues normally afterward.
+Does not terminate the loop.
+Commonly used for filtering unwanted values.
+Very useful in data processing and validation.
+Topic 7 Mastery Challenge
+Problem Statement
+
+Write a Java program that prints numbers from:
+
+1 to 10
+
+but skips:
+
+5
+
+using the continue statement.
+
+Input Format
+
+No input required.
+
+Output Format
+1
+2
+3
+4
+6
+7
+8
+9
+10
+Sample Output
+1
+2
+3
+4
+6
+7
+8
+9
+10
+Hint 1
+
+Use a for loop.
+
+Hint 2
+
+Check:
+
+i == 5
+Hint 3
+
+Use continue before printing.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Write loop here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if(i == 5)
+            {
+                continue;
+            }
+
+            System.out.println(i);
+        }
+
+    }
+
+}
+Code Explanation
+
+The loop prints numbers from:
+
+1 to 10
+
+When:
+
+i == 5
+
+Java executes:
+
+continue;
+
+which skips the print statement for that iteration.
+
+Therefore:
+
+5
+
+is not printed.
+
+Output
+1
+2
+3
+4
+6
+7
+8
+9
+10
+
+Topic 8: Enhanced for Loop (for-each Loop)
+Topic Introduction
+
+In previous topics, we learned:
+
+while Loop
+do-while Loop
+for Loop
+Nested Loops
+break
+continue
+
+The traditional for loop works well.
+
+Example:
+
+int[] marks = {85, 90, 78, 95};
+
+for(int i = 0; i < marks.length; i++)
+{
+    System.out.println(marks[i]);
+}
+
+Output:
+
+85
+90
+78
+95
+
+This works perfectly.
+
+However, when we only want to read values from an array, writing:
+
+i < marks.length
+
+and
+
+marks[i]
+
+again and again becomes repetitive.
+
+Java provides a simpler alternative:
+
+Enhanced for Loop (for-each Loop)
+Definition
+
+An Enhanced for Loop (also called a for-each Loop) is a simplified loop used to traverse arrays and collections without using an index variable.
+
+It automatically accesses each element one by one.
+
+Why We Need Enhanced for Loop
+
+Traditional for loop:
+
+for(int i = 0; i < marks.length; i++)
+{
+    System.out.println(marks[i]);
+}
+
+Enhanced for loop:
+
+for(int mark : marks)
+{
+    System.out.println(mark);
+}
+
+Shorter.
+
+Cleaner.
+
+Less chance of mistakes.
+
+Syntax
+for(dataType variable : collection)
+{
+    // code
+}
+Syntax Breakdown
+
+Example:
+
+for(int number : numbers)
+{
+    System.out.println(number);
+}
+dataType
+
+Type of elements.
+
+Example:
+
+int
+String
+double
+char
+variable
+
+Temporary variable storing current element.
+
+Example:
+
+number
+name
+salary
+collection
+
+Array or collection being traversed.
+
+Example:
+
+numbers
+names
+marks
+Flow of Execution
+
+Suppose:
+
+int[] numbers = {10, 20, 30};
+
+Loop:
+
+for(int num : numbers)
+{
+    System.out.println(num);
+}
+
+Execution:
+
+num = 10
+
+num = 20
+
+num = 30
+
+Loop ends.
+
+Example 1: Print Array Elements
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers = {10, 20, 30, 40};
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+        }
+
+    }
+
+}
+Output
+10
+20
+30
+40
+Example 2: Student Marks
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks = {85, 90, 78, 95};
+
+        for(int mark : marks)
+        {
+            System.out.println(mark);
+        }
+
+    }
+
+}
+Output
+85
+90
+78
+95
+Example 3: String Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        for(String name : names)
+        {
+            System.out.println(name);
+        }
+
+    }
+
+}
+Output
+Balu
+Rahul
+Anjali
+Example 4: Calculate Sum
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers = {10, 20, 30, 40};
+
+        int sum = 0;
+
+        for(int num : numbers)
+        {
+            sum += num;
+        }
+
+        System.out.println(sum);
+
+    }
+
+}
+Output
+100
+Comparison: for vs Enhanced for
+Traditional for Loop
+for(int i = 0; i < numbers.length; i++)
+{
+    System.out.println(numbers[i]);
+}
+Enhanced for Loop
+for(int num : numbers)
+{
+    System.out.println(num);
+}
+Advantages of Enhanced for Loop
+Less Code
+for(int num : numbers)
+
+instead of:
+
+for(int i = 0; i < numbers.length; i++)
+Better Readability
+
+Easy to understand.
+
+Fewer Errors
+
+No risk of:
+
+ArrayIndexOutOfBoundsException
+
+caused by wrong indexes.
+
+Limitations of Enhanced for Loop
+Cannot Access Index
+
+Wrong:
+
+for(int num : numbers)
+{
+    System.out.println(index);
+}
+
+No index available.
+
+Cannot Easily Modify Elements
+
+Example:
+
+for(int num : numbers)
+{
+    num = num * 2;
+}
+
+Original array remains unchanged.
+
+Only Sequential Traversal
+
+Cannot:
+
+Jump
+Skip Indexes
+Move Backward
+
+easily.
+
+User Input Example
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int[] arr = new int[3];
+
+        for(int i = 0; i < arr.length; i++)
+        {
+            arr[i] = sc.nextInt();
+        }
+
+        for(int value : arr)
+        {
+            System.out.println(value);
+        }
+
+    }
+
+}
+Input
+10
+20
+30
+Output
+10
+20
+30
+Real World Usage
+Student Marks
+Read all marks
+Product Prices
+Read all prices
+Employee Names
+Read all names
+Sensor Readings
+Process all readings
+Game Scores
+Display all scores
+Common Mistakes
+Mistake 1
+
+Wrong Data Type
+
+Wrong:
+
+String[] names =
+{
+    "A",
+    "B"
+};
+
+for(int name : names)
+{
+}
+
+Type mismatch.
+
+Mistake 2
+
+Expecting Index
+
+Wrong:
+
+for(int num : numbers)
+{
+    System.out.println(i);
+}
+
+No index variable exists.
+
+Mistake 3
+
+Trying to Modify Array Elements
+
+Wrong assumption:
+
+for(int num : numbers)
+{
+    num = 100;
+}
+
+Array remains unchanged.
+
+Mistake 4
+
+Using Enhanced for on Non-Iterable Data
+
+Wrong:
+
+for(int x : 100)
+{
+}
+
+Compilation error.
+
+Best Practices
+Use for-each When Only Reading Data
+
+Good:
+
+for(int mark : marks)
+{
+    System.out.println(mark);
+}
+Use Meaningful Variable Names
+
+Good:
+
+mark
+student
+salary
+Use Traditional for Loop When Index Is Needed
+
+Example:
+
+for(int i = 0; i < arr.length; i++)
+Key Points
+Enhanced for Loop is also called for-each Loop.
+Used for arrays and collections.
+Automatically accesses elements one by one.
+Easier to read than traditional for loops.
+Cannot directly access indexes.
+Best for reading data.
+Topic 8 Mastery Challenge
+Problem Statement
+
+Create an array:
+
+{5, 10, 15, 20, 25}
+
+Using an Enhanced for Loop:
+
+Display every element.
+Calculate and display the total sum.
+Input Format
+
+No input required.
+
+Output Format
+5
+10
+15
+20
+25
+Sum = 75
+Sample Output
+5
+10
+15
+20
+25
+Sum = 75
+Hint 1
+
+Create an integer array.
+
+Hint 2
+
+Use:
+
+for(int num : numbers)
+Hint 3
+
+Maintain a sum variable.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            5, 10, 15, 20, 25
+        };
+
+        // Write enhanced for loop here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            5, 10, 15, 20, 25
+        };
+
+        int sum = 0;
+
+        for(int num : numbers)
+        {
+            System.out.println(num);
+            sum += num;
+        }
+
+        System.out.println("Sum = " + sum);
+
+    }
+
+}
+Code Explanation
+
+The enhanced for loop automatically accesses:
+
+5
+10
+15
+20
+25
+
+one by one.
+
+For every element:
+
+sum += num;
+
+adds it to the total.
+
+Final sum:
+
+75
+Output
+5
+10
+15
+20
+25
+Sum = 75
+
+Phase 3 - Quiz 2
+Topics Covered
+
+✅ Topic 5: Nested Loops
+✅ Topic 6: break Statement
+✅ Topic 7: continue Statement
+✅ Topic 8: Enhanced for Loop
+
+Question 1
+
+What is a Nested Loop?
+
+A. A loop that never stops
+
+B. A loop inside another loop
+
+C. A loop with break
+
+D. A loop with continue
+
+✅ Correct Answer: B
+
+Explanation
+
+A Nested Loop is a loop placed inside another loop.
+
+Question 2
+
+If an outer loop runs 4 times and an inner loop runs 3 times, how many total executions occur?
+
+A. 7
+
+B. 12
+
+C. 4
+
+D. 3
+
+✅ Correct Answer: B
+
+Explanation
+
+Formula:
+
+Outer Loop × Inner Loop
+4 × 3 = 12
+Question 3
+
+What does the break statement do?
+
+A. Skips current iteration
+
+B. Restarts loop
+
+C. Exits current loop or switch
+
+D. Creates infinite loop
+
+✅ Correct Answer: C
+
+Explanation
+
+break immediately terminates the current loop or switch statement.
+
+Question 4
+
+What does continue do?
+
+A. Ends program
+
+B. Ends loop
+
+C. Skips current iteration and continues
+
+D. Restarts program
+
+✅ Correct Answer: C
+
+Explanation
+
+continue skips only the current iteration.
+
+Question 5
+
+Which loop is also called a for-each loop?
+
+A. while
+
+B. do-while
+
+C. Enhanced for Loop
+
+D. Nested Loop
+
+✅ Correct Answer: C
+
+Explanation
+
+Enhanced for Loop is commonly called the for-each Loop.
+
+Question 6
+
+Which of the following is an advantage of Enhanced for Loop?
+
+A. Direct index access
+
+B. Less code and better readability
+
+C. Reverse traversal
+
+D. Random access
+
+✅ Correct Answer: B
+
+Explanation
+
+Enhanced for Loop reduces code and improves readability.
+
+Question 7 (Output Prediction)
+
+What will be the output?
+
+for(int i = 1; i <= 5; i++)
+{
+    if(i == 3)
+    {
+        break;
+    }
+
+    System.out.println(i);
+}
+
+A.
+
+1
+2
+
+B.
+
+1
+2
+3
+
+C.
+
+1
+2
+3
+4
+5
+
+D. No Output
+
+✅ Correct Answer: A
+
+Explanation
+
+When:
+
+i == 3
+
+break executes before printing.
+
+Question 8 (Output Prediction)
+
+What will be the output?
+
+for(int i = 1; i <= 5; i++)
+{
+    if(i == 3)
+    {
+        continue;
+    }
+
+    System.out.println(i);
+}
+
+A.
+
+1
+2
+3
+4
+5
+
+B.
+
+1
+2
+4
+5
+
+C.
+
+3
+
+D. No Output
+
+✅ Correct Answer: B
+
+Explanation
+
+The value:
+
+3
+
+is skipped.
+
+Question 9 (Error Finding)
+
+Find the error:
+
+String[] names =
+{
+    "A",
+    "B"
+};
+
+for(int name : names)
+{
+    System.out.println(name);
+}
+
+A. Missing loop
+
+B. Missing braces
+
+C. Wrong data type
+
+D. Missing semicolon
+
+✅ Correct Answer: C
+
+Explanation
+
+Array elements are:
+
+String
+
+So loop variable must also be:
+
+String
+
+Correct:
+
+for(String name : names)
+Question 10 (Scenario Based)
+
+A game map contains:
+
+Rows
+Columns
+
+Which concept is most suitable?
+
+A. switch
+
+B. if
+
+C. Nested Loops
+
+D. Scanner
+
+✅ Correct Answer: C
+
+Explanation
+
+Rows and columns naturally require Nested Loops.
+
+Phase 3 Final Quiz: Loops & Iteration
+Topics Covered
+
+✅ Introduction to Loops
+✅ while Loop
+✅ do-while Loop
+✅ for Loop
+✅ Nested Loops
+✅ break Statement
+✅ continue Statement
+✅ Enhanced for Loop
+
+Question 1
+
+What is the main purpose of loops?
+
+A. Create classes
+
+B. Store values
+
+C. Repeat code
+
+D. Take input
+
+✅ Correct Answer: C
+
+Question 2
+
+Which are the three common components of a loop?
+
+A. Class, Object, Method
+
+B. Initialization, Condition, Update
+
+C. Input, Output, Process
+
+D. Array, Loop, Method
+
+✅ Correct Answer: B
+
+Question 3
+
+Which loop checks the condition before execution?
+
+A. do-while
+
+B. while
+
+C. switch
+
+D. if
+
+✅ Correct Answer: B
+
+Question 4
+
+Which loop guarantees at least one execution?
+
+A. while
+
+B. for
+
+C. do-while
+
+D. switch
+
+✅ Correct Answer: C
+
+Question 5
+
+Which loop is best when the number of iterations is known?
+
+A. while
+
+B. do-while
+
+C. for
+
+D. switch
+
+✅ Correct Answer: C
+
+Question 6
+
+What is a Nested Loop?
+
+A. Loop outside program
+
+B. Infinite loop
+
+C. Loop inside another loop
+
+D. Loop with break
+
+✅ Correct Answer: C
+
+Question 7
+
+What does break do?
+
+A. Skip current iteration
+
+B. Exit current loop or switch
+
+C. Restart loop
+
+D. End program
+
+✅ Correct Answer: B
+
+Question 8
+
+What does continue do?
+
+A. End loop
+
+B. End program
+
+C. Skip current iteration
+
+D. Restart program
+
+✅ Correct Answer: C
+
+Question 9
+
+Enhanced for Loop is also called:
+
+A. while loop
+
+B. nested loop
+
+C. for-each loop
+
+D. infinite loop
+
+✅ Correct Answer: C
+
+Question 10
+
+Which loop is an exit-controlled loop?
+
+A. for
+
+B. while
+
+C. do-while
+
+D. nested loop
+
+✅ Correct Answer: C
+
+Question 11 (Output Prediction)
+int i = 1;
+
+while(i <= 3)
+{
+    System.out.println(i);
+    i++;
+}
+
+Output?
+
+A.
+
+1
+2
+3
+
+B.
+
+1
+2
+3
+4
+
+C.
+
+0
+1
+2
+3
+
+D. Infinite Loop
+
+✅ Correct Answer: A
+
+Question 12 (Output Prediction)
+int i = 10;
+
+do
+{
+    System.out.println(i);
+}
+while(i <= 5);
+
+Output?
+
+A. No Output
+
+B.
+
+10
+
+C.
+
+5
+
+D. Infinite Loop
+
+✅ Correct Answer: B
+
+Question 13 (Output Prediction)
+for(int i = 1; i <= 5; i++)
+{
+    if(i == 3)
+    {
+        break;
+    }
+
+    System.out.println(i);
+}
+
+Output?
+
+A.
+
+1
+2
+
+B.
+
+1
+2
+3
+
+C.
+
+1
+2
+3
+4
+5
+
+D. No Output
+
+✅ Correct Answer: A
+
+Question 14 (Output Prediction)
+for(int i = 1; i <= 5; i++)
+{
+    if(i == 3)
+    {
+        continue;
+    }
+
+    System.out.println(i);
+}
+
+Output?
+
+A.
+
+1
+2
+4
+5
+
+B.
+
+1
+2
+3
+4
+5
+
+C.
+
+3
+
+D. No Output
+
+✅ Correct Answer: A
+
+Question 15 (Output Prediction)
+for(int row = 1; row <= 2; row++)
+{
+    for(int col = 1; col <= 2; col++)
+    {
+        System.out.print("* ");
+    }
+
+    System.out.println();
+}
+
+Output?
+
+A.
+
+*
+*
+
+B.
+
+* *
+* *
+
+C.
+
+* * *
+* * *
+
+D.
+
+**
+**
+
+✅ Correct Answer: B
+
+Question 16 (Error Finding)
+int i = 1;
+
+while(i <= 5)
+{
+    System.out.println(i);
+}
+
+What is missing?
+
+A. Scanner
+
+B. Condition
+
+C. Update
+
+D. break
+
+✅ Correct Answer: C
+
+Question 17 (Error Finding)
+String[] names =
+{
+    "A",
+    "B"
+};
+
+for(int name : names)
+{
+}
+
+What is wrong?
+
+A. Missing loop
+
+B. Missing array
+
+C. Wrong data type
+
+D. Missing semicolon
+
+✅ Correct Answer: C
+
+Question 18 (Scenario Based)
+
+A multiplication table from:
+
+1 to 10
+
+is best implemented using:
+
+A. switch
+
+B. for loop
+
+C. if statement
+
+D. Scanner
+
+✅ Correct Answer: B
+
+Question 19 (Scenario Based)
+
+A chess board contains:
+
+8 Rows
+8 Columns
+
+Which concept is most suitable?
+
+A. if
+
+B. switch
+
+C. Nested Loops
+
+D. continue
+
+✅ Correct Answer: C
+
+Question 20 (Scenario Based)
+
+A search operation should stop immediately when an item is found.
+
+Which statement should be used?
+
+A. continue
+
+B. if
+
+C. switch
+
+D. break
+
+✅ Correct Answer: D
+
+Phase 4: Arrays & Array Operations
+Phase Introduction
+
+Until now, we have stored data using variables.
+
+Example:
+
+int mark1 = 85;
+int mark2 = 90;
+int mark3 = 78;
+int mark4 = 95;
+int mark5 = 88;
+
+This works for a small amount of data.
+
+But imagine storing marks for:
+
+100 Students
+
+Would we create:
+
+mark1
+mark2
+mark3
+...
+mark100
+
+No.
+
+This would make programs difficult to manage.
+
+To solve this problem, Java provides Arrays.
+
+Arrays allow us to store multiple values of the same type inside a single variable.
+
+Arrays are one of the most important data structures in programming and are heavily used in:
+
+Student Management Systems
+Banking Applications
+Games
+Social Media Apps
+E-Commerce Platforms
+AI and Machine Learning
+Topic 1: Introduction to Arrays
+Topic Introduction
+
+Imagine a classroom with 5 students.
+
+Their marks are:
+
+85
+90
+78
+95
+88
+
+Without arrays:
+
+int mark1 = 85;
+int mark2 = 90;
+int mark3 = 78;
+int mark4 = 95;
+int mark5 = 88;
+
+This becomes difficult when the number of students increases.
+
+With arrays:
+
+int[] marks = {85, 90, 78, 95, 88};
+
+All values are stored inside one variable.
+
+Much cleaner.
+
+Much easier to manage.
+
+Definition
+
+An Array is a collection of elements of the same data type stored in contiguous memory locations and accessed using indexes.
+
+Why We Need Arrays
+
+Without arrays:
+
+int student1 = 80;
+int student2 = 85;
+int student3 = 90;
+int student4 = 75;
+int student5 = 95;
+
+Problems:
+
+Too many variables
+Difficult maintenance
+Hard to process using loops
+
+With arrays:
+
+int[] students = {80, 85, 90, 75, 95};
+
+Advantages:
+
+Single variable
+Easy processing
+Works perfectly with loops
+Real World Examples
+Student Marks
+85
+90
+78
+95
+88
+
+Stored in:
+
+int[] marks
+Product Prices
+100
+250
+300
+450
+
+Stored in:
+
+double[] prices
+Employee Names
+Rahul
+Anjali
+Balu
+
+Stored in:
+
+String[] names
+Monthly Sales
+Jan
+Feb
+Mar
+...
+
+Stored in arrays.
+
+Characteristics of Arrays
+Same Data Type
+
+Valid:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+Invalid:
+
+int[] numbers =
+{
+    10,
+    "Java",
+    30
+};
+
+Different data types are not allowed.
+
+Fixed Size
+
+Once created:
+
+int[] arr = new int[5];
+
+Size cannot change.
+
+Indexed
+
+Every element has an index.
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+Index	Value
+0	85
+1	90
+2	78
+3	95
+4	88
+Understanding Indexes
+
+Arrays start from:
+
+0
+
+Not:
+
+1
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+Index	Value
+0	10
+1	20
+2	30
+Visual Representation
+numbers
+
+ ┌────┬────┬────┐
+ │10  │20  │30  │
+ └────┴────┴────┘
+
+   0    1    2
+Example 1: Integer Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+    }
+
+}
+
+Stores 5 marks in one variable.
+
+Example 2: String Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+    }
+
+}
+
+Stores multiple names.
+
+Example 3: Double Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        double[] prices =
+        {
+            100.5,
+            250.75,
+            499.99
+        };
+
+    }
+
+}
+
+Stores decimal values.
+
+Example 4: Boolean Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        boolean[] status =
+        {
+            true,
+            false,
+            true
+        };
+
+    }
+
+}
+
+Stores boolean values.
+
+Memory Concept
+
+Example:
+
+int[] marks =
+{
+    85,
+    90,
+    78
+};
+
+Memory:
+
+Index 0 → 85
+
+Index 1 → 90
+
+Index 2 → 78
+
+Java automatically allocates memory for each element.
+
+Advantages of Arrays
+Less Code
+
+Instead of:
+
+mark1
+mark2
+mark3
+mark4
+mark5
+
+Use:
+
+marks[]
+Easy Processing
+
+Loops work easily with arrays.
+
+Example:
+
+for(int mark : marks)
+{
+}
+Better Organization
+
+Related data stays together.
+
+Faster Access
+
+Using indexes:
+
+marks[2]
+
+directly accesses an element.
+
+Common Mistakes
+Mistake 1
+
+Thinking Index Starts From 1
+
+Wrong:
+
+marks[1]
+
+for first element.
+
+Correct:
+
+marks[0]
+Mistake 2
+
+Mixing Data Types
+
+Wrong:
+
+int[] arr =
+{
+    10,
+    "Java"
+};
+Mistake 3
+
+Confusing Array Name and Elements
+
+Wrong:
+
+marks
+
+means entire array.
+
+marks[0]
+
+means one element.
+
+Mistake 4
+
+Ignoring Fixed Size
+
+Arrays cannot automatically grow.
+
+Best Practices
+Use Meaningful Names
+
+Good:
+
+studentMarks
+employeeNames
+productPrices
+Store Related Data Together
+
+Good:
+
+int[] marks
+Remember Index Starts at 0
+
+Always verify indexes carefully.
+
+Key Points
+Arrays store multiple values in one variable.
+All elements must be the same data type.
+Arrays use indexes.
+Indexes start from 0.
+Arrays have fixed size.
+Arrays work extremely well with loops.
+Topic 1 Mastery Challenge
+Problem Statement
+
+A school wants to store marks of 5 students:
+
+85
+90
+78
+95
+88
+
+Create an integer array to store these values.
+
+Display:
+
+Array Created Successfully
+Input Format
+
+No input required.
+
+Output Format
+Array Created Successfully
+Sample Output
+Array Created Successfully
+Hint 1
+
+Create an integer array.
+
+Hint 2
+
+Store all 5 marks inside the array.
+
+Hint 3
+
+Print a success message.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Create array here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks =
+        {
+            85,
+            90,
+            78,
+            95,
+            88
+        };
+
+        System.out.println("Array Created Successfully");
+
+    }
+
+}
+Code Explanation
+
+The array:
+
+int[] marks
+
+stores:
+
+85
+90
+78
+95
+88
+
+inside a single variable.
+
+The program then displays a success message.
+
+Output
+Array Created Successfully
+
+Topic 2: Creating and Initializing Arrays
+Topic Introduction
+
+In the previous topic, we learned what an array is and why arrays are important.
+
+Now we will learn how to actually create arrays in Java.
+
+Creating an array generally happens in three steps:
+
+Declaration
+Creation
+Initialization
+
+Understanding these steps is very important because every Java developer uses arrays regularly.
+
+Definition
+
+Array Creation and Initialization is the process of declaring an array variable, allocating memory for it, and optionally assigning values to its elements.
+
+Step 1: Array Declaration
+
+Declaration tells Java:
+
+"I want to create an array variable."
+
+Syntax:
+
+dataType[] arrayName;
+
+Example:
+
+int[] marks;
+Explanation
+int[]
+
+means:
+
+Array of integers
+marks
+
+means:
+
+Array variable name
+
+At this point:
+
+int[] marks;
+
+No memory is allocated yet.
+
+Only the variable is declared.
+
+Step 2: Array Creation
+
+Creation allocates memory.
+
+Syntax:
+
+arrayName = new dataType[size];
+
+Example:
+
+marks = new int[5];
+Explanation
+new
+
+creates a new array object.
+
+int[5]
+
+creates space for:
+
+5 integers
+Complete Example
+int[] marks;
+
+marks = new int[5];
+Step 3: Array Initialization
+
+Initialization means assigning values.
+
+Example:
+
+marks[0] = 85;
+marks[1] = 90;
+marks[2] = 78;
+marks[3] = 95;
+marks[4] = 88;
+Combined Version
+
+All three steps together:
+
+int[] marks = new int[5];
+
+marks[0] = 85;
+marks[1] = 90;
+marks[2] = 78;
+marks[3] = 95;
+marks[4] = 88;
+Shortcut Initialization
+
+Java provides a shorter syntax.
+
+Instead of:
+
+int[] marks = new int[5];
+
+marks[0] = 85;
+marks[1] = 90;
+marks[2] = 78;
+marks[3] = 95;
+marks[4] = 88;
+
+We can write:
+
+int[] marks =
+{
+    85,
+    90,
+    78,
+    95,
+    88
+};
+
+This is called:
+
+Array Literal Initialization
+Different Ways to Create Arrays
+Method 1: Declaration + Creation + Initialization
+int[] numbers;
+
+numbers = new int[3];
+
+numbers[0] = 10;
+numbers[1] = 20;
+numbers[2] = 30;
+Method 2: Declaration and Creation Together
+int[] numbers = new int[3];
+Method 3: Direct Initialization
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+Method 4: Using new with Values
+int[] numbers =
+        new int[]
+{
+    10,
+    20,
+    30
+};
+Visual Representation
+
+Example:
+
+int[] numbers =
+{
+    10,
+    20,
+    30
+};
+
+Memory:
+
+ ┌────┬────┬────┐
+ │10  │20  │30  │
+ └────┴────┴────┘
+
+   0    1    2
+Default Values in Arrays
+
+When values are not assigned, Java provides default values.
+
+int Array
+int[] numbers = new int[3];
+
+Contents:
+
+0
+0
+0
+double Array
+double[] prices = new double[3];
+
+Contents:
+
+0.0
+0.0
+0.0
+boolean Array
+boolean[] status = new boolean[3];
+
+Contents:
+
+false
+false
+false
+String Array
+String[] names = new String[3];
+
+Contents:
+
+null
+null
+null
+Example 1: Integer Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] marks = new int[5];
+
+        marks[0] = 85;
+        marks[1] = 90;
+        marks[2] = 78;
+        marks[3] = 95;
+        marks[4] = 88;
+
+        System.out.println("Array Created");
+
+    }
+
+}
+Output
+Array Created
+Example 2: Direct Initialization
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30
+        };
+
+        System.out.println("Success");
+
+    }
+
+}
+Output
+Success
+Example 3: String Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        String[] names =
+        {
+            "Balu",
+            "Rahul",
+            "Anjali"
+        };
+
+        System.out.println("Names Stored");
+
+    }
+
+}
+Output
+Names Stored
+Example 4: Boolean Array
+public class Main {
+
+    public static void main(String[] args) {
+
+        boolean[] status =
+        {
+            true,
+            false,
+            true
+        };
+
+        System.out.println("Status Stored");
+
+    }
+
+}
+Output
+Status Stored
+Real World Usage
+Student Marks
+int[] marks
+Product Prices
+double[] prices
+Employee Names
+String[] names
+Online User Status
+boolean[] onlineStatus
+Common Mistakes
+Mistake 1
+
+Using Invalid Index
+
+Wrong:
+
+int[] arr = new int[3];
+
+arr[3] = 50;
+
+Valid indexes:
+
+0
+1
+2
+Mistake 2
+
+Forgetting new
+
+Wrong:
+
+int[] arr;
+
+arr[0] = 10;
+
+Memory not allocated.
+
+Mistake 3
+
+Wrong Size Assumption
+
+new int[5]
+
+means:
+
+Indexes:
+0 to 4
+
+not:
+
+1 to 5
+Mistake 4
+
+Mixing Data Types
+
+Wrong:
+
+int[] arr =
+{
+    10,
+    "Java"
+};
+
+Compilation Error.
+
+Best Practices
+Use Meaningful Names
+
+Good:
+
+studentMarks
+productPrices
+employeeNames
+Initialize Arrays Properly
+
+Avoid partially initialized arrays when possible.
+
+Use Direct Initialization for Known Values
+
+Good:
+
+int[] arr =
+{
+    10,
+    20,
+    30
+};
+Remember Index Starts at 0
+
+Always verify array size and indexes.
+
+Key Points
+Arrays are created using declaration, creation, and initialization.
+Memory is allocated using:
+new
+Arrays can be initialized directly.
+Arrays have fixed size.
+Default values are automatically assigned.
+Indexes start from 0.
+Topic 2 Mastery Challenge
+Problem Statement
+
+Create an integer array that stores:
+
+10
+20
+30
+40
+50
+
+using direct initialization.
+
+Display:
+
+Array Initialized Successfully
+Input Format
+
+No input required.
+
+Output Format
+Array Initialized Successfully
+Sample Output
+Array Initialized Successfully
+Hint 1
+
+Create an integer array.
+
+Hint 2
+
+Use direct initialization.
+
+Hint 3
+
+Print a success message.
+
+Code Editor
+public class Main {
+
+    public static void main(String[] args) {
+
+        // Create array here
+
+    }
+
+}
+Solution Code
+public class Main {
+
+    public static void main(String[] args) {
+
+        int[] numbers =
+        {
+            10,
+            20,
+            30,
+            40,
+            50
+        };
+
+        System.out.println("Array Initialized Successfully");
+
+    }
+
+}
+Code Explanation
+
+The array:
+
+int[] numbers
+
+stores:
+
+10
+20
+30
+40
+50
+
+using direct initialization.
+
+The program then displays a confirmation message.
+
+Output
+Array Initialized Successfully
+
