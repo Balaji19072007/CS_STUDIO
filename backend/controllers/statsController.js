@@ -87,30 +87,41 @@ exports.checkRatingStatus = async (req, res) => {
     }
 
     // Determine if we should show rating
-    // 1. Must satisfy minimum usage (10 mins)
+    // 1. Must satisfy minimum usage (10 mins) OR have completed 3+ course topics
     // 2. AND (Never shown OR Snoozed for > 5 days)
 
     let showRating = false;
     let reason = 'tracking';
 
-    if (accumulatedTime >= TEN_MINUTES) {
+    // Get completed course topics count to power the dual trigger
+    const { data: courseProgress } = await supabase
+      .from('user_course_progress')
+      .select('completed_topics')
+      .eq('user_id', userId);
+      
+    const totalCompletedCourseTopics = courseProgress 
+      ? courseProgress.reduce((sum, cp) => sum + (cp.completed_topics || 0), 0) 
+      : 0;
+
+    if (accumulatedTime >= TEN_MINUTES || totalCompletedCourseTopics >= 3) {
       if (!user.rating_shown) {
         showRating = true; // First time eligible
+        reason = accumulatedTime >= TEN_MINUTES ? 'usage_time' : 'topics_completed';
       } else if (user.last_rating_prompt_at) {
         // Check snooze timer
         const lastPrompt = new Date(user.last_rating_prompt_at).getTime();
         if (Date.now() - lastPrompt > FIVE_DAYS) {
           showRating = true; // Snooze expired
+          reason = 'snoozed_expired';
         } else {
           reason = 'snoozed';
         }
       } else {
         // Fallback: rating_shown is true but no timestamp (migration case)
-        // Show it so we can capture the timestamp properly this time
         showRating = true;
       }
     } else {
-      reason = 'insufficient_time';
+      reason = 'insufficient_time_and_topics';
     }
 
     res.json({
@@ -129,21 +140,19 @@ exports.checkRatingStatus = async (req, res) => {
 
 exports.startUsageTracking = async (req, res) => {
   try {
-    // STUBBED FOR STABILITY
-    console.log('[Stats] startUsageTracking called (STUBBED)');
+    const userId = req.user.id;
+    
+    // Update the usage start time
+    await supabase.from('users').update({
+      usage_start_time: new Date().toISOString(),
+      last_active_at: new Date().toISOString()
+    }).eq('id', userId);
 
-    if (req.user && req.user.id) {
-      console.log(`[Stats] User ID: ${req.user.id}`);
-    } else {
-      console.warn('[Stats] No user ID in request (Auth middleware issue?)');
-    }
-
-    // Temporary: Return success immediately to prevent 500s
-    return res.json({ success: true, tracking: true, message: 'Tracking started (stubbed)' });
+    return res.json({ success: true, tracking: true, message: 'Tracking started' });
 
   } catch (err) {
-    console.error('[Stats] CRITICAL ERROR in startUsageTracking stub:', err);
-    res.status(500).json({ success: false, msg: 'Server error' });
+    console.error('[Stats] ERROR in startUsageTracking:', err);
+    res.status(500).json({ success: false, msg: 'Server error starting tracking' });
   }
 };
 
@@ -227,5 +236,79 @@ exports.markRatingShown = async (req, res) => {
   } catch (err) {
     console.error('Mark rating shown error:', err.message);
     res.status(500).json({ success: false, msg: 'Server error' });
+  }
+};
+
+// ==========================================
+// COURSE RATING LOGIC
+// ==========================================
+
+exports.submitCourseRating = async (req, res) => {
+  const { courseId, rating, feedback } = req.body;
+  const userId = req.user.id;
+
+  try {
+    if (!courseId) return res.status(400).json({ msg: 'Course ID is required' });
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ msg: 'Rating must be between 1 and 5' });
+    }
+
+    // Check if user already rated this specific course
+    const { data: existing } = await supabase
+      .from('course_ratings')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .single();
+
+    if (existing) {
+      return res.status(400).json({ msg: 'You have already rated this course' });
+    }
+
+    // Insert course rating
+    const { error } = await supabase.from('course_ratings').insert({
+      user_id: userId,
+      course_id: courseId,
+      rating,
+      feedback: feedback || '',
+      created_at: new Date().toISOString()
+    });
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      msg: 'Thank you for rating the course!',
+      rating,
+      feedback: feedback || ''
+    });
+
+  } catch (err) {
+    console.error('Submit course rating error:', err.message);
+    res.status(500).json({ success: false, msg: 'Server error while submitting course rating' });
+  }
+};
+
+exports.checkCourseRatingStatus = async (req, res) => {
+  const userId = req.user.id;
+  const { courseId } = req.params;
+
+  try {
+    // Check if user already rated this specific course
+    const { data: existing } = await supabase
+      .from('course_ratings')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .single();
+
+    if (existing) {
+      return res.json({ success: true, hasRated: true });
+    }
+
+    res.json({ success: true, hasRated: false });
+  } catch (err) {
+    console.error('Check course rating status error:', err.message);
+    res.status(500).json({ success: false, msg: 'Server error checking course rating status' });
   }
 };

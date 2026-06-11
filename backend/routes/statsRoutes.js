@@ -16,4 +16,8 @@ router.post('/mark-rating-shown', authMiddleware, statsController.markRatingShow
 // Backward compatibility
 router.get('/rating-eligibility', authMiddleware, statsController.checkRatingStatus);
 
+// Course rating routes
+router.post('/course-rating', authMiddleware, statsController.submitCourseRating);
+router.get('/course-rating-status/:courseId', authMiddleware, statsController.checkCourseRatingStatus);
+
 module.exports = router;

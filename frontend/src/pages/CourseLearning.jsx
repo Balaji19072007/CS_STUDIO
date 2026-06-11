@@ -12,6 +12,8 @@ import { LearningSkeleton } from '../components/common/SkeletonLoader';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { supabase } from '../config/supabase';
+import { courseRatingAPI } from '../config/api';
+import CourseRatingModal from '../components/common/CourseRatingModal';
 
 const isProgressCompleted = (entry) =>
     Boolean(entry?.completed === true || entry?.status === 'completed' || entry?.completed_at);
@@ -53,6 +55,48 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const [certificate, setCertificate] = useState(null);
     const [certificateStatus, setCertificateStatus] = useState('');
     const [certificateError, setCertificateError] = useState('');
+    const [showCourseRating, setShowCourseRating] = useState(false);
+    const [hasRatedCourse, setHasRatedCourse] = useState(false);
+
+    // Check if user already rated this course
+    useEffect(() => {
+        if (!user || !courseId) return;
+        const checkRatingStatus = async () => {
+            try {
+                const res = await courseRatingAPI.checkCourseRatingStatus(courseId);
+                if (res.data?.success) {
+                    setHasRatedCourse(res.data.hasRated);
+                }
+            } catch (err) {
+                console.error("Failed to check course rating status", err);
+            }
+        };
+        checkRatingStatus();
+    }, [user, courseId]);
+
+    // Trigger course rating at milestones (3, 13, 23...)
+    useEffect(() => {
+        if (hasRatedCourse || !user || !phases.length || Object.keys(userProgress).length === 0) return;
+        
+        let completedCount = 0;
+        Object.values(userProgress).forEach(val => {
+            // Filter out phase progress objects (which have 'percentage' key)
+            if (val && val.percentage === undefined && isProgressCompleted(val)) {
+                completedCount++;
+            }
+        });
+
+        // The milestones: 3, 13, 23, 33...
+        const lastShown = sessionStorage.getItem(`course_rating_shown_${courseId}`);
+        if ((completedCount > 0 && completedCount % 10 === 3) && parseInt(lastShown) !== completedCount) {
+            // Slight delay so it doesn't pop up too aggressively immediately upon completing the topic
+            const timer = setTimeout(() => {
+                setShowCourseRating(true);
+                sessionStorage.setItem(`course_rating_shown_${courseId}`, completedCount.toString());
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [userProgress, hasRatedCourse, courseId, phases, user]);
 
     useEffect(() => {
         const handleReset = () => {
@@ -866,6 +910,21 @@ const CourseLearning = ({ embeddedCourseId }) => {
                 }
                 </main>
             </div>
+            
+            {/* Render the Course Rating Modal */}
+            {showCourseRating && !hasRatedCourse && (
+                <CourseRatingModal 
+                    courseId={courseId} 
+                    courseTitle={course?.title}
+                    onClose={() => {
+                        setShowCourseRating(false);
+                        // Once they close it, we check if they rated it so we don't bother them again this session
+                        courseRatingAPI.checkCourseRatingStatus(courseId).then(res => {
+                            if (res.data?.success) setHasRatedCourse(res.data.hasRated);
+                        }).catch(console.error);
+                    }} 
+                />
+            )}
         </div>
     );
 };

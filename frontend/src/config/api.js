@@ -99,6 +99,8 @@ export const API_ENDPOINTS = {
     STOP_TRACKING: `/api/stats/stop-tracking`,
     MARK_RATING_SHOWN: `/api/stats/mark-rating-shown`,
     RATING_ELIGIBILITY: `/api/stats/rating-eligibility`,
+    COURSE_RATING_SUBMIT: `/api/stats/course-rating`,
+    COURSE_RATING_STATUS: `/api/stats/course-rating-status`,
   },
 
   // 🔔 NEW: Notification endpoints
@@ -143,6 +145,11 @@ export const statsAPI = {
   stopUsageTracking: () => api.post(API_ENDPOINTS.STATS.STOP_TRACKING, {}),
   markRatingShown: () => api.post(API_ENDPOINTS.STATS.MARK_RATING_SHOWN, {}),
   checkRatingEligibility: () => api.get(API_ENDPOINTS.STATS.RATING_ELIGIBILITY),
+};
+
+export const courseRatingAPI = {
+  submitCourseRating: (data) => api.post(API_ENDPOINTS.STATS.COURSE_RATING_SUBMIT, data),
+  checkCourseRatingStatus: (courseId) => api.get(`${API_ENDPOINTS.STATS.COURSE_RATING_STATUS}/${courseId}`)
 };
 
 export const authAPI = {
