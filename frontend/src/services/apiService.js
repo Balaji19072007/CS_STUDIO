@@ -1,6 +1,6 @@
 // frontend/src/services/apiService.js
 import axios from 'axios';
-import API_CONFIG from '../config/api.js';
+import { API_CONFIG } from '../config/api.js';
 
 // Create axios instance with default config
 const api = axios.create({
