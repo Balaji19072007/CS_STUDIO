@@ -228,7 +228,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                 setExpandedPhaseId(phases[0].id);
             }
         }
-    }, [topicId, quizId, phases, expandedPhaseId]);
+    }, [topicId, quizId, phases]);
 
     // Fetch user progress (Optimized: Single Batch Request)
     useEffect(() => {
