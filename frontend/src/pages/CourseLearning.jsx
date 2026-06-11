@@ -696,140 +696,174 @@ const CourseLearning = ({ embeddedCourseId }) => {
                     ) : selectedPhase ? (
                         renderPhaseIntro(selectedPhase)
                     ) : (
-                        <div className="min-h-full p-6 md:p-10 lg:px-12 w-full flex flex-col justify-start max-w-7xl mx-auto">
-                            {/* Modern Welcome Banner */}
-                            <div className="relative w-full rounded-3xl overflow-hidden mb-12 shadow-2xl group">
-                                {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 transition-all duration-700"></div>
-                                {/* Decorative glowing orbs */}
-                                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none group-hover:bg-blue-500/30 transition-all duration-700"></div>
-                                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none group-hover:bg-indigo-500/30 transition-all duration-700"></div>
-                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
-                                
-                                <div className="relative z-10 p-10 md:p-16 lg:p-20 text-center">
-                                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-200 font-medium text-sm mb-6 backdrop-blur-sm">
-                                        <span className="w-2 h-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
+                        <div className="min-h-full w-full bg-white dark:bg-[#0B1120]">
+                            {/* ── Hero Banner ── */}
+                            <div className="relative w-full overflow-hidden" style={{ minHeight: 260 }}>
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#0f1f4b] via-[#1a2f6e] to-[#0B1120]" />
+                                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+                                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
+                                <div className="relative z-10 px-8 md:px-14 lg:px-20 py-12 md:py-16">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-semibold mb-5 tracking-wide">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                                         Interactive Learning Experience
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-indigo-200 mb-6 tracking-tight drop-shadow-sm">
-                                        Welcome to <br className="hidden md:block" /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">{course?.title || 'C Programming'}</span>
+                                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
+                                        {course?.title || 'C Programming'}
                                     </h1>
-                                    <p className="text-blue-100/90 text-lg md:text-xl leading-relaxed mb-10 max-w-3xl mx-auto font-medium">
-                                        {course?.overview_description || "Master C Programming from the ground up. You will not only write valid C programs, but you will also understand why the language still matters in operating systems, embedded devices, tooling, and performance-critical software."}
+                                    <p className="text-blue-100/80 text-base md:text-lg leading-relaxed max-w-3xl mb-8 font-medium">
+                                        {course?.overview_description || course?.description || 'Master C Programming from the ground up — write valid C programs, understand why the language still powers operating systems, embedded devices, tooling, and performance-critical software.'}
                                     </p>
-                                    <button 
-                                        onClick={() => {
-                                            if (phases.length > 0 && phases[0].items.length > 0) {
-                                                setExpandedPhaseId(phases[0].id);
-                                                selectItem(phases[0].items[0]);
-                                            }
-                                        }}
-                                        className="relative overflow-hidden group bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full shadow-[0_0_40px_rgba(59,130,246,0.4)] hover:shadow-[0_0_60px_rgba(59,130,246,0.6)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95 text-lg"
-                                    >
-                                        <span className="relative z-10 flex items-center justify-center gap-2">
-                                            Start Learning Now
-                                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                                    <div className="flex flex-wrap gap-4 items-center">
+                                        <button
+                                            onClick={() => {
+                                                if (phases.length > 0 && phases[0].items.length > 0) {
+                                                    setExpandedPhaseId(phases[0].id);
+                                                    selectItem(phases[0].items[0]);
+                                                }
+                                            }}
+                                            className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-blue-500/40 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 text-sm"
+                                        >
+                                            Start Learning
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                                        </button>
+                                        <div className="flex items-center gap-5 text-sm text-blue-200/70 font-medium">
+                                            <span className="flex items-center gap-1.5">
+                                                <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                                {phases.length} Phases
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                                                {totalCourseTopics} Topics
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                                                Certificate at 100%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ── Progress bar (if started) ── */}
+                            {courseProgressPercentage > 0 && (
+                                <div className="px-8 md:px-14 lg:px-20 py-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700/50 flex items-center gap-4">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Your Progress</span>
+                                    <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-700" style={{ width: `${courseProgressPercentage}%` }} />
+                                    </div>
+                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">{completedItems}/{totalItems} complete</span>
+                                </div>
+                            )}
+
+                            {/* ── Body ── */}
+                            <div className="px-8 md:px-14 lg:px-20 py-10 space-y-10">
+
+                                {/* ── What You'll Learn ── */}
+                                <section>
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-3">
+                                        <span className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                         </span>
-                                        <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[100%] group-hover:translate-x-[50%] transition-transform duration-1000 ease-in-out"></div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Three Stats Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
-                                {/* Total Phases */}
-                                <div className="group relative bg-white/50 dark:bg-slate-800/50 backdrop-blur-md rounded-3xl p-8 border border-white/40 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-                                    <div className="relative z-10 flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 border border-blue-200 dark:border-blue-700/50 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:rotate-3 transition-transform duration-300">
-                                            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-slate-500 dark:text-slate-400 font-bold text-sm uppercase tracking-widest mb-1">Total Phases</h3>
-                                            <span className="text-4xl font-black text-slate-900 dark:text-white drop-shadow-sm">{phases.length}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Total Topics */}
-                                <div className="group relative bg-white/50 dark:bg-slate-800/50 backdrop-blur-md rounded-3xl p-8 border border-white/40 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-                                    <div className="relative z-10 flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 border border-emerald-200 dark:border-emerald-700/50 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:rotate-3 transition-transform duration-300">
-                                            <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-slate-500 dark:text-slate-400 font-bold text-sm uppercase tracking-widest mb-1">Total Topics</h3>
-                                            <span className="text-4xl font-black text-slate-900 dark:text-white drop-shadow-sm">{totalItems}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Certificate */}
-                                <div className="group relative bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 backdrop-blur-md rounded-3xl p-8 border border-amber-200/50 dark:border-amber-700/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-                                    <div className="relative z-10 flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-700/40 dark:to-amber-600/40 border border-amber-300 dark:border-amber-500/50 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:-rotate-3 transition-transform duration-300">
-                                            <svg className="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-amber-700 dark:text-amber-500 font-bold text-sm uppercase tracking-widest mb-1">Certificate</h3>
-                                            <span className="text-2xl font-black text-amber-900 dark:text-amber-300 drop-shadow-sm">At 100%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-12">
-                                {/* How This Course Works */}
-                                <div className="group relative bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-100 dark:border-slate-700 shadow-xl overflow-hidden hover:border-cyan-200 dark:hover:border-cyan-800 transition-colors duration-500">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-50 dark:bg-cyan-900/10 rounded-bl-full -mr-20 -mt-20 pointer-events-none transition-transform group-hover:scale-105 duration-700"></div>
-                                    <div className="relative z-10">
-                                        <div className="flex items-center gap-5 mb-6">
-                                            <div className="w-14 h-14 rounded-2xl bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                                                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                            </div>
-                                            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl tracking-tight">
-                                                How This Course Works
-                                            </h3>
-                                        </div>
-                                        <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium">
-                                            Learn the concept, study the example, solve the mastery challenge, then move to the next lesson. The flow is designed to feel like a structured tutorial experience rather than a static reading page.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* What You Will Learn */}
-                                <div className="group relative bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-100 dark:border-slate-700 shadow-xl overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors duration-500">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-bl-full -mr-20 -mt-20 pointer-events-none transition-transform group-hover:scale-105 duration-700"></div>
-                                    <div className="relative z-10">
-                                        <div className="flex items-center gap-5 mb-6">
-                                            <div className="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                                                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                                            </div>
-                                            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl tracking-tight">
-                                                What You Will Learn
-                                            </h3>
-                                        </div>
-                                        <ul className="space-y-4">
-                                            <li className="flex items-start gap-4">
-                                                <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mt-1 flex-shrink-0">
-                                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                                        What You'll Learn
+                                    </h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {[
+                                            'Write complete, well-structured C programs confidently',
+                                            'Understand variables, data types, and the compile pipeline',
+                                            'Master pointers, memory management, and arrays',
+                                            'Build functions, structs, and modular programs',
+                                            'Handle file I/O, strings, and standard libraries',
+                                            'Apply logic with loops, conditionals, and recursion',
+                                        ].map((point, i) => (
+                                            <div key={i} className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                                                <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
                                                 </div>
-                                                <span className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium">Read and write complete C programs confidently and understand logic building.</span>
-                                            </li>
-                                            <li className="flex items-start gap-4">
-                                                <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mt-1 flex-shrink-0">
-                                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
-                                                </div>
-                                                <span className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium">Explain the compile pipeline, primitive types, variables, and basic memory management.</span>
-                                            </li>
-                                        </ul>
+                                                <span className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{point}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                </div>
+                                </section>
+
+                                {/* ── How It Works ── */}
+                                <section>
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-3">
+                                        <span className="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                        </span>
+                                        How This Course Works
+                                    </h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        {[
+                                            { step: '1', label: 'Learn the Concept', icon: '📖', color: 'blue' },
+                                            { step: '2', label: 'Study the Example', icon: '💡', color: 'cyan' },
+                                            { step: '3', label: 'Solve the Challenge', icon: '⚔️', color: 'purple' },
+                                            { step: '4', label: 'Move to Next Lesson', icon: '✅', color: 'green' },
+                                        ].map((s) => (
+                                            <div key={s.step} className="flex flex-col items-center text-center p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 gap-2">
+                                                <div className="text-2xl">{s.icon}</div>
+                                                <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Step {s.step}</div>
+                                                <div className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">{s.label}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                {/* ── Course Phases Roadmap ── */}
+                                <section>
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-3">
+                                        <span className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                                        </span>
+                                        Course Roadmap
+                                    </h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {phases.map((phase, idx) => {
+                                            const phaseProgress = userProgress[phase.id];
+                                            const pct = phaseProgress?.percentage || 0;
+                                            const isStarted = pct > 0;
+                                            const isDone = pct === 100;
+                                            return (
+                                                <button
+                                                    key={phase.id}
+                                                    onClick={() => {
+                                                        setExpandedPhaseId(phase.id);
+                                                        if (phase.items.length > 0) selectItem(phase.items[0]);
+                                                    }}
+                                                    className="flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md group
+                                                        bg-white dark:bg-slate-800/50
+                                                        border-slate-200 dark:border-slate-700/50
+                                                        hover:border-blue-300 dark:hover:border-blue-600/50"
+                                                >
+                                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-black mt-0.5
+                                                        ${isDone ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' :
+                                                          isStarted ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' :
+                                                          'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                                                        {isDone ? '✓' : idx + 1}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                            {phase.title}
+                                                        </div>
+                                                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                                            {phase.items.filter(i => i.type === 'topic').length} topics
+                                                            {phase.items.filter(i => i.type === 'quiz').length > 0 && ` · ${phase.items.filter(i => i.type === 'quiz').length} quiz`}
+                                                        </div>
+                                                        {isStarted && (
+                                                            <div className="mt-1.5 h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
                             </div>
                         </div>
-                    )}
+                    )
+                }
                 </main>
             </div>
         </div>
