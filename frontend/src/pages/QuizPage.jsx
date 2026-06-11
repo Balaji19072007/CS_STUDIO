@@ -451,6 +451,19 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
 
     if (loading) return <QuizSkeleton />;
 
+    if (!quiz) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0F172A] flex items-center justify-center">
+                <div className="text-center p-8">
+                    <div className="text-6xl mb-4">📝</div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Quiz Coming Soon</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">This quiz is being prepared. Check back later!</p>
+                    <button onClick={() => navigate(`/courses/${courseId}/learn`)} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors">Back to Course</button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`min-h-screen bg-gray-50 dark:bg-[#0F172A] transition-colors ${gameState === 'RUNNING' ? 'fixed inset-0 z-50 overflow-y-auto' : ''}`}>
             <style>{`

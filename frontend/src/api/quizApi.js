@@ -30,7 +30,7 @@ export const getQuiz = async (quizId) => {
             .from('quizzes')
             .select('*')
             .eq('id', quizId)
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
         return data;

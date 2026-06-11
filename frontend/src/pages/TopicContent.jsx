@@ -401,13 +401,10 @@ const TopicContent = ({
                             {!isCodeOnly && (
                                 <button
                                     onClick={() => {
-                                        if (presentation.playgroundLanguage) {
-                                            navigate(`/code?lang=${presentation.playgroundLanguage}&source=${encodeURIComponent(displayCodeText)}`, {
-                                                state: { source: displayCodeText, lang: presentation.playgroundLanguage }
-                                            });
-                                            return;
-                                        }
-                                        navigator.clipboard.writeText(displayCodeText);
+                                        const targetLang = presentation.playgroundLanguage || presentation.syntaxLanguage || 'text';
+                                        navigate(`/code?lang=${targetLang}&source=${encodeURIComponent(displayCodeText)}`, {
+                                            state: { source: displayCodeText, lang: targetLang }
+                                        });
                                     }}
                                     className={`absolute bottom-4 right-4 rounded-lg px-4 py-2 text-xs font-bold shadow-lg transition-all ${presentation.buttonClass}`}
                                 >
