@@ -82,7 +82,7 @@ const Courses = () => {
                                         key={course.id}
                                         ref={isActive ? activeTabRef : null}
                                         onClick={() => {
-                                            if (activeCourse === course.id && course.id === 'c') {
+                                            if (activeCourse === course.id && (course.id === 'c' || course.id === 'java')) {
                                                 sessionStorage.removeItem('cs_embedded_topic');
                                                 sessionStorage.removeItem('cs_embedded_quiz');
                                                 window.dispatchEvent(new Event('reset-course-learning'));
@@ -113,9 +113,9 @@ const Courses = () => {
                 </div>
             </div>
             {/* Dynamic Content Area */}
-            {activeCourse === 'c' ? (
+            {activeCourse === 'c' || activeCourse === 'java' ? (
                 <div className="flex-1 w-full overflow-hidden">
-                    <CourseLearning embeddedCourseId="c-lang" />
+                    <CourseLearning embeddedCourseId={activeCourse === 'c' ? 'c-lang' : 'java-programming'} />
                 </div>
             ) : (
                 <div className="flex-1 w-full overflow-y-auto px-4 sm:px-6 lg:px-8 pb-20">
