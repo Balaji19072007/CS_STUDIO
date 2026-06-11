@@ -602,8 +602,7 @@ const UserHomePage = () => {
                                         Start Solving
                                     </Link>
                                 </div>
-                            )
-                        )}
+                            )}
 
 
                         {/* 3. Mastery Widget */}
