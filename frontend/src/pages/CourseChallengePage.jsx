@@ -378,7 +378,10 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     };
 
     const handleReset = () => {
-        const defaultCode = challenge?.starter_code || '#include <stdio.h>\n\nint main(void) {\n    /* Write your code here. */\n    return 0;\n}';
+        const javaDefault = 'public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}';
+        const cDefault = '#include <stdio.h>\n\nint main(void) {\n    /* Write your code here. */\n    return 0;\n}';
+        const lang = (challenge?.language || '').toLowerCase();
+        const defaultCode = challenge?.starter_code || (lang === 'java' ? javaDefault : cDefault);
         setCode(defaultCode);
         localStorage.setItem(`course_challenge_code_${challengeId}`, defaultCode);
         setOutput('Compile and run your code to see output...');

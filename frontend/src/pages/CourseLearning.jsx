@@ -138,7 +138,9 @@ const CourseLearning = ({ embeddedCourseId }) => {
 
                             // Dynamically inject quizzes for C programming if needed
                             let items = [];
-                            if ((courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming') && phase.order_index !== 18) {
+                            const isCCourse = (courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming');
+                            const isJavaCourse = (courseData?.title?.toLowerCase().includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
+                            if (isCCourse && phase.order_index !== 18) {
                                 const topicItems = topics.map(t => ({ ...t, type: 'topic' }));
                                 const quizItems = quizzes.map(q => ({ ...q, type: 'quiz' })).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
                                 
@@ -198,7 +200,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                     })
                 );
 
-                console.log('✅ Final Phases with Items:', phasesWithItems);
+                console.log('✅ Final Phases with Items:', phasesWithItems.map(p => ({ id: p.id, title: p.title, itemCount: p.items?.length || 0, items: p.items?.map(i => i.id) })));
                 setPhases(phasesWithItems);
 
                 // Auto-expand logic is now handled in a separate useEffect

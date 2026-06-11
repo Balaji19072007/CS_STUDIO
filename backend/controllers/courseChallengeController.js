@@ -241,11 +241,65 @@ const resolveChallengeById = async (challengeId) => {
     };
   }
 
+  // Check if this is a Java fallback challenge ID (300000+ range)
+  const numericId = Number.parseInt(challengeId, 10);
+  if (!Number.isNaN(numericId) && numericId >= 300000 && numericId < 400000) {
+    const diff = numericId - 300000;
+    const phaseNum = Math.floor(diff / 100);
+    const topicNum = diff % 100;
+    const topicId = `java-p${phaseNum}-t${topicNum}`;
+    const javaChallenge = await getJavaFallbackChallengeByTopicId(topicId);
+    if (javaChallenge) {
+      return {
+        source: 'fallback',
+        challenge: javaChallenge,
+      };
+    }
+  }
+
   return null;
 };
 
+const getJavaFallbackChallengeByTopicId = async (topicId) => {
+  if (!topicId || !topicId.startsWith('java-')) return null;
+
+  const parts = topicId.split('-');
+  const phaseNum = parts.length > 1 ? parts[1].replace(/^p/, '') : '0';
+  const topicNum = parts.length > 2 ? parts[2].replace(/^t/, '') : '0';
+
+  // Try to get the actual topic title from the database
+  let displayTitle = `Topic ${phaseNum}.${topicNum}`;
+  try {
+    const { data } = await supabase
+      .from('topics')
+      .select('title')
+      .eq('id', topicId)
+      .single();
+    if (data?.title) {
+      displayTitle = data.title;
+    }
+  } catch {
+    // Fallback to generated title
+  }
+
+  return {
+    id: 300000 + parseInt(phaseNum || '0', 10) * 100 + parseInt(topicNum || '0', 10),
+    title: `Challenge: ${displayTitle}`,
+    description: `Write a Java program that demonstrates your understanding of ${displayTitle}. Apply the concepts you learned in this topic to solve the following problem.\n\nImplement a complete Java solution in a class called \`Main\`. Ensure your program compiles and runs correctly. Focus on writing clean, well-structured code that showcases the key concepts from this topic.`,
+    reference_output: '',
+    test_input: '',
+    test_args: [],
+    starter_code: 'public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}',
+    solution_code: '',
+    hints: [],
+    topic_id: topicId,
+    course_id: 'java-programming',
+    language: 'Java',
+  };
+};
+
 const resolveChallengeByTopicId = async (topicId) => {
-  const fallbackChallenge = getFallbackChallengeByTopicId(topicId);
+  const fallbackChallenge = getFallbackChallengeByTopicId(topicId) || await getJavaFallbackChallengeByTopicId(topicId);
   const databaseChallenge = await getDbChallengeByTopicId(topicId);
   
   if (databaseChallenge) {
