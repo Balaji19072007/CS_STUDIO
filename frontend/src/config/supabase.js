@@ -8,10 +8,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     fetch: (url, options) => {
       const token = localStorage.getItem('token');
       if (token) {
-        options.headers = {
-          ...options.headers,
-          Authorization: `Bearer ${token}`,
-        };
+        const headers = new Headers(options?.headers || {});
+        headers.set('Authorization', `Bearer ${token}`);
+        options = { ...options, headers };
       }
       return fetch(url, options);
     },
