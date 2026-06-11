@@ -10,6 +10,16 @@ import {
   isCProgrammingCourse,
   getFallbackPhase,
 } from '../data/cProgrammingPhaseFallbacks.js';
+import {
+  getJavaFallbackPhases,
+  getJavaFallbackTopicContent,
+  getJavaFallbackTopicLearningMeta,
+  getJavaFallbackTopicMetadata,
+  getJavaFallbackTopics,
+  hasJavaFallbackTopicContent,
+  isJavaProgrammingCourse,
+  getJavaFallbackPhase,
+} from '../data/javaProgrammingPhaseFallbacks.js';
 
 const getAuthHeaders = (includeJson = false) => {
   const headers = {};
@@ -26,6 +36,12 @@ const getAuthHeaders = (includeJson = false) => {
   return headers;
 };
 
+const getJavaCourseFallback = (courseId) => ({
+  id: courseId,
+  title: 'Java Programming',
+  description: 'Master Java programming from basics to advanced concepts.',
+});
+
 export const getCourse = async (courseId) => {
   try {
     if (isCProgrammingCourse(courseId)) {
@@ -34,6 +50,9 @@ export const getCourse = async (courseId) => {
         title: 'C Programming',
         description: 'Master C programming from basics to advanced concepts.',
       };
+    }
+    if (isJavaProgrammingCourse(courseId)) {
+      return getJavaCourseFallback(courseId);
     }
 
     const { data, error } = await supabase
@@ -52,6 +71,9 @@ export const getCourse = async (courseId) => {
         title: 'C Programming',
         description: 'Master C programming from basics to advanced concepts.',
       };
+    }
+    if (isJavaProgrammingCourse(courseId)) {
+      return getJavaCourseFallback(courseId);
     }
     throw error;
   }
@@ -107,6 +129,9 @@ export const getPhases = async (courseId) => {
     if (isCProgrammingCourse(courseId)) {
       return getFallbackPhases(courseId);
     }
+    if (isJavaProgrammingCourse(courseId)) {
+      return getJavaFallbackPhases(courseId);
+    }
 
     const { data, error } = await supabase
       .from('phases')
@@ -121,6 +146,9 @@ export const getPhases = async (courseId) => {
     if (isCProgrammingCourse(courseId)) {
       return getFallbackPhases(courseId);
     }
+    if (isJavaProgrammingCourse(courseId)) {
+      return getJavaFallbackPhases(courseId);
+    }
     throw error;
   }
 };
@@ -129,6 +157,9 @@ export const getPhase = async (phaseId) => {
   try {
     const fallbackPhase = getFallbackPhase(phaseId);
     if (fallbackPhase) return fallbackPhase;
+
+    const javaFallbackPhase = getJavaFallbackPhase(phaseId);
+    if (javaFallbackPhase) return javaFallbackPhase;
 
     const { data, error } = await supabase
       .from('phases')
@@ -151,6 +182,11 @@ export const getTopics = async (phaseId) => {
       return fallbackTopics;
     }
 
+    const javaFallbackTopics = getJavaFallbackTopics(phaseId);
+    if (javaFallbackTopics && javaFallbackTopics.length > 0) {
+      return javaFallbackTopics;
+    }
+
     const { data, error } = await supabase
       .from('topics')
       .select('*')
@@ -165,6 +201,10 @@ export const getTopics = async (phaseId) => {
     if (fallbackTopics && fallbackTopics.length > 0) {
       return fallbackTopics;
     }
+    const javaFallbackTopics = getJavaFallbackTopics(phaseId);
+    if (javaFallbackTopics && javaFallbackTopics.length > 0) {
+      return javaFallbackTopics;
+    }
     throw error;
   }
 };
@@ -177,7 +217,7 @@ export const getTopic = async (topicId) => {
       .eq('id', topicId)
       .single();
 
-    const fallbackTopic = getFallbackTopicMetadata(topicId);
+    const fallbackTopic = getFallbackTopicMetadata(topicId) || getJavaFallbackTopicMetadata(topicId);
 
     if (error) {
       if (fallbackTopic) {
@@ -200,7 +240,7 @@ export const getTopic = async (topicId) => {
     };
   } catch (error) {
     console.error('Error fetching topic:', error);
-    const fallbackTopic = getFallbackTopicMetadata(topicId);
+    const fallbackTopic = getFallbackTopicMetadata(topicId) || getJavaFallbackTopicMetadata(topicId);
     if (fallbackTopic) {
       return fallbackTopic;
     }
@@ -220,11 +260,20 @@ export const getTopicContent = async (topicId) => {
       if (hasFallbackTopicContent(topicId)) {
         return getFallbackTopicContent(topicId);
       }
+      if (hasJavaFallbackTopicContent(topicId)) {
+        return getJavaFallbackTopicContent(topicId);
+      }
       throw error;
     }
 
     if (!data || data.length === 0) {
-      return getFallbackTopicContent(topicId);
+      if (hasFallbackTopicContent(topicId)) {
+        return getFallbackTopicContent(topicId);
+      }
+      if (hasJavaFallbackTopicContent(topicId)) {
+        return getJavaFallbackTopicContent(topicId);
+      }
+      return [];
     }
 
     return data;
@@ -232,6 +281,9 @@ export const getTopicContent = async (topicId) => {
     console.error('Error fetching topic content:', error);
     if (hasFallbackTopicContent(topicId)) {
       return getFallbackTopicContent(topicId);
+    }
+    if (hasJavaFallbackTopicContent(topicId)) {
+      return getJavaFallbackTopicContent(topicId);
     }
     throw error;
   }
@@ -253,7 +305,8 @@ export const getPracticeProblems = async (topicId) => {
   }
 };
 
-export const getTopicLearningMeta = (topicId) => getFallbackTopicLearningMeta(topicId);
+export const getTopicLearningMeta = (topicId) =>
+  getFallbackTopicLearningMeta(topicId) || getJavaFallbackTopicLearningMeta(topicId);
 
 export const getCourseChallenge = async (topicId) => {
   try {
