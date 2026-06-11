@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
@@ -75,12 +75,22 @@ function App() {
 function AppContent() {
   const { isDark } = useTheme();
   const location = useLocation();
-  const { user, loading } = useAuth(); // Destructure loading
-  const isLoggedIn = !!user; // Check if user is logged in
+  const { user, loading } = useAuth();
+  const isLoggedIn = !!user;
 
-  // Global Loading State - Shows immediately on refresh
-  if (loading) {
-    return <FullPageLoader message="Initializing CS Studio..." />;
+  // Keep the loader visible until it signals completion (progress hits 100% + fade-out)
+  const [showLoader, setShowLoader] = useState(true);
+  const handleLoaderComplete = useCallback(() => setShowLoader(false), []);
+
+  // Show the loader while auth is pending OR until the loader's own animation finishes
+  if (showLoader) {
+    return (
+      <FullPageLoader
+        message="Initializing CS Studio..."
+        isReady={!loading}
+        onComplete={handleLoaderComplete}
+      />
+    );
   }
 
   // Page refresh handling is now done in index.html for better reliability

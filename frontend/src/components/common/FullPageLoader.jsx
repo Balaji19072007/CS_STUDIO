@@ -108,37 +108,75 @@ const STATUS_MSGS = [
     'Almost ready...',
 ];
 
-const FullPageLoader = ({ message = 'Initializing CS Studio...' }) => {
+const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false, onComplete }) => {
     const { isDark } = useTheme();
     const [progress, setProgress] = useState(0);
     const [statusIdx, setStatusIdx] = useState(0);
     const [fadeIn, setFadeIn] = useState(false);
+    const [finishing, setFinishing] = useState(false);
+    const msgIntervalRef = useRef(null);
+    const progressRef = useRef(0);
+    const stepTimerRef = useRef(null);
 
+    // ── Phase 1: fake progress up to 85% while loading ──
     useEffect(() => {
         setFadeIn(true);
 
-        // Simulate a smooth progress bar
-        const target = 90;
-        let current = 0;
+        const target = 85;
         const step = () => {
-            current += Math.random() * 4 + 1;
-            if (current > target) current = target;
-            setProgress(Math.floor(current));
-            if (current < target) setTimeout(step, 120);
+            progressRef.current += Math.random() * 3 + 0.5;
+            if (progressRef.current > target) progressRef.current = target;
+            setProgress(Math.floor(progressRef.current));
+            if (progressRef.current < target) {
+                stepTimerRef.current = setTimeout(step, 140);
+            }
         };
-        setTimeout(step, 200);
+        stepTimerRef.current = setTimeout(step, 200);
 
-        // Cycle status messages
-        const msgInterval = setInterval(() => {
+        msgIntervalRef.current = setInterval(() => {
             setStatusIdx((prev) => (prev + 1) % STATUS_MSGS.length);
         }, 1800);
 
-        return () => clearInterval(msgInterval);
+        return () => {
+            clearInterval(msgIntervalRef.current);
+            clearTimeout(stepTimerRef.current);
+        };
     }, []);
+
+    // ── Phase 2: when auth is done → rush to 100%, then fade out ──
+    useEffect(() => {
+        if (!isReady) return;
+
+        // Stop fake progress & status cycling
+        clearTimeout(stepTimerRef.current);
+        clearInterval(msgIntervalRef.current);
+
+        // Animate from current value to 100 quickly
+        const rushToHundred = () => {
+            progressRef.current = Math.min(progressRef.current + 4, 100);
+            setProgress(Math.floor(progressRef.current));
+            setStatusIdx(STATUS_MSGS.length); // triggers "Ready!" label
+            if (progressRef.current < 100) {
+                stepTimerRef.current = setTimeout(rushToHundred, 18);
+            } else {
+                // Hold at 100% for 600ms so the user sees it, then fade out
+                setTimeout(() => {
+                    setFinishing(true);
+                    setTimeout(() => {
+                        if (onComplete) onComplete();
+                    }, 520); // matches CSS transition below
+                }, 600);
+            }
+        };
+        rushToHundred();
+    }, [isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const bg = isDark
         ? 'linear-gradient(135deg, #0A0E27 0%, #0D1B3E 50%, #0A0E27 100%)'
         : 'linear-gradient(135deg, #EFF6FF 0%, #E0EAFF 50%, #EFF6FF 100%)';
+
+    // Which label to show
+    const statusLabel = statusIdx >= STATUS_MSGS.length ? '✓ Ready!' : STATUS_MSGS[statusIdx];
 
     return (
         <div
@@ -150,9 +188,10 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...' }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: bg,
-                opacity: fadeIn ? 1 : 0,
-                transition: 'opacity 0.6s ease',
+                opacity: finishing ? 0 : (fadeIn ? 1 : 0),
+                transition: finishing ? 'opacity 0.5s ease' : 'opacity 0.6s ease',
                 overflow: 'hidden',
+                pointerEvents: finishing ? 'none' : 'all',
             }}
         >
             {/* Keyframe styles */}
@@ -355,12 +394,15 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...' }) => {
                             fontSize: '0.68rem',
                             letterSpacing: '0.15em',
                             textTransform: 'uppercase',
-                            color: isDark ? 'rgba(148,163,184,0.8)' : 'rgba(71,85,105,0.7)',
+                            color: statusIdx >= STATUS_MSGS.length
+                                ? (isDark ? 'rgba(96,165,250,0.95)' : 'rgba(37,99,235,0.95)')
+                                : (isDark ? 'rgba(148,163,184,0.8)' : 'rgba(71,85,105,0.7)'),
                             fontFamily: 'monospace',
+                            fontWeight: statusIdx >= STATUS_MSGS.length ? 700 : 400,
                             animation: 'statusFade 1.8s ease both',
                         }}
                     >
-                        {STATUS_MSGS[statusIdx]}
+                        {statusLabel}
                     </p>
                 </div>
 
