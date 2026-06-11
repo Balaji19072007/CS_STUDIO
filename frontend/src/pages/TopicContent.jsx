@@ -195,7 +195,7 @@ const TopicContent = ({
             return true;
         } catch (error) {
             console.error('Error marking topic complete:', error);
-            alert('Failed to update progress');
+            alert(`Failed to update progress: ${error?.message || error}`);
             return false;
         } finally {
             setCompleting(false);

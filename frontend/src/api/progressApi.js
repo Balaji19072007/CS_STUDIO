@@ -97,11 +97,12 @@ const persistTopicCompletionWithPayload = async (userId, topicId, payload) => {
 // Get user's overall course progress
 export const getUserCourseProgress = async (userId, courseId) => {
   try {
+    const queryCourseId = courseId === 'c-programming' ? 'c-lang' : courseId;
     const { data, error } = await supabase
       .from('user_course_progress')
       .select('*')
       .eq('user_id', userId)
-      .eq('course_id', courseId)
+      .eq('course_id', queryCourseId)
       .order('last_accessed_at', { ascending: false, nullsFirst: false })
       .limit(1);
 
@@ -273,7 +274,7 @@ export const updateCourseProgress = async (userId, courseId) => {
       .from('user_course_progress')
       .update(payload)
       .eq('user_id', userId)
-      .eq('course_id', courseId)
+      .eq('course_id', queryCourseId)
       .select('*');
 
     if (updateError) {
@@ -288,7 +289,7 @@ export const updateCourseProgress = async (userId, courseId) => {
       .from('user_course_progress')
       .insert({
         user_id: userId,
-        course_id: courseId,
+        course_id: queryCourseId,
         progress_percentage: progressPercentage,
         last_accessed_at: new Date().toISOString(),
       })
