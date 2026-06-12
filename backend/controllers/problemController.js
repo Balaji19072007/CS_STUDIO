@@ -8,7 +8,7 @@ exports.getProblems = async (req, res) => {
     try {
         const userId = req.user ? req.user.id : null;
         const page = Math.max(1, parseInt(req.query.page) || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+        const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit) || 1000));
         const offset = (page - 1) * limit;
         const difficulty = req.query.difficulty;
         const language = req.query.language;
