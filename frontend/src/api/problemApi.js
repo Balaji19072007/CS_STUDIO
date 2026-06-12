@@ -60,7 +60,8 @@ export const fetchAllProblems = async () => {
         headers,
         credentials: 'include'
     });
-    return handleResponse(response);
+    const data = await handleResponse(response);
+    return data.problems || data; // data.problems for backend response shape
 };
 
 /**
