@@ -43,7 +43,14 @@ export const getFallbackTopicLearningMeta = (topicId) => {
 export const getFallbackTopicContent = (topicId) => {
   const entry = TOPICS_BY_ID.get(topicId);
   if (!entry) return null;
-  return buildTopicSections(entry);
+  const result = buildTopicSections(entry);
+  return (result.blocks || []).map((b, i) => ({
+    id: b.id,
+    content_type: b.type,
+    content_text: b.content,
+    topic_id: topicId,
+    order_index: i + 1,
+  }));
 };
 
 // ============ KIND INFERENCE ============

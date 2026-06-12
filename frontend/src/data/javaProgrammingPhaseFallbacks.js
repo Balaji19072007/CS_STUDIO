@@ -58,7 +58,14 @@ export async function getJavaFallbackTopicContent(topicId) {
   await _init();
   const entry = _TOPICS_BY_ID.get(topicId);
   if (!entry) return null;
-  return buildTopicSections(entry);
+  const result = buildTopicSections(entry);
+  return (result.blocks || []).map((b, i) => ({
+    id: b.id,
+    content_type: b.type,
+    content_text: b.content,
+    topic_id: topicId,
+    order_index: i + 1,
+  }));
 }
 
 export async function getJavaFallbackTopicLearningMeta(topicId) {
