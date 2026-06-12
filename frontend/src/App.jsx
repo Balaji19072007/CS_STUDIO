@@ -137,22 +137,22 @@ function AppContent() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/problems" element={<Problems />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/:courseId" element={<Navigate to="learn" replace />} />
-          <Route path="/courses/:courseId/learn" element={<CourseLearning />} />
-          <Route path="/courses/:courseId/learn/topic/:topicId" element={<CourseLearning />} />
-          <Route path="/courses/:courseId/learn/quiz/:quizId" element={<CourseLearning />} />
+          <Route path="/problems" element={<ProtectedRoute><Problems /></ProtectedRoute>} />
+          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+          <Route path="/courses/:courseId" element={<ProtectedRoute><Navigate to="learn" replace /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/learn" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/learn/topic/:topicId" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/learn/quiz/:quizId" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
 
           {/* Legacy routes - redirected or fallback */}
-          <Route path="/courses/:courseId/topic/:topicId" element={<TopicContent />} />
-          <Route path="/courses/:courseId/quiz/:quizId" element={<QuizPage />} />
+          <Route path="/courses/:courseId/topic/:topicId" element={<ProtectedRoute><TopicContent /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/quiz/:quizId" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
           {/* Legacy routes - kept for backward compatibility */}
-          <Route path="/courses/:courseId/phases/:phaseId" element={<PhaseTopics />} />
-          <Route path="/courses/:courseId/phases/:phaseId/topics/:topicId" element={<TopicContent />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/courses/:courseId/phases/:phaseId" element={<ProtectedRoute><PhaseTopics /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/phases/:phaseId/topics/:topicId" element={<ProtectedRoute><TopicContent /></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/solve" element={<ProtectedRoute><SolveProblem /></ProtectedRoute>} />
           <Route path="/challenge/:problemId" element={<ProtectedRoute><CourseChallenge /></ProtectedRoute>} />
           <Route path="/course-challenge/:challengeId" element={<ProtectedRoute><CourseChallengePage /></ProtectedRoute>} />
