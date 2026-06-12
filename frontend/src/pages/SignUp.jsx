@@ -490,6 +490,7 @@ const SignUp = () => {
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
+                    name="terms"
                     checked={termsChecked}
                     onChange={(e) => setTermsChecked(e.target.checked)}
                     className="mt-1 w-5 h-5 rounded border-gray-600 bg-gray-700/50 text-primary-500 focus:ring-2 focus:ring-primary-500"
@@ -547,6 +548,7 @@ const SignUp = () => {
                     <input
                       key={index}
                       type="text"
+                      name={`otp-${index}`}
                       maxLength="1"
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target, index)}
