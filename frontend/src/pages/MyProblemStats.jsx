@@ -159,18 +159,18 @@ const MyProblemStats = () => {
                                                 <div className="w-full max-w-[140px]">
                                                     <div className="flex justify-between text-xs mb-1">
                                                         <span className="text-gray-400">Score</span>
-                                                        <span className={`font-bold ${item.bestAccuracy >= 90 ? 'text-green-400' :
-                                                            item.bestAccuracy >= 50 ? 'text-yellow-400' : 'text-red-400'
+                                                        <span className={`font-bold ${(item.bestAccuracy || 0) >= 90 ? 'text-green-400' :
+                                                            (item.bestAccuracy || 0) >= 50 ? 'text-yellow-400' : 'text-red-400'
                                                             }`}>
-                                                            {item.bestAccuracy}%
+                                                            {item.bestAccuracy || 0}%
                                                         </span>
                                                     </div>
                                                     <div className="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
                                                         <div
-                                                            className={`h-full rounded-full transition-all duration-500 ${item.bestAccuracy >= 90 ? 'bg-green-500' :
-                                                                item.bestAccuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                                                            className={`h-full rounded-full transition-all duration-500 ${(item.bestAccuracy || 0) >= 90 ? 'bg-green-500' :
+                                                                (item.bestAccuracy || 0) >= 50 ? 'bg-yellow-500' : 'bg-red-500'
                                                                 }`}
-                                                            style={{ width: `${item.bestAccuracy}%` }}
+                                                            style={{ width: `${item.bestAccuracy || 0}%` }}
                                                         ></div>
                                                     </div>
                                                 </div>

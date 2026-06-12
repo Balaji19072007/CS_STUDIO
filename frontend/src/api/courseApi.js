@@ -39,6 +39,7 @@ const getJavaCourseFallback = (courseId) => ({
   id: courseId,
   title: 'Java Programming',
   description: 'Master Java programming from basics to advanced concepts.',
+  overview_description: 'Master Java programming from the ground up — build robust applications, understand object-oriented design, and learn the ecosystem that powers enterprise software.',
 });
 
 export const getCourse = async (courseId) => {
@@ -48,6 +49,7 @@ export const getCourse = async (courseId) => {
         id: courseId,
         title: 'C Programming',
         description: 'Master C programming from basics to advanced concepts.',
+        overview_description: 'Master C Programming from the ground up — write valid C programs, understand why the language still powers operating systems, embedded devices, tooling, and performance-critical software.',
       };
     }
     if (isJavaProgrammingCourse(courseId)) {
@@ -69,6 +71,7 @@ export const getCourse = async (courseId) => {
         id: courseId,
         title: 'C Programming',
         description: 'Master C programming from basics to advanced concepts.',
+        overview_description: 'Master C Programming from the ground up — write valid C programs, understand why the language still powers operating systems, embedded devices, tooling, and performance-critical software.',
       };
     }
     if (isJavaProgrammingCourse(courseId)) {
@@ -338,7 +341,8 @@ export const getCourseChallenge = async (topicId) => {
     });
 
     if (!res.ok) throw new Error('Failed to fetch challenge');
-    return await res.json();
+    const data = await res.json();
+    return data.success !== undefined ? data.challenge : data;
   } catch (error) {
     console.error('Error fetching course challenge:', error);
     return null;
@@ -353,7 +357,8 @@ export const getCourseChallengeById = async (challengeId) => {
     });
 
     if (!res.ok) throw new Error('Failed to fetch challenge');
-    return await res.json();
+    const data = await res.json();
+    return data.success !== undefined ? data.challenge : data;
   } catch (error) {
     console.error('Error fetching course challenge by ID:', error);
     throw error;

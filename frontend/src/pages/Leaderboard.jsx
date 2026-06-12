@@ -194,7 +194,7 @@ const LeaderboardTableRow = ({ user, index }) => {
             </td>
             {/* Hide less important columns on mobile */}
             <td className="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-center text-gray-300 hidden sm:table-cell">
-                {(user.accuracy !== undefined || user.averageAccuracy !== undefined) ? `${user.accuracy || Math.round(user.averageAccuracy)}%` : 'N/A'}
+                {user.accuracy !== undefined ? `${Math.round(user.accuracy)}%` : user.averageAccuracy !== undefined ? `${Math.round(user.averageAccuracy)}%` : 'N/A'}
             </td>
             <td className="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-center text-gray-300 hidden sm:table-cell">
                 {user.currentStreak || user.streak || 0} days
@@ -331,8 +331,8 @@ const Leaderboard = () => {
             const aPoints = a.totalPoints || a.points || 0;
             const bPoints = b.totalPoints || b.points || 0;
 
-            if (bSolved !== aSolved) return bSolved - aSolved;
-            return bPoints - aPoints;
+            if (bPoints !== aPoints) return bPoints - aPoints;
+            return bSolved - aSolved;
         });
 
         // Add rank to each user

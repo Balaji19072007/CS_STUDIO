@@ -126,7 +126,11 @@ export const submitQuizAttempt = async (userId, quizId, answers, score, passed) 
             .from('user_quiz_answers')
             .insert(answerInserts);
 
-        if (answersError) throw answersError;
+        if (answersError) {
+            // Rollback the attempt if answers fail to insert
+            await supabase.from('user_quiz_attempts').delete().eq('id', attempt.id);
+            throw answersError;
+        }
 
         return attempt;
     } catch (error) {

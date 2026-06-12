@@ -120,7 +120,7 @@ const AdminDashboard = () => {
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Total Users</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {updates.stats.totalUsers || 0}
+              {updates?.stats?.totalUsers || 0}
             </h3>
           </div>
         </div>
@@ -133,7 +133,7 @@ const AdminDashboard = () => {
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Problems Solved</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {updates.stats.totalProblems || 0}
+              {updates?.stats?.totalProblems || 0}
             </h3>
           </div>
         </div>
@@ -147,11 +147,11 @@ const AdminDashboard = () => {
             <h2 className="text-lg font-bold text-gray-800 dark:text-white">Recent Signups</h2>
           </div>
           <div className="p-5 flex-grow overflow-y-auto max-h-[400px]">
-            {updates.recentUsers.length === 0 ? (
+            {(!updates?.recentUsers || updates.recentUsers.length === 0) ? (
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recent signups found.</p>
             ) : (
               <div className="space-y-4">
-                {updates.recentUsers.map(user => (
+                {updates?.recentUsers?.map(user => (
                   <div key={user.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-600">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center text-white font-bold shadow-inner">
@@ -185,11 +185,11 @@ const AdminDashboard = () => {
             <h2 className="text-lg font-bold text-gray-800 dark:text-white">Recent Activity</h2>
           </div>
           <div className="p-5 flex-grow overflow-y-auto max-h-[400px]">
-            {updates.recentProgress.length === 0 ? (
+            {(!updates?.recentProgress || updates.recentProgress.length === 0) ? (
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recent activity found.</p>
             ) : (
               <div className="space-y-4">
-                {updates.recentProgress.map(progress => (
+                {updates?.recentProgress?.map(progress => (
                   <div key={progress.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-600">
                     <div className="bg-green-100 dark:bg-green-900/30 p-2.5 rounded-lg text-green-600 dark:text-green-400">
                       <CheckCircle size={20} />
@@ -230,12 +230,12 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {auditLogs.length === 0 ? (
+              {!auditLogs || auditLogs.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="py-8 text-center text-gray-500 dark:text-gray-400">No audit logs found.</td>
                 </tr>
               ) : (
-                auditLogs.map(log => (
+                auditLogs?.map(log => (
                   <tr key={log.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                     <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-300">
                       {new Date(log.created_at).toLocaleString()}

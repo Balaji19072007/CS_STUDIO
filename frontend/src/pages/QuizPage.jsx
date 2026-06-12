@@ -45,7 +45,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                 // Fetch History
                 if (user) {
                     const attempts = await getUserQuizAttempts(user.id, resolvedQuizId);
-                    setHistory(attempts);
+                    setHistory(attempts || []);
                 }
 
                 setLoading(false);
@@ -161,7 +161,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                 let isCorrect = false;
 
                 if (question.question_type === 'true_false') {
-                    isCorrect = userAnswer === question.correct_answer;
+                    isCorrect = String(userAnswer) === String(question.correct_answer);
                 } else {
                     isCorrect = parseInt(userAnswer) === parseInt(question.correct_answer);
                 }
@@ -171,7 +171,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
             });
 
             const score = Math.round((correctCount / questions.length) * 100);
-            const passed = score >= (quiz.pass_percentage || 60);
+            const passed = score >= (quiz?.pass_percentage ?? 60);
 
             // Submit
             await submitQuizAttempt(user.id, resolvedQuizId, answerDetails, score, passed);
@@ -179,7 +179,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
 
             // Refresh history
             const attempts = await getUserQuizAttempts(user.id, resolvedQuizId);
-            setHistory(attempts);
+            setHistory(attempts || []);
 
             if (passed) {
                 window.dispatchEvent(
@@ -190,7 +190,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
             }
 
             setResults({
-                score, pass_percentage: quiz.pass_percentage || 60, passed,
+                score, pass_percentage: quiz?.pass_percentage ?? 60, passed,
                 correct: correctCount, incorrect: questions.length - correctCount,
                 total: questions.length, answerDetails
             });
@@ -263,7 +263,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
             {embedded && (
                 <div className="mt-8 sm:mt-12 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 gap-3">
                     {isFirst ? (
-                        <div></div>
+                        <div className="hidden sm:block"></div>
                     ) : (
                         <button
                             onClick={onPrevious}
@@ -283,8 +283,8 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                                 }
                             }
                         }}
-                        disabled={!(history.length > 0 && history.some(h => h.passed))}
-                        className={`rounded-xl px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${(history.length > 0 && history.some(h => h.passed)) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500' : 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600'}`}
+                        disabled={!(history.length > 0 && history.some(h => h.passed)) || loading}
+                        className={`rounded-xl px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${(history.length > 0 && history.some(h => h.passed)) && !loading ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500' : 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600'}`}
                     >
                         <span className="hidden sm:inline">{isLast ? 'Finish Course' : 'Continue to Next Lesson'}</span>
                         <span className="sm:hidden">{isLast ? 'Finish' : 'Next'}</span>
@@ -402,7 +402,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                 {!embedded ? (
                     <button onClick={() => setGameState('IDLE')} className="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-xl font-bold transition-colors whitespace-nowrap">Back to Menu</button>
                 ) : (
-                    <button onClick={onNext} disabled={isLast} className={`px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl font-bold transition-all shadow-sm whitespace-nowrap ${isLast ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 shadow-lg'}`}>
+                    <button onClick={onNext} disabled={isLast || !results.passed} className={`px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl font-bold transition-all shadow-sm whitespace-nowrap ${isLast || !results.passed ? 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800/50 dark:text-gray-600' : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 shadow-lg'}`}>
                         <span className="hidden sm:inline">Continue to Next Lesson</span>
                         <span className="sm:hidden">Next Lesson</span>
                     </button>
@@ -427,7 +427,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                                     <div className="flex-1">
                                         <p className="text-gray-900 dark:text-white font-medium mb-2 transition-colors">{q.question_text}</p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 transition-colors">Your Answer: <span className={isCorr ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                            {q.question_type === 'true_false' ? detail?.selectedAnswer : q.options[detail?.selectedAnswer]?.option_text || 'None'}
+                                            {q.question_type === 'true_false' ? (detail?.selectedAnswer !== null ? String(detail?.selectedAnswer) : 'None') : q.options[detail?.selectedAnswer]?.option_text || 'None'}
                                         </span></p>
                                         {!isCorr && (
                                             <p className="text-sm text-green-600 dark:text-green-400 transition-colors">Correct Answer: <span>
@@ -471,10 +471,10 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
             `}</style>
 
             {/* Nav (Only visible if NOT running) */}
-            {gameState !== 'RUNNING' && !embedded && (
+            {gameState !== 'RUNNING' && (
                 <header className="bg-white dark:bg-[#1E293B] border-b border-gray-200 dark:border-gray-700/50 px-4 py-3 flex items-center gap-4 transition-colors">
                     <button onClick={() => navigate(`/courses/${courseId}/learn`)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-colors">←</button>
-                    <span className="font-bold text-gray-900 dark:text-white transition-colors">Exit Quiz</span>
+                    <span className="font-bold text-gray-900 dark:text-white transition-colors">{embedded ? 'Quiz' : 'Exit Quiz'}</span>
                 </header>
             )}
 

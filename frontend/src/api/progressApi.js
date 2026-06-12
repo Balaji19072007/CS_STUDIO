@@ -183,10 +183,17 @@ export const getAllUserProgressForCourse = async (userId, courseId) => {
     // If join query fails, fall back to fetching all user progress
     if (error) {
       console.warn('Join query failed, fetching plain progress:', error.message);
+      
+      const { data: phasesData } = await supabase.from('phases').select('id').eq('course_id', queryCourseId);
+      const phaseIds = phasesData?.map(p => p.id) || [];
+      const { data: topicsData } = await supabase.from('topics').select('id').in('phase_id', phaseIds);
+      const topicIds = topicsData?.map(t => t.id) || [];
+      
       const { data: plainData, error: plainError } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .in('topic_id', topicIds.length > 0 ? topicIds : ['none']);
 
       if (plainError) throw plainError;
       data = plainData;
@@ -278,10 +285,16 @@ export const updateCourseProgress = async (userId, courseId) => {
       if (!error) progressRows = data || [];
     } catch (e) {
       console.warn('Could not fetch progress with join, using plain query:', e.message);
+      const { data: phasesData } = await supabase.from('phases').select('id').eq('course_id', queryCourseId);
+      const phaseIds = phasesData?.map(p => p.id) || [];
+      const { data: topicsData } = await supabase.from('topics').select('id').in('phase_id', phaseIds);
+      const topicIds = topicsData?.map(t => t.id) || [];
+      
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .in('topic_id', topicIds.length > 0 ? topicIds : ['none']);
       if (!error) progressRows = data || [];
     }
 
@@ -362,10 +375,14 @@ export const getPhaseProgress = async (userId, phaseId) => {
       if (!error) progressRows = data || [];
     } catch (e) {
       console.warn('Could not fetch phase progress with join:', e.message);
+      const { data: topicsData } = await supabase.from('topics').select('id').eq('phase_id', phaseId);
+      const topicIds = topicsData?.map(t => t.id) || [];
+      
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .in('topic_id', topicIds.length > 0 ? topicIds : ['none']);
       if (!error) progressRows = data || [];
     }
 

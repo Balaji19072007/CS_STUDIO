@@ -267,11 +267,11 @@ const MyProgress = () => {
                       <div className={`w-2 h-2 rounded-full ${item.status === 'solved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                       <div>
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</h4>
-                        <p className="text-xs text-gray-500">{new Date(item.lastSubmission).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">{item.lastSubmission || item.solvedAt ? new Date(item.lastSubmission || item.solvedAt).toLocaleDateString() : 'N/A'}</p>
                       </div>
                     </div>
                     <span className="text-xs font-mono text-gray-400">
-                      {item.bestAccuracy}% Acc
+                      {item.bestAccuracy || 0}% Acc
                     </span>
                   </div>
                 ))}
@@ -311,9 +311,7 @@ const MyProgress = () => {
               </div>
             </div>
 
-
           </div>
-
         </div>
       </div>
     </div>
@@ -321,4 +319,3 @@ const MyProgress = () => {
 };
 
 export default MyProgress;
-

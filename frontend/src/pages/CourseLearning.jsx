@@ -144,8 +144,8 @@ const CourseLearning = ({ embeddedCourseId }) => {
 
                         // Dynamically inject quizzes for C programming if needed
                         let items = [];
-                        const isCCourse = (courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming' || courseId === 'c-lang');
-                        const isJavaCourse = (courseData?.title?.toLowerCase().includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
+                        const isCCourse = (courseData?.title?.toLowerCase()?.includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming' || courseId === 'c-lang');
+                        const isJavaCourse = (courseData?.title?.toLowerCase()?.includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
                             if ((isCCourse && phase.order_index !== 18) || (isJavaCourse && phase.order_index !== 22)) {
                                 const topicItems = topics.map(t => ({ ...t, type: 'topic' }));
                                 const quizItems = quizzes.map(q => ({ ...q, type: 'quiz' })).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
@@ -269,15 +269,18 @@ const CourseLearning = ({ embeddedCourseId }) => {
                 // We have the full phases structure and the full progress map, so we don't need API calls for this
                 phases.forEach(phase => {
                     const topics = phase.items.filter(i => i.type === 'topic');
-                    const totalTopics = topics.length;
+                    const quizzes = phase.items.filter(i => i.type === 'quiz');
+                    const totalItems = topics.length + quizzes.length;
 
-                    if (totalTopics > 0) {
+                    if (totalItems > 0) {
                         const completedTopics = topics.filter(t => isProgressCompleted(progressMap[t.id])).length;
-                        const percentage = Math.round((completedTopics / totalTopics) * 100);
+                        const completedQuizzes = quizzes.filter(q => isProgressCompleted(progressMap[q.id])).length;
+                        const completedItems = completedTopics + completedQuizzes;
+                        const percentage = Math.round((completedItems / totalItems) * 100);
 
                         progressMap[phase.id] = {
-                            total: totalTopics,
-                            completed: completedTopics,
+                            total: totalItems,
+                            completed: completedItems,
                             percentage: percentage
                         };
                     } else {
@@ -377,10 +380,10 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const isLast = currentIndex === allItems.length - 1;
 
     const goToNext = () => {
-        if (!isLast) {
+        if (currentIndex !== -1 && !isLast) {
             const nextItem = allItems[currentIndex + 1];
             selectItem(nextItem);
-        } else {
+        } else if (isLast) {
             if (isEmbedded) {
                 setLocalTopicId(null);
                 setLocalQuizId(null);
@@ -391,7 +394,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
     };
 
     const goToPrevious = () => {
-        if (!isFirst) {
+        if (currentIndex !== -1 && !isFirst) {
             const prevItem = allItems[currentIndex - 1];
             selectItem(prevItem);
         }
@@ -496,6 +499,24 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                 />
                             );
                         })}
+                    </div>
+
+                    <div className="mt-12 flex justify-between items-center border-t border-gray-200 dark:border-gray-800 pt-6">
+                        <button
+                            onClick={goToPrevious}
+                            disabled={isFirst}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all ${isFirst ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400' : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 shadow-sm hover:shadow'}`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            Previous
+                        </button>
+                        <button
+                            onClick={goToNext}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg shadow-blue-500/20"
+                        >
+                            Start Phase
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </button>
                     </div>
                 </div>
             </div>

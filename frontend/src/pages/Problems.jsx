@@ -63,7 +63,7 @@ const Problems = () => {
 
                     // Deduplicate problems just in case backend or strict mode causes issues
                     const uniqueProblems = problemsWithStatus.filter((prob, index, self) =>
-                        index === self.findIndex((p) => p.problemId === prob.problemId)
+                        index === self.findIndex((p) => (p.problemId || p.id) === (prob.problemId || prob.id))
                     );
 
                     setAllProblems(uniqueProblems);

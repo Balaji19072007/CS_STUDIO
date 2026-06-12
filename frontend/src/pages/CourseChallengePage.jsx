@@ -130,18 +130,30 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
     useEffect(() => {
         fetchChallenge();
 
+        const startTimeKey = `course_challenge_start_${challengeId}`;
+        let startTime = parseInt(localStorage.getItem(startTimeKey), 10);
+        if (!startTime || isNaN(startTime)) {
+            startTime = Date.now();
+            localStorage.setItem(startTimeKey, startTime.toString());
+        }
+
+        // Initialize elapsed time immediately
+        const initialElapsed = Math.floor((Date.now() - startTime) / 1000);
+        setTimeElapsed(initialElapsed);
+        if (initialElapsed >= LOCK_TIME_SECONDS) {
+            setIsSolutionUnlocked(true);
+        }
+
         const interval = window.setInterval(() => {
-            setTimeElapsed((previous) => {
-                const nextValue = previous + 1;
-                if (nextValue >= LOCK_TIME_SECONDS) {
-                    setIsSolutionUnlocked(true);
-                }
-                return nextValue;
-            });
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            setTimeElapsed(elapsedSeconds);
+            if (elapsedSeconds >= LOCK_TIME_SECONDS) {
+                setIsSolutionUnlocked(true);
+            }
         }, 1000);
 
         return () => window.clearInterval(interval);
-    }, [fetchChallenge]);
+    }, [fetchChallenge, challengeId]);
 
     // WebSocket execution setup
     useEffect(() => {

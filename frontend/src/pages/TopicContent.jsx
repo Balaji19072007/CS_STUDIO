@@ -177,8 +177,8 @@ const TopicContent = ({
 
     const handleMarkComplete = async () => {
         if (!user) {
-            alert('Please sign in to track progress');
-            return false;
+            // Allow anonymous users to continue without saving progress
+            return true;
         }
 
         try {
@@ -287,9 +287,10 @@ const TopicContent = ({
     };
 
     const extractLanguage = (rawText = '') => {
+        if (!rawText) return null;
         if (rawText.includes('```')) {
-            const match = rawText.match(/```([a-zA-Z+#]*)\n/);
-            return match ? match[1].toLowerCase() : null;
+            const match = rawText.match(/```([a-zA-Z+#]*)/);
+            return match && match[1] ? match[1].toLowerCase() : null;
         }
         return null;
     };
@@ -402,8 +403,9 @@ const TopicContent = ({
                                 <button
                                     onClick={() => {
                                         const targetLang = presentation.playgroundLanguage || presentation.syntaxLanguage || 'text';
-                                        navigate(`/code?lang=${targetLang}&source=${encodeURIComponent(displayCodeText)}`, {
-                                            state: { source: displayCodeText, lang: targetLang }
+                                        const safeCode = displayCodeText || '';
+                                        navigate(`/code?lang=${targetLang}&source=${encodeURIComponent(safeCode)}`, {
+                                            state: { source: safeCode, lang: targetLang }
                                         });
                                     }}
                                     className={`absolute bottom-4 right-4 rounded-lg px-4 py-2 text-xs font-bold shadow-lg transition-all ${presentation.buttonClass}`}
@@ -552,7 +554,7 @@ const TopicContent = ({
                                 {/* Start Button */}
                                 <div className="w-full flex justify-end">
                                     <button
-                                        onClick={() => navigate(`/course-project/${courseChallenge.id}`, { state: { from: location.pathname } })}
+                                        onClick={() => navigate(`/course-project/${courseChallenge.id || resolvedTopicId}`, { state: { from: location.pathname } })}
                                         className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] transition-all duration-300 transform hover:-translate-y-1 flex items-center gap-4 group"
                                     >
                                         Start Project
@@ -622,7 +624,7 @@ const TopicContent = ({
                                                 : `Solve this ${courseChallenge.title?.toLowerCase().includes('project') ? 'project' : 'challenge'} to unlock the next lesson in the course path.`}
                                         </p>
                                         <button
-                                            onClick={() => navigate(courseChallenge.title?.toLowerCase().includes('project') ? `/course-project/${courseChallenge.id}` : `/course-challenge/${courseChallenge.id}`, { state: { from: location.pathname } })}
+                                            onClick={() => navigate(courseChallenge.title?.toLowerCase().includes('project') ? `/course-project/${courseChallenge.id || resolvedTopicId}` : `/course-challenge/${courseChallenge.id || resolvedTopicId}`, { state: { from: location.pathname } })}
                                             className={`rounded-lg px-6 py-2.5 text-sm font-bold transition-colors ${courseChallenge.solved ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700' : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 shadow-sm'}`}
                                         >
                                             {courseChallenge.solved ? `Review ${courseChallenge.title?.toLowerCase().includes('project') ? 'Project' : 'Challenge'}` : `Open ${courseChallenge.title?.toLowerCase().includes('project') ? 'Project' : 'Challenge'}`}
