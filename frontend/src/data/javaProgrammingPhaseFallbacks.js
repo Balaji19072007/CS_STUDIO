@@ -62,7 +62,7 @@ export async function getJavaFallbackTopicContent(topicId) {
   return (result.blocks || []).map((b, i) => ({
     id: b.id,
     content_type: b.type,
-    content_text: b.content,
+    content_text: Array.isArray(b.content) ? b.content.join('\n') : String(b.content || ''),
     topic_id: topicId,
     order_index: i + 1,
   }));
@@ -217,7 +217,7 @@ const buildNotes = (kind) => {
     thread: ['Use high-level concurrency utilities', 'Avoid synchronized blocks when possible'],
     general: ['Practice regularly', 'Review code from experienced developers'],
   };
-  return map[kind] || map.general;
+  return (map[kind] || map.general).join('\n');
 };
 
 const buildPracticeNotes = (entry, kind) => {
@@ -234,7 +234,7 @@ const buildPracticeNotes = (entry, kind) => {
     thread: ['Create and start threads', 'Use ExecutorService'],
     general: ['Practice with small exercises daily', 'Build a small project'],
   };
-  return map[kind] || map.general;
+  return (map[kind] || map.general).join('\n');
 };
 
 const buildTopicSections = (entry) => {
