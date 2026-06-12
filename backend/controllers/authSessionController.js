@@ -100,11 +100,6 @@ exports.login = async (req, res) => {
         }
       }
       
-      if (aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
-          logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required');
-          return res.json({ success: true, user: data.user, mfa_required: true });
-      }
-
       logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'SUCCESS');
       return res.json({ success: true, user: data.user, token: data.session.access_token, session: data.session });
     } else if (data.user) {
