@@ -1,45 +1,72 @@
-import phasesData from './javaProgrammingPhasesData.json';
-
-export const JAVA_PHASES = phasesData;
-
-const PHASES_BY_ID = new Map(JAVA_PHASES.map((phase) => [phase.id, phase]));
-
-export const getJavaFallbackPhase = (phaseId) => PHASES_BY_ID.get(phaseId);
-
-const FLAT_TOPICS = JAVA_PHASES.flatMap((phase) =>
-  phase.topics.map((entry) => ({ ...entry, phase_id: phase.id, phase_title: phase.title }))
-);
-
-const TOPICS_BY_ID = new Map(FLAT_TOPICS.map((entry) => [entry.id, entry]));
-
 export const isJavaProgrammingCourse = (courseId) => courseId === 'java-programming' || courseId === 'Java';
 
-export const getJavaFallbackPhases = (courseId) => {
+let _initialized = false;
+let _initPromise = null;
+let _phasesData;
+let _PHASES_BY_ID;
+let _FLAT_TOPICS;
+let _TOPICS_BY_ID;
+
+async function _init() {
+  if (_initialized) return;
+  if (!_initPromise) {
+    _initPromise = (async () => {
+      const mod = await import('./javaProgrammingPhasesData.json');
+      _phasesData = mod.default;
+      _PHASES_BY_ID = new Map(_phasesData.map((phase) => [phase.id, phase]));
+      _FLAT_TOPICS = _phasesData.flatMap((phase) =>
+        phase.topics.map((entry) => ({ ...entry, phase_id: phase.id, phase_title: phase.title }))
+      );
+      _TOPICS_BY_ID = new Map(_FLAT_TOPICS.map((entry) => [entry.id, entry]));
+      _initialized = true;
+    })();
+  }
+  await _initPromise;
+}
+
+export async function getJavaFallbackPhase(phaseId) {
+  await _init();
+  return _PHASES_BY_ID.get(phaseId);
+}
+
+export async function getJavaFallbackPhases(courseId) {
+  await _init();
   if (courseId && !isJavaProgrammingCourse(courseId)) return [];
-  return JAVA_PHASES.map(({ topics, ...phase }) => ({
+  return _phasesData.map(({ topics, ...phase }) => ({
     ...phase,
     courseId: courseId || phase.course_id,
     topics: topics.map((t) => t.id),
   }));
-};
+}
 
-export const getJavaFallbackTopics = (phaseId) => FLAT_TOPICS.filter((t) => t.phase_id === phaseId);
+export async function getJavaFallbackTopics(phaseId) {
+  await _init();
+  return _FLAT_TOPICS.filter((t) => t.phase_id === phaseId);
+}
 
-export const getJavaFallbackTopicMetadata = (topicId) => TOPICS_BY_ID.get(topicId) || null;
+export async function getJavaFallbackTopicMetadata(topicId) {
+  await _init();
+  return _TOPICS_BY_ID.get(topicId) || null;
+}
 
-export const hasJavaFallbackTopicContent = (topicId) => TOPICS_BY_ID.has(topicId);
+export async function hasJavaFallbackTopicContent(topicId) {
+  await _init();
+  return _TOPICS_BY_ID.has(topicId);
+}
 
-export const getJavaFallbackTopicContent = (topicId) => {
-  const entry = TOPICS_BY_ID.get(topicId);
+export async function getJavaFallbackTopicContent(topicId) {
+  await _init();
+  const entry = _TOPICS_BY_ID.get(topicId);
   if (!entry) return null;
   return buildTopicSections(entry);
-};
+}
 
-export const getJavaFallbackTopicLearningMeta = (topicId) => {
-  const entry = TOPICS_BY_ID.get(topicId);
+export async function getJavaFallbackTopicLearningMeta(topicId) {
+  await _init();
+  const entry = _TOPICS_BY_ID.get(topicId);
   if (!entry) return null;
   return buildLearningMeta(entry);
-};
+}
 
 // ============ INFERENCE ============
 

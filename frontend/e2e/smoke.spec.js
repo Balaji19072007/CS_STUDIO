@@ -11,11 +11,13 @@ test.describe('Smoke Tests', () => {
     await expect(page).toHaveTitle(/CS Studio/);
   });
 
-  test('navigation links are present', async ({ page }) => {
+  test('main content renders with heading', async ({ page }) => {
     await page.goto('/');
-    // Check for common navigation elements
-    const nav = page.locator('nav, header, [role="navigation"]');
-    await expect(nav).toBeVisible();
+    // Landing page may omit nav for unauthenticated users; check content renders
+    await expect(page.locator('main, #root > div, .app-container').first()).toBeVisible();
+    const heading = page.locator('h1, h2').first();
+    await expect(heading).toBeVisible();
+    await expect(heading).not.toBeEmpty();
   });
 
   test('theme toggle works', async ({ page }) => {

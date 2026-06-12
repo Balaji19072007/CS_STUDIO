@@ -1,25 +1,24 @@
 import { supabase } from '../config/supabase';
 import { buildApiUrl } from '../config/api.js';
-import {
-  getFallbackPhases,
-  getFallbackTopicContent,
-  getFallbackTopicLearningMeta,
-  getFallbackTopicMetadata,
-  getFallbackTopics,
-  hasFallbackTopicContent,
-  isCProgrammingCourse,
-  getFallbackPhase,
-} from '../data/cProgrammingPhaseFallbacks.js';
-import {
-  getJavaFallbackPhases,
-  getJavaFallbackTopicContent,
-  getJavaFallbackTopicLearningMeta,
-  getJavaFallbackTopicMetadata,
-  getJavaFallbackTopics,
-  hasJavaFallbackTopicContent,
-  isJavaProgrammingCourse,
-  getJavaFallbackPhase,
-} from '../data/javaProgrammingPhaseFallbacks.js';
+
+const getCModule = (() => {
+  let mod = null;
+  return async () => {
+    if (!mod) mod = await import('../data/cProgrammingPhaseFallbacks.js');
+    return mod;
+  };
+})();
+
+const getJavaModule = (() => {
+  let mod = null;
+  return async () => {
+    if (!mod) mod = await import('../data/javaProgrammingPhaseFallbacks.js');
+    return mod;
+  };
+})();
+
+const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'C';
+const isJavaProgrammingCourse = (courseId) => courseId === 'java-programming' || courseId === 'Java';
 
 const getAuthHeaders = (includeJson = false) => {
   const headers = {};
@@ -127,10 +126,12 @@ export const getEnrolledCourses = async () => {
 export const getPhases = async (courseId) => {
   try {
     if (isCProgrammingCourse(courseId)) {
-      return getFallbackPhases(courseId);
+      const cModule = await getCModule();
+      return cModule.getFallbackPhases(courseId);
     }
     if (isJavaProgrammingCourse(courseId)) {
-      return getJavaFallbackPhases(courseId);
+      const javaModule = await getJavaModule();
+      return javaModule.getJavaFallbackPhases(courseId);
     }
 
     const { data, error } = await supabase
@@ -144,10 +145,12 @@ export const getPhases = async (courseId) => {
   } catch (error) {
     console.error('Error fetching phases:', error);
     if (isCProgrammingCourse(courseId)) {
-      return getFallbackPhases(courseId);
+      const cModule = await getCModule();
+      return cModule.getFallbackPhases(courseId);
     }
     if (isJavaProgrammingCourse(courseId)) {
-      return getJavaFallbackPhases(courseId);
+      const javaModule = await getJavaModule();
+      return javaModule.getJavaFallbackPhases(courseId);
     }
     throw error;
   }
@@ -155,10 +158,12 @@ export const getPhases = async (courseId) => {
 
 export const getPhase = async (phaseId) => {
   try {
-    const fallbackPhase = getFallbackPhase(phaseId);
+    const cModule = await getCModule();
+    const fallbackPhase = cModule.getFallbackPhase(phaseId);
     if (fallbackPhase) return fallbackPhase;
 
-    const javaFallbackPhase = getJavaFallbackPhase(phaseId);
+    const javaModule = await getJavaModule();
+    const javaFallbackPhase = await javaModule.getJavaFallbackPhase(phaseId);
     if (javaFallbackPhase) return javaFallbackPhase;
 
     const { data, error } = await supabase
@@ -177,15 +182,13 @@ export const getPhase = async (phaseId) => {
 
 export const getTopics = async (phaseId) => {
   try {
-    const fallbackTopics = getFallbackTopics(phaseId);
-    if (fallbackTopics && fallbackTopics.length > 0) {
-      return fallbackTopics;
-    }
+    const cModule = await getCModule();
+    const fallbackTopics = cModule.getFallbackTopics(phaseId);
+    if (fallbackTopics && fallbackTopics.length > 0) return fallbackTopics;
 
-    const javaFallbackTopics = getJavaFallbackTopics(phaseId);
-    if (javaFallbackTopics && javaFallbackTopics.length > 0) {
-      return javaFallbackTopics;
-    }
+    const javaModule = await getJavaModule();
+    const javaFallbackTopics = await javaModule.getJavaFallbackTopics(phaseId);
+    if (javaFallbackTopics && javaFallbackTopics.length > 0) return javaFallbackTopics;
 
     const { data, error } = await supabase
       .from('topics')
@@ -197,14 +200,13 @@ export const getTopics = async (phaseId) => {
     return data || [];
   } catch (error) {
     console.error('Error fetching topics:', error);
-    const fallbackTopics = getFallbackTopics(phaseId);
-    if (fallbackTopics && fallbackTopics.length > 0) {
-      return fallbackTopics;
-    }
-    const javaFallbackTopics = getJavaFallbackTopics(phaseId);
-    if (javaFallbackTopics && javaFallbackTopics.length > 0) {
-      return javaFallbackTopics;
-    }
+    const cModule = await getCModule();
+    const fallbackTopics = cModule.getFallbackTopics(phaseId);
+    if (fallbackTopics && fallbackTopics.length > 0) return fallbackTopics;
+
+    const javaModule = await getJavaModule();
+    const javaFallbackTopics = await javaModule.getJavaFallbackTopics(phaseId);
+    if (javaFallbackTopics && javaFallbackTopics.length > 0) return javaFallbackTopics;
     throw error;
   }
 };
@@ -217,18 +219,19 @@ export const getTopic = async (topicId) => {
       .eq('id', topicId)
       .single();
 
-    const fallbackTopic = getFallbackTopicMetadata(topicId) || getJavaFallbackTopicMetadata(topicId);
+    const cModule = await getCModule();
+    let fallbackTopic = cModule.getFallbackTopicMetadata(topicId);
+    if (!fallbackTopic) {
+      const javaModule = await getJavaModule();
+      fallbackTopic = await javaModule.getJavaFallbackTopicMetadata(topicId);
+    }
 
     if (error) {
-      if (fallbackTopic) {
-        return fallbackTopic;
-      }
+      if (fallbackTopic) return fallbackTopic;
       throw error;
     }
 
-    if (!fallbackTopic) {
-      return data;
-    }
+    if (!fallbackTopic) return data;
 
     return {
       ...fallbackTopic,
@@ -240,10 +243,13 @@ export const getTopic = async (topicId) => {
     };
   } catch (error) {
     console.error('Error fetching topic:', error);
-    const fallbackTopic = getFallbackTopicMetadata(topicId) || getJavaFallbackTopicMetadata(topicId);
-    if (fallbackTopic) {
-      return fallbackTopic;
+    const cModule = await getCModule();
+    let fallbackTopic = cModule.getFallbackTopicMetadata(topicId);
+    if (!fallbackTopic) {
+      const javaModule = await getJavaModule();
+      fallbackTopic = await javaModule.getJavaFallbackTopicMetadata(topicId);
     }
+    if (fallbackTopic) return fallbackTopic;
     throw error;
   }
 };
@@ -257,21 +263,25 @@ export const getTopicContent = async (topicId) => {
       .order('order_index');
 
     if (error) {
-      if (hasFallbackTopicContent(topicId)) {
-        return getFallbackTopicContent(topicId);
+      const cModule = await getCModule();
+      if (cModule.hasFallbackTopicContent(topicId)) {
+        return cModule.getFallbackTopicContent(topicId);
       }
-      if (hasJavaFallbackTopicContent(topicId)) {
-        return getJavaFallbackTopicContent(topicId);
+      const javaModule = await getJavaModule();
+      if (await javaModule.hasJavaFallbackTopicContent(topicId)) {
+        return javaModule.getJavaFallbackTopicContent(topicId);
       }
       throw error;
     }
 
     if (!data || data.length === 0) {
-      if (hasFallbackTopicContent(topicId)) {
-        return getFallbackTopicContent(topicId);
+      const cModule = await getCModule();
+      if (cModule.hasFallbackTopicContent(topicId)) {
+        return cModule.getFallbackTopicContent(topicId);
       }
-      if (hasJavaFallbackTopicContent(topicId)) {
-        return getJavaFallbackTopicContent(topicId);
+      const javaModule = await getJavaModule();
+      if (await javaModule.hasJavaFallbackTopicContent(topicId)) {
+        return javaModule.getJavaFallbackTopicContent(topicId);
       }
       return [];
     }
@@ -279,11 +289,13 @@ export const getTopicContent = async (topicId) => {
     return data;
   } catch (error) {
     console.error('Error fetching topic content:', error);
-    if (hasFallbackTopicContent(topicId)) {
-      return getFallbackTopicContent(topicId);
+    const cModule = await getCModule();
+    if (cModule.hasFallbackTopicContent(topicId)) {
+      return cModule.getFallbackTopicContent(topicId);
     }
-    if (hasJavaFallbackTopicContent(topicId)) {
-      return getJavaFallbackTopicContent(topicId);
+    const javaModule = await getJavaModule();
+    if (await javaModule.hasJavaFallbackTopicContent(topicId)) {
+      return javaModule.getJavaFallbackTopicContent(topicId);
     }
     throw error;
   }
@@ -305,8 +317,13 @@ export const getPracticeProblems = async (topicId) => {
   }
 };
 
-export const getTopicLearningMeta = (topicId) =>
-  getFallbackTopicLearningMeta(topicId) || getJavaFallbackTopicLearningMeta(topicId);
+export const getTopicLearningMeta = async (topicId) => {
+  const cModule = await getCModule();
+  const cMeta = cModule.getFallbackTopicLearningMeta(topicId);
+  if (cMeta) return cMeta;
+  const javaModule = await getJavaModule();
+  return javaModule.getJavaFallbackTopicLearningMeta(topicId);
+};
 
 export const getCourseChallenge = async (topicId) => {
   try {

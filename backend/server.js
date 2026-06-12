@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 const Sentry = require('@sentry/node');
-const { nodeProfilingIntegration } = require('@sentry/profiling-node');
 const { validateEnv } = require('./util/envValidation');
 
 // Validate required environment variables
@@ -32,10 +31,17 @@ const server = http.createServer(app);
 
 // Initialize Sentry in production
 if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  let profilingIntegration;
+  try {
+    const { nodeProfilingIntegration } = require('@sentry/profiling-node');
+    profilingIntegration = nodeProfilingIntegration();
+  } catch (e) {
+    // Profiling not available for this platform; skip
+  }
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV,
-    integrations: [nodeProfilingIntegration()],
+    integrations: profilingIntegration ? [profilingIntegration] : [],
     tracesSampleRate: 0.1,
     profilesSampleRate: 0.1,
   });
