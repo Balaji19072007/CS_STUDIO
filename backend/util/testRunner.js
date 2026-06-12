@@ -1,6 +1,6 @@
 const TestEvaluationService = require('./testEvaluationService');
 const CodeExecutionService = require('./codeExecutionService');
-const Problem = require('../models/Problem');
+const { supabase } = require('../config/supabase');
 
 class TestRunner {
   constructor() {
@@ -16,20 +16,27 @@ class TestRunner {
       console.log(`🧪 Running tests for problem ${problemId}, language: ${language}`);
       
       // Get problem with test cases
-      const problem = await Problem.findOne({ problemId });
-      if (!problem) {
+      const { data: problem, error } = await supabase
+        .from('problems')
+        .select('*')
+        .eq('problem_id', problemId)
+        .single();
+
+      if (error || !problem) {
         throw new Error(`Problem with ID ${problemId} not found`);
       }
 
-      if (!problem.examples || problem.examples.length === 0) {
+      const examples = problem.examples || problem.test_cases || [];
+
+      if (!examples || examples.length === 0) {
         throw new Error(`No test cases found for problem ${problemId}`);
       }
 
       const results = {
-        problemId: problem.problemId,
+        problemId: problem.problem_id,
         title: problem.title,
         difficulty: problem.difficulty,
-        totalTests: problem.examples.length,
+        totalTests: examples.length,
         passedTests: 0,
         failedTests: 0,
         testCases: [],
@@ -40,8 +47,8 @@ class TestRunner {
       const startTime = Date.now();
 
       // Run each test case
-      for (let i = 0; i < problem.examples.length; i++) {
-        const testCase = problem.examples[i];
+      for (let i = 0; i < examples.length; i++) {
+        const testCase = examples[i];
         const testResult = await this.runSingleTestCase(
           userCode, 
           language, 
@@ -140,14 +147,24 @@ class TestRunner {
    */
   async runSampleTests(problemId, userCode, language, maxSamples = 2) {
     try {
-      const problem = await Problem.findOne({ problemId });
-      if (!problem || !problem.examples || problem.examples.length === 0) {
+      const { data: problem, error } = await supabase
+        .from('problems')
+        .select('*')
+        .eq('problem_id', problemId)
+        .single();
+
+      if (error || !problem) {
+        throw new Error(`Problem with ID ${problemId} not found`);
+      }
+
+      const examples = problem.examples || problem.test_cases || [];
+      if (!examples || examples.length === 0) {
         throw new Error(`No test cases found for problem ${problemId}`);
       }
 
-      const sampleTestCases = problem.examples.slice(0, maxSamples);
+      const sampleTestCases = examples.slice(0, maxSamples);
       const results = {
-        problemId: problem.problemId,
+        problemId: problem.problem_id,
         title: problem.title,
         sampleTests: [],
         totalSamples: sampleTestCases.length

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const TestRunner = require('../util/testRunner');
 const CodeVerificationService = require('../util/codeVerificationService');
-const Problem = require('../models/Problem');
+const { supabase } = require('../config/supabase');
 
 const testRunner = new TestRunner();
 const codeVerificationService = new CodeVerificationService();
@@ -107,16 +107,22 @@ router.get('/problem/:problemId/test-cases', async (req, res) => {
   try {
     const { problemId } = req.params;
 
-    const problem = await Problem.findOne({ problemId: parseInt(problemId) });
-    if (!problem) {
+    const { data: problem, error } = await supabase
+      .from('problems')
+      .select('*')
+      .eq('problem_id', parseInt(problemId))
+      .single();
+
+    if (error || !problem) {
       return res.status(404).json({
         success: false,
         error: `Problem with ID ${problemId} not found`
       });
     }
 
-    // Return only test case structure without solutions
-    const testCases = problem.examples.map(example => ({
+    const exampleList = problem.examples || problem.test_cases || [];
+
+    const testCases = exampleList.map(example => ({
       input: example.input,
       output: example.output || example.expectedOutput,
       explanation: example.explanation

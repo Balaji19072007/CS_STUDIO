@@ -1,5 +1,5 @@
 // controllers/googleAuthController.js
-const User = require('../models/User');
+const { supabase } = require('../config/supabase');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
@@ -65,22 +65,25 @@ const verifyGoogleToken = async (token) => {
 };
 
 // ===================================================================
-// New Helper: Finds a unique username (Needed for Mongoose validation)
+// Helper: Finds a unique username
 // ===================================================================
 const findUniqueUsername = async (initialUsername) => {
-    // 1. Sanitize the base username
     let base = initialUsername.toLowerCase().replace(/[^a-z0-9]/g, '');
     if (!base) base = 'user';
 
     let username = base;
     let counter = 0;
 
-    // 2. Check for uniqueness and append a number if needed
-    while (await User.findOne({ username })) {
+    while (true) {
+        const { data } = await supabase
+            .from('users')
+            .select('id')
+            .ilike('username', username)
+            .maybeSingle();
+        if (!data) return username;
         counter++;
         username = `${base}${counter}`;
     }
-    return username;
 };
 
 
@@ -112,25 +115,34 @@ exports.googleAuth = async (req, res) => {
 
 
         // 2. Check if the user already exists in the database
-        let user = await User.findOne({ email });
+        const { data: existingUser } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
 
-        if (user) {
-            console.log('User found in DB. Updating...'); // DEBUG
-            // --- SIGN IN / UPDATE (FIX IMPLEMENTED HERE) ---
+        if (existingUser) {
+            let user = existingUser;
+            console.log('User found in DB. Updating...');
 
-            // CRITICAL FIX: If the existing user is missing a username, generate and save it.
             if (!user.username) {
-                const username = await findUniqueUsername(initialUsername);
-                user.username = username;
+                user.username = await findUniqueUsername(initialUsername);
             }
 
-            // Update latest info if changed
-            let isUpdated = false;
-            if (photoUrl && user.photoUrl !== photoUrl) { user.photoUrl = photoUrl; isUpdated = true; }
-            if (firstName && user.firstName !== firstName) { user.firstName = firstName || user.firstName; isUpdated = true; }
-            if (lastName && user.lastName !== lastName) { user.lastName = lastName || user.lastName; isUpdated = true; }
+            let updates = {};
+            if (photoUrl && user.photo_url !== photoUrl) updates.photo_url = photoUrl;
+            if (firstName && user.first_name !== firstName) updates.first_name = firstName;
+            if (lastName && user.last_name !== lastName) updates.last_name = lastName;
+            if (user.username !== existingUser.username) updates.username = user.username;
 
-            if (isUpdated) await user.save();
+            if (Object.keys(updates).length > 0) {
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update(updates)
+                    .eq('id', user.id);
+                if (updateError) throw updateError;
+                Object.assign(user, updates);
+            }
 
             const authToken = generateToken(user.id, user.email);
 
@@ -138,41 +150,43 @@ exports.googleAuth = async (req, res) => {
                 message: 'Signed in with Google successfully.',
                 token: authToken,
                 userId: user.id,
-                name: `${user.firstName} ${user.lastName}`,
+                name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
                 email: user.email,
-                photoUrl: user.photoUrl
+                photoUrl: user.photo_url
             });
         } else {
-            console.log('User not found. Creating new user...'); // DEBUG
-            // --- SIGN UP ---
-            const dummyPassword = await bcrypt.hash(Math.random().toString(36), 10);
-
-            // Generate a guaranteed unique username for the new user
+            console.log('User not found. Creating new user...');
             const username = await findUniqueUsername(initialUsername);
-            console.log('Final Username for new user:', username); // DEBUG
 
-            user = new User({
-                firstName,
-                lastName,
-                email,
-                password: dummyPassword,
-                username: username,
-                photoUrl,
-                googleId
-            });
+            const { data: newUser, error: insertError } = await supabase
+                .from('users')
+                .insert({
+                    email,
+                    username,
+                    first_name: firstName,
+                    last_name: lastName,
+                    photo_url: photoUrl,
+                    role: 'user',
+                    total_points: 0,
+                    problems_solved: 0,
+                    current_streak: 0,
+                    average_accuracy: 0,
+                })
+                .select()
+                .single();
 
-            await user.save();
-            console.log('New user saved.'); // DEBUG
+            if (insertError) throw insertError;
+            console.log('New user saved.');
 
-            const authToken = generateToken(user.id, user.email);
+            const authToken = generateToken(newUser.id, newUser.email);
 
             return res.json({
                 message: 'Signed up with Google successfully.',
                 token: authToken,
-                userId: user.id,
-                name: `${user.firstName} ${user.lastName}`,
-                email: user.email,
-                photoUrl: user.photoUrl
+                userId: newUser.id,
+                name: `${newUser.first_name || ''} ${newUser.last_name || ''}`.trim(),
+                email: newUser.email,
+                photoUrl: newUser.photo_url
             });
         }
 

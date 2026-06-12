@@ -1,207 +1,146 @@
 // backend/controllers/notificationController.js
-const Notification = require('../models/Notification');
+const { supabase } = require('../config/supabase');
 const NotificationService = require('../util/notificationService');
 
-// Get all notifications for authenticated user
-// Get all notifications for authenticated user
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { page = 1, limit = 20, unreadOnly = false } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const unreadOnly = req.query.unreadOnly === 'true';
 
-    const result = await Notification.getNotifications(userId, {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      unreadOnly: unreadOnly === 'true'
-    });
+    let query = supabase
+      .from('notifications')
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .range((page - 1) * limit, page * limit - 1);
+
+    if (unreadOnly) query = query.eq('is_read', false);
+
+    const { data: notifications, count, error } = await query;
+
+    if (error) throw error;
 
     res.json({
       success: true,
-      data: result.notifications,
+      data: notifications || [],
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: result.total,
-        pages: Math.ceil(result.total / limit)
-      }
+        page,
+        limit,
+        total: count || 0,
+        pages: Math.ceil((count || 0) / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching notifications:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching notifications',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error fetching notifications', error: error.message });
   }
 };
 
-
-// Get unread notifications count
 exports.getUnreadCount = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { count, error } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', req.user.id)
+      .eq('is_read', false);
 
-    const count = await Notification.countDocuments({
-      user: userId,
-      read: false
-    });
+    if (error) throw error;
 
-    res.json({
-      success: true,
-      count
-    });
+    res.json({ success: true, count: count || 0 });
   } catch (error) {
     console.error('Error fetching unread count:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching unread count',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error fetching unread count', error: error.message });
   }
 };
 
-// Mark notification as read
 exports.markAsRead = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { notificationId } = req.params;
+    const { data: notification, error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', req.params.notificationId)
+      .eq('user_id', req.user.id)
+      .select()
+      .single();
 
-    const notification = await Notification.findOneAndUpdate(
-      { _id: notificationId, user: userId },
-      { read: true },
-      { new: true }
-    );
-
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: 'Notification not found'
-      });
+    if (error || !notification) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
     }
 
-    res.json({
-      success: true,
-      message: 'Notification marked as read',
-      data: notification
-    });
+    res.json({ success: true, message: 'Notification marked as read', data: notification });
   } catch (error) {
     console.error('Error marking notification as read:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error marking notification as read',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error marking notification as read', error: error.message });
   }
 };
 
-// Mark all notifications as read
 exports.markAllAsRead = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', req.user.id)
+      .eq('is_read', false);
 
-    const result = await Notification.updateMany(
-      { user: userId, read: false },
-      { read: true }
-    );
+    if (error) throw error;
 
-    res.json({
-      success: true,
-      message: 'All notifications marked as read',
-      data: {
-        modifiedCount: result.modifiedCount
-      }
-    });
+    res.json({ success: true, message: 'All notifications marked as read' });
   } catch (error) {
     console.error('Error marking all notifications as read:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error marking all notifications as read',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error marking all notifications as read', error: error.message });
   }
 };
 
-// Delete a notification
 exports.deleteNotification = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { notificationId } = req.params;
+    const { data: notification, error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', req.params.notificationId)
+      .eq('user_id', req.user.id)
+      .select()
+      .single();
 
-    const notification = await Notification.findOneAndDelete({
-      _id: notificationId,
-      user: userId
-    });
-
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: 'Notification not found'
-      });
+    if (error || !notification) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
     }
 
-    res.json({
-      success: true,
-      message: 'Notification deleted successfully'
-    });
+    res.json({ success: true, message: 'Notification deleted successfully' });
   } catch (error) {
     console.error('Error deleting notification:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error deleting notification',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error deleting notification', error: error.message });
   }
 };
 
-// Clear all notifications
 exports.clearAll = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', req.user.id);
 
-    const result = await Notification.deleteMany({ user: userId });
+    if (error) throw error;
 
-    res.json({
-      success: true,
-      message: 'All notifications cleared',
-      data: {
-        deletedCount: result.deletedCount
-      }
-    });
+    res.json({ success: true, message: 'All notifications cleared' });
   } catch (error) {
     console.error('Error clearing notifications:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error clearing notifications',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error clearing notifications', error: error.message });
   }
 };
 
-// Create a new notification (for testing/admin)
 exports.createNotification = async (req, res) => {
   try {
-    const userId = req.user.id;
     const { title, message, type, link, important } = req.body;
 
-    const notification = await NotificationService.sendNotification(userId, {
-      title,
-      message,
-      type,
-      link,
-      important
+    const notification = await NotificationService.sendNotification(req.user.id, {
+      title, message, type, link, important,
     });
 
-    res.json({
-      success: true,
-      message: 'Notification created successfully',
-      data: notification
-    });
+    res.json({ success: true, message: 'Notification created successfully', data: notification });
   } catch (error) {
     console.error('Error creating notification:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error creating notification',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Error creating notification', error: error.message });
   }
 };

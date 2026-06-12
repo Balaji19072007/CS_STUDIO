@@ -1,5 +1,5 @@
 // controllers/leaderboardController.js
-const User = require('../models/User');
+const { supabase } = require('../config/supabase');
 const { cache } = require('../util/cache');
 
 // @route   GET /api/leaderboard
@@ -14,20 +14,27 @@ exports.getGlobalLeaderboard = async (req, res) => {
         }
 
         // 1. Fetch Top Users
-        const topUsers = await User.getTopUsers(100);
+        const { data: topUsers, error } = await supabase
+            .from('users')
+            .select('*')
+            .neq('role', 'admin')
+            .order('total_points', { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
 
         // 2. Format data for the front-end
-        const leaderboardData = topUsers.map((user, index) => ({
+        const leaderboardData = (topUsers || []).map((user, index) => ({
             rank: index + 1,
             _id: user.id, // Frontend expects _id
-            name: `${user.firstName} ${user.lastName}`,
+            name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
             username: user.username,
-            solved: user.problemsSolved,
-            accuracy: Math.round(user.averageAccuracy) || 0,
-            streak: user.currentStreak,
-            points: user.totalPoints,
-            photoUrl: user.photoUrl,
-            updatedAt: user.updatedAt
+            solved: user.problems_solved,
+            accuracy: Math.round(user.average_accuracy) || 0,
+            streak: user.current_streak,
+            points: user.total_points,
+            photoUrl: user.photo_url,
+            updatedAt: user.updated_at
         }));
 
         cache.set(cacheKey, leaderboardData, 120); // Cache for 2 minutes
@@ -50,16 +57,27 @@ exports.getUserRank = async (req, res) => {
         const userId = req.user.id;
 
         // 1. Get Top Users to calculate rank
-        const allUsers = await User.getTopUsers(1000);
+        const { data: allUsers, error: listError } = await supabase
+            .from('users')
+            .select('id, total_points')
+            .neq('role', 'admin')
+            .order('total_points', { ascending: false })
+            .limit(1000);
+
+        if (listError) throw listError;
 
         // 2. Find current user's position
-        let userRank = allUsers.findIndex(user => user.id === userId);
+        let userRank = (allUsers || []).findIndex(user => user.id === userId);
         let rank = userRank !== -1 ? userRank + 1 : null;
 
         // 3. Get current user detailed
-        const currentUser = await User.findById(userId);
+        const { data: currentUser, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
 
-        if (!currentUser) {
+        if (userError || !currentUser) {
             return res.status(404).json({
                 success: false,
                 msg: 'User not found'
@@ -71,17 +89,17 @@ exports.getUserRank = async (req, res) => {
         res.json({
             success: true,
             rank: rank,
-            totalUsers: allUsers.length,
+            totalUsers: (allUsers || []).length,
             user: {
                 _id: currentUser.id,
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
+                firstName: currentUser.first_name,
+                lastName: currentUser.last_name,
                 username: currentUser.username,
-                problemsSolved: currentUser.problemsSolved,
-                totalPoints: currentUser.totalPoints,
-                currentStreak: currentUser.currentStreak,
-                averageAccuracy: currentUser.averageAccuracy,
-                photoUrl: currentUser.photoUrl
+                problemsSolved: currentUser.problems_solved,
+                totalPoints: currentUser.total_points,
+                currentStreak: currentUser.current_streak,
+                averageAccuracy: currentUser.average_accuracy,
+                photoUrl: currentUser.photo_url
             }
         });
 
@@ -100,7 +118,14 @@ exports.getUserRank = async (req, res) => {
 // @access  Public
 exports.getTotalUsers = async (req, res) => {
     try {
-        const count = await User.count({ hasSolvedProblems: true });
+        const { count, error } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .neq('role', 'admin')
+            .gt('problems_solved', 0);
+
+        if (error) throw error;
+
         res.json({
             success: true,
             totalUsers: count || 0

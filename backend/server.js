@@ -49,13 +49,7 @@ if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.tracingHandler());
 }
 
-// --- Model Imports ---
-// Models are now largely deprecated in favor of direct Supabase queries in controllers
-// But we keep them if other parts of code import them, though they might fail if they try to access firebase `db`.
-// Ideally, we should remove them or update them. 
-// For "minimal code changes" but "production migration", we refactored the controllers. 
-// We should ensure `server.js` doesn't crash by importing models that try to connect to Firestore.
-// The Controllers (auth, problem) are refactored to NOT use valid Models.
+
 
 // --- Controller & Route Imports ---
 const authRoutes = require('./routes/authRoutes');
@@ -100,7 +94,7 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    res.setHeader('X-Response-Time', `${duration}ms`);
+    try { res.setHeader('X-Response-Time', `${duration}ms`); } catch (_) {}
     if (duration > 1000) {
       logger.warn('Slow response', { url: req.originalUrl, method: req.method, duration: `${duration}ms` });
     }
@@ -275,12 +269,29 @@ const io = new Server(server, {
 require('./socket/socketHandler')(io);
 
 // Health Check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date(),
-    version: 'supabase-migrated-v1',
-    cwd: process.cwd()
+app.get('/api/health', async (req, res) => {
+  const checks = {};
+
+  // Database connectivity
+  try {
+    const { count, error } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .limit(1);
+    checks.database = { status: error ? 'error' : 'ok', error: error?.message || null };
+  } catch (e) {
+    checks.database = { status: 'error', error: e.message };
+  }
+
+  const allOk = Object.values(checks).every(c => c.status === 'ok');
+
+  res.status(allOk ? 200 : 503).json({
+    status: allOk ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    version: 'v1.1.0',
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    checks,
   });
 });
 

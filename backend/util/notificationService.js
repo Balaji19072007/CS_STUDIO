@@ -1,24 +1,26 @@
 // backend/util/notificationService.js
-const Notification = require('../models/Notification');
+const { supabase } = require('../config/supabase');
 const socketHandler = require('../socket/socketHandler');
 
 class NotificationService {
-  /**
-   * Send notification to a single user with real-time emission
-   */
   static async sendNotification(userId, notificationData) {
     try {
-      const notification = new Notification({
-        user: userId,
-        title: notificationData.title,
-        message: notificationData.message,
-        type: notificationData.type || 'system',
-        link: notificationData.link || '',
-        important: notificationData.important || false,
-        data: notificationData.data || {},
-      });
+      const { data: notification, error } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          title: notificationData.title,
+          message: notificationData.message,
+          type: notificationData.type || 'system',
+          link: notificationData.link || '',
+          important: notificationData.important || false,
+          data: notificationData.data || {},
+        })
+        .select()
+        .single();
 
-      await notification.save();
+      if (error) throw error;
+
       await this.emitRealTimeNotification(userId, notification);
 
       console.log(`Notification sent to user ${userId}: ${notificationData.title}`);
@@ -29,18 +31,12 @@ class NotificationService {
     }
   }
 
-  /**
-   * Emit real-time notification via Socket.IO.
-   */
   static async emitRealTimeNotification(userId, notification) {
     try {
-      const notificationObj = notification.toJSON ? notification.toJSON() : notification;
-
-      if (socketHandler.emitToUser(userId, 'new-notification', notificationObj)) {
+      if (socketHandler.emitToUser(userId, 'new-notification', notification)) {
         console.log(`Real-time notification emitted to user-${userId}`);
         return true;
       }
-
       console.error('Socket.IO instance not available');
       return false;
     } catch (error) {
@@ -49,13 +45,10 @@ class NotificationService {
     }
   }
 
-  /**
-   * Send notification to multiple users
-   */
   static async sendBulkNotifications(userIds, notificationData) {
     try {
       const notifications = userIds.map((userId) => ({
-        user: userId,
+        user_id: userId,
         title: notificationData.title,
         message: notificationData.message,
         type: notificationData.type || 'system',
@@ -64,9 +57,14 @@ class NotificationService {
         data: notificationData.data || {},
       }));
 
-      const result = await Notification.insertMany(notifications);
+      const { data: result, error } = await supabase
+        .from('notifications')
+        .insert(notifications)
+        .select();
 
-      for (let i = 0; i < result.length; i += 1) {
+      if (error) throw error;
+
+      for (let i = 0; i < (result || []).length; i += 1) {
         await this.emitRealTimeNotification(userIds[i], result[i]);
       }
 

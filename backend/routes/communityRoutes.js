@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Discussion = require('../models/Discussion');
-const User = require('../models/User'); // Import User model for manual fetching
+const { supabase } = require('../config/supabase');
 const authMiddleware = require('../middleware/authMiddleware');
 const xss = require('xss');
 
@@ -9,14 +8,18 @@ const xss = require('xss');
 const hydrateAuthor = async (authorId) => {
     try {
         if (!authorId) return null;
-        const user = await User.findById(authorId);
+        const { data: user } = await supabase
+            .from('users')
+            .select('id, first_name, last_name, username, photo_url')
+            .eq('id', authorId)
+            .single();
         if (!user) return { _id: authorId, username: 'Unknown User' };
         return {
             _id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            firstName: user.first_name,
+            lastName: user.last_name,
             username: user.username,
-            photoUrl: user.photoUrl
+            photoUrl: user.photo_url
         };
     } catch (err) {
         return { _id: authorId, username: 'Unknown User' };
@@ -28,20 +31,19 @@ const hydrateAuthor = async (authorId) => {
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        // Fetch all discussions
-        let discussions = await Discussion.find();
+        const { data: discussions, error } = await supabase
+            .from('discussions')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-        // Sort by createdAt desc
-        discussions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        if (error) throw error;
 
-        // Manually populate authors
-        const enrichedDiscussions = await Promise.all(discussions.map(async (doc) => {
-            const discussion = doc.toObject();
+        const enrichedDiscussions = await Promise.all((discussions || []).map(async (discussion) => {
             discussion.author = await hydrateAuthor(discussion.author);
             return discussion;
         }));
 
-        res.json(enrichedDiscussions);
+        res.json(enrichedDiscussions || []);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -53,22 +55,23 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        const doc = await Discussion.findByIdAndUpdate(
-            req.params.id,
-            { $inc: { views: 1 } },
-            { new: true }
-        );
+        // Increment views
+        await supabase.rpc('increment_discussion_views', { discussion_id: req.params.id });
 
-        if (!doc) {
+        const { data: discussion, error } = await supabase
+            .from('discussions')
+            .select('*')
+            .eq('id', req.params.id)
+            .single();
+
+        if (error || !discussion) {
             return res.status(404).json({ msg: 'Discussion not found' });
         }
 
-        const discussion = doc.toObject();
         discussion.author = await hydrateAuthor(discussion.author);
 
-        // Hydrate comments authors
         if (discussion.comments) {
-            discussion.comments = await Promise.all(discussion.comments.map(async (comment) => {
+            discussion.comments = await Promise.all((discussion.comments || []).map(async (comment) => {
                 comment.author = await hydrateAuthor(comment.author);
                 return comment;
             }));
@@ -77,9 +80,6 @@ router.get('/:id', async (req, res) => {
         res.json(discussion);
     } catch (err) {
         console.error(err.message);
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({ msg: 'Discussion not found' });
-        }
         res.status(500).send('Server Error');
     }
 });
@@ -91,7 +91,6 @@ router.post('/', authMiddleware, async (req, res) => {
     try {
         const { title, content, tags } = req.body;
 
-        // Sanitize inputs
         const sanitizedTitle = xss(title?.trim().substring(0, 200) || '');
         const sanitizedContent = xss(content?.trim() || '');
         const sanitizedTags = (tags || []).map(t => xss(t?.trim().substring(0, 50) || '')).filter(Boolean);
@@ -100,35 +99,27 @@ router.post('/', authMiddleware, async (req, res) => {
             return res.status(400).json({ msg: 'Title and content are required' });
         }
 
-        const newDiscussion = new Discussion({
-            title: sanitizedTitle,
-            content: sanitizedContent,
-            tags: sanitizedTags,
-            author: req.user.id // Store ID string
-        });
+        const { data: discussion, error } = await supabase
+            .from('discussions')
+            .insert({
+                title: sanitizedTitle,
+                content: sanitizedContent,
+                tags: sanitizedTags,
+                author: req.user.id,
+                comments: [],
+                likes: [],
+                views: 0,
+            })
+            .select()
+            .single();
 
-        const savedDoc = await newDiscussion.save();
-        const discussion = savedDoc.toObject();
+        if (error) throw error;
 
-        // Populate author from req.user since we have it
-        discussion.author = {
-            _id: req.user.id,
-            firstName: req.user.firstName,
-            lastName: req.user.lastName,
-            username: req.user.username,
-            photoUrl: req.user.photoUrl
-        };
-        // Note: req.user might not have all fields if from JWT, but typically OK for display
-        // If JWT is slim, we might want to fetch full user:
-        const fullUser = await hydrateAuthor(req.user.id);
-        discussion.author = fullUser;
+        discussion.author = await hydrateAuthor(req.user.id);
 
         res.json(discussion);
     } catch (err) {
         console.error('❌ Error creating discussion:', err.message);
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({ msg: err.message, errors: err.errors });
-        }
         res.status(500).send('Server Error');
     }
 });
@@ -139,32 +130,41 @@ router.post('/', authMiddleware, async (req, res) => {
 router.post('/:id/comment', authMiddleware, async (req, res) => {
     try {
         const user = req.user;
-        const discussionDoc = await Discussion.findById(req.params.id);
-
-        if (!discussionDoc) {
-            return res.status(404).json({ msg: 'Discussion not found' });
-        }
-
         const sanitizedContent = xss(req.body.content?.trim() || '');
         if (!sanitizedContent) {
             return res.status(400).json({ msg: 'Comment content is required' });
         }
 
+        const { data: current, error: fetchError } = await supabase
+            .from('discussions')
+            .select('comments')
+            .eq('id', req.params.id)
+            .single();
+
+        if (fetchError || !current) {
+            return res.status(404).json({ msg: 'Discussion not found' });
+        }
+
         const newComment = {
             content: sanitizedContent,
-            author: user.id
+            author: user.id,
+            createdAt: new Date().toISOString(),
         };
 
-        discussionDoc.comments.unshift(newComment);
-        await discussionDoc.save();
+        const comments = [newComment, ...(current.comments || [])];
 
-        // Return just the comments with populated authors
-        // We need to re-fetch or manual populate. Manual is better to avoid populate calls.
+        const { data: updated, error: updateError } = await supabase
+            .from('discussions')
+            .update({ comments })
+            .eq('id', req.params.id)
+            .select()
+            .single();
 
-        const latestComments = await Promise.all(discussionDoc.comments.map(async (c) => {
-            const commentObj = c.toObject();
-            commentObj.author = await hydrateAuthor(commentObj.author);
-            return commentObj;
+        if (updateError) throw updateError;
+
+        const latestComments = await Promise.all((updated.comments || []).map(async (c) => {
+            c.author = await hydrateAuthor(c.author);
+            return c;
         }));
 
         res.json(latestComments);
@@ -179,26 +179,34 @@ router.post('/:id/comment', authMiddleware, async (req, res) => {
 // @access  Private
 router.put('/:id/like', authMiddleware, async (req, res) => {
     try {
-        const discussion = await Discussion.findById(req.params.id);
+        const { data: current, error: fetchError } = await supabase
+            .from('discussions')
+            .select('likes')
+            .eq('id', req.params.id)
+            .single();
 
-        if (!discussion) {
+        if (fetchError || !current) {
             return res.status(404).json({ msg: 'Discussion not found' });
         }
 
-        // Check if the post has already been liked
         const userId = req.user.id;
-        if (discussion.likes.includes(userId)) {
-            // Unlike
-            const removeIndex = discussion.likes.indexOf(userId);
-            discussion.likes.splice(removeIndex, 1);
+        let likes = current.likes || [];
+        if (likes.includes(userId)) {
+            likes = likes.filter(id => id !== userId);
         } else {
-            // Like
-            discussion.likes.unshift(userId);
+            likes = [userId, ...likes];
         }
 
-        await discussion.save();
+        const { data: updated, error: updateError } = await supabase
+            .from('discussions')
+            .update({ likes })
+            .eq('id', req.params.id)
+            .select('likes')
+            .single();
 
-        res.json(discussion.likes);
+        if (updateError) throw updateError;
+
+        res.json(updated.likes);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -210,25 +218,25 @@ router.put('/:id/like', authMiddleware, async (req, res) => {
 // @access  Private
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
-        const discussion = await Discussion.findById(req.params.id);
+        const { data: discussion, error: fetchError } = await supabase
+            .from('discussions')
+            .select('id, author')
+            .eq('id', req.params.id)
+            .single();
 
-        if (!discussion) {
+        if (fetchError || !discussion) {
             return res.status(404).json({ msg: 'Discussion not found' });
         }
 
-        // Check user
         if (discussion.author !== req.user.id) {
             return res.status(401).json({ msg: 'User not authorized' });
         }
 
-        await discussion.deleteOne();
+        await supabase.from('discussions').delete().eq('id', req.params.id);
 
         res.json({ msg: 'Discussion removed' });
     } catch (err) {
         console.error(err.message);
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({ msg: 'Discussion not found' });
-        }
         res.status(500).send('Server Error');
     }
 });

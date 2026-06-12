@@ -1,6 +1,4 @@
-const Progress = require('../models/Progress');
-const User = require('../models/User');
-const Problem = require('../models/Problem');
+const { supabase } = require('../config/supabase');
 
 // @route   POST /api/problems/:problemId/progress
 // @desc    Update user progress when solving/attempting a problem
@@ -10,54 +8,61 @@ exports.updateProgress = async (req, res) => {
         const { problemId } = req.params;
         const { accuracy, isSolved } = req.body;
         const userId = req.user.id;
+        const pid = parseInt(problemId);
 
-        // Find or create progress entry
-        // Note: Progress.findOne returns instance or null
-        let progress = await Progress.findOne({
-            userId: userId,
-            problemId: parseInt(problemId)
-        });
+        // Find existing progress entry
+        const { data: existing } = await supabase
+            .from('progress')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('problem_id', pid)
+            .maybeSingle();
 
-        if (!progress) {
-            progress = new Progress({
-                userId: userId,
-                problemId: parseInt(problemId),
-                status: 'attempted',
-                bestAccuracy: accuracy
-            });
-        } else {
-            // Update best accuracy if current attempt is better
-            progress.bestAccuracy = Math.max(progress.bestAccuracy, accuracy);
-        }
+        const now = new Date().toISOString();
+        let bestAccuracy = existing ? Math.max(existing.best_accuracy, accuracy || 0) : (accuracy || 0);
+        let status = existing ? existing.status : 'attempted';
+        let solvedAt = existing ? existing.solved_at : null;
 
-        // Update status if solved
         if (isSolved) {
-            progress.status = 'solved';
-            // NEW: Set solvedAt ONLY on the first solve
-            if (!progress.solvedAt) {
-                progress.solvedAt = new Date().toISOString();
-            }
-        } else {
-            if (progress.status !== 'solved') {
-                progress.status = 'attempted';
-            }
+            status = 'solved';
+            if (!solvedAt) solvedAt = now;
+        } else if (status !== 'solved') {
+            status = 'attempted';
         }
 
-        // Update timer/lastSubmission
-        progress.lastSubmission = new Date().toISOString();
+        const progressData = {
+            user_id: userId,
+            problem_id: pid,
+            status,
+            best_accuracy: bestAccuracy,
+            last_submission: now,
+            ...(solvedAt ? { solved_at: solvedAt } : {}),
+        };
 
-        await progress.save();
+        const { data: progress, error } = await supabase
+            .from('progress')
+            .upsert(progressData, { onConflict: 'user_id, problem_id' })
+            .select()
+            .single();
 
-        // Trigger User Stats Update
-        await Progress.updateUserStats(userId, accuracy, isSolved);
+        if (error) throw error;
+
+        // Trigger atomic user stats update
+        if (isSolved) {
+            await supabase.rpc('increment_user_stats', {
+                p_user_id: userId,
+                p_solved_inc: 1,
+                p_points_inc: accuracy >= 100 ? 100 : Math.round((accuracy || 0) * 10),
+            });
+        }
 
         res.json({
             success: true,
             progress: {
-                problemId: progress.problemId,
+                problemId: progress.problem_id,
                 status: progress.status,
-                bestAccuracy: progress.bestAccuracy,
-                lastSubmission: progress.lastSubmission
+                bestAccuracy: progress.best_accuracy,
+                lastSubmission: progress.last_submission
             }
         });
 
@@ -78,39 +83,32 @@ exports.getHistory = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // Fetch all progress for this user
-        let history = await Progress.find({ userId });
+        const { data: historyRows, error } = await supabase
+            .from('progress')
+            .select('*')
+            .eq('user_id', userId)
+            .lt('problem_id', 1001)
+            .order('last_submission', { ascending: false });
 
-        // Filter out course problems (ID >= 1001)
-        history = history.filter(h => h.problemId < 1001);
+        if (error) throw error;
 
-        // Sort in memory (descending date)
-        history.sort((a, b) => new Date(b.lastSubmission) - new Date(a.lastSubmission));
-
-        // Fetch all problems to map details (Using JSON source)
         const { loadAllProblems } = require('../util/problemUtils');
         const allProblems = await loadAllProblems();
 
         const problemMap = {};
-        allProblems.forEach(p => {
-            problemMap[p.id] = p; // JSON uses 'id'
-        });
+        allProblems.forEach(p => { problemMap[p.id] = p; });
 
-        const enrichedHistory = history.map(h => {
-            // Auto-correct status: If accuracy is 100%, consider it solved
-            // This fixes legacy/bugged records showing "Attempted" with 100% score
-            const isActuallySolved = h.bestAccuracy === 100;
-            const finalStatus = isActuallySolved ? 'solved' : h.status;
-
+        const enrichedHistory = (historyRows || []).map(h => {
+            const isActuallySolved = h.best_accuracy === 100;
             return {
-                problemId: h.problemId,
-                title: problemMap[h.problemId]?.title || 'Unknown Problem',
-                difficulty: problemMap[h.problemId]?.difficulty || 'Medium',
-                status: finalStatus,
-                bestAccuracy: h.bestAccuracy,
-                timeTaken: h.timeSpent !== undefined ? h.timeSpent : 0,
-                lastSubmission: h.lastSubmission,
-                solvedAt: isActuallySolved ? (h.solvedAt || h.lastSubmission) : h.solvedAt
+                problemId: h.problem_id,
+                title: problemMap[h.problem_id]?.title || 'Unknown Problem',
+                difficulty: problemMap[h.problem_id]?.difficulty || 'Medium',
+                status: isActuallySolved ? 'solved' : h.status,
+                bestAccuracy: h.best_accuracy,
+                timeTaken: h.time_spent !== undefined ? h.time_spent : 0,
+                lastSubmission: h.last_submission,
+                solvedAt: isActuallySolved ? (h.solved_at || h.last_submission) : h.solved_at
             };
         });
 
@@ -130,32 +128,30 @@ exports.getHistory = async (req, res) => {
 // @access  Private
 exports.getUserStats = async (req, res) => {
     try {
-        console.log('⚡ getUserStats called for:', req.user.id);
         const userId = req.user.id;
 
-        const user = await User.findById(userId);
-        if (!user) console.warn('⚠️ User not found in DB for stats:', userId);
-
-        if (user) {
-            // Validate Streak
-            try {
-                await Progress.checkStreak(userId, user);
-            } catch (error) {
-                console.error('Stats streak check failed:', error);
-            }
-        }
+        const { data: user } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
 
         const userStats = user ? {
-            problemsSolved: user.problemsSolved,
-            totalPoints: user.totalPoints,
-            currentStreak: user.currentStreak,
-            averageAccuracy: user.averageAccuracy
+            problemsSolved: user.problems_solved,
+            totalPoints: user.total_points,
+            currentStreak: user.current_streak,
+            averageAccuracy: user.average_accuracy
         } : {};
 
-        // Basic Counts from Progress - EXCLUDE COURSE PROBLEMS (ID >= 1001)
-        const allUserProgress = await Progress.find({ userId });
-        const userProgress = allUserProgress.filter(p => p.problemId < 1001);
-        console.log(`Found ${userProgress.length} regular problem progress records for stats (excluded ${allUserProgress.length - userProgress.length} course problems).`);
+        const { data: allProgress, error: progError } = await supabase
+            .from('progress')
+            .select('*')
+            .eq('user_id', userId)
+            .lt('problem_id', 1001);
+
+        if (progError) throw progError;
+
+        const userProgress = allProgress || [];
 
         const stats = {
             solved: userProgress.filter(p => p.status === 'solved').length,
@@ -163,46 +159,32 @@ exports.getUserStats = async (req, res) => {
             todo: 0
         };
 
-        // Difficulty Breakdown (Solved Problems Only)
-        // 1. Get solved problem IDs
         const solvedIds = userProgress
             .filter(p => p.status === 'solved')
-            .map(p => p.problemId);
+            .map(p => p.problem_id);
 
-        // 2. Fetch all problems to count difficulties (Using JSON source instead of DB)
         const { loadAllProblems } = require('../util/problemUtils');
         const allProblems = await loadAllProblems();
-
-        // Filter to only regular problems
         const regularProblems = allProblems.filter(p => p.problemType === 'regular' || p.id < 1001);
 
-        // Difficulty stats for solved
-        const difficultyBreakdown = {
-            Easy: 0, Medium: 0, Hard: 0
-        };
-
+        const difficultyBreakdown = { Easy: 0, Medium: 0, Hard: 0 };
         solvedIds.forEach(pid => {
-            const prob = regularProblems.find(p => p.id === pid); // JSON uses 'id'
+            const prob = regularProblems.find(p => p.id === pid);
             if (prob && difficultyBreakdown[prob.difficulty] !== undefined) {
                 difficultyBreakdown[prob.difficulty]++;
             }
         });
 
-        // Total Problems Count by Difficulty (REGULAR ONLY)
         const totalBreakdown = {
             Easy: 0, Medium: 0, Hard: 0, Total: regularProblems.length
         };
-
         regularProblems.forEach(p => {
             if (totalBreakdown[p.difficulty] !== undefined) {
                 totalBreakdown[p.difficulty]++;
             }
         });
 
-        // Calculate "todo" as Total - (Solved + Attempted)
-        // Or if 'todo' means "not started", it's Total - userProgress.length (unique problemIds)
-        // Assuming userProgress only contains touched problems.
-        const uniqueTouched = new Set(userProgress.map(p => p.problemId)).size;
+        const uniqueTouched = new Set(userProgress.map(p => p.problem_id)).size;
         stats.todo = totalBreakdown.Total - uniqueTouched;
 
         res.json({
