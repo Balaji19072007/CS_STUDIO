@@ -850,6 +850,16 @@ const Navbar = () => {
                                                     <i data-feather="bar-chart-2" className="w-5 h-5 text-primary-500 mb-1 group-hover:scale-110 transition-transform"></i>
                                                     <span className={`text-xs group-hover:scale-105 transition-transform ${isDark ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-900'}`}>My Progress</span>
                                                 </Link>
+                                                {user?.role === 'admin' && (
+                                                    <Link
+                                                        to="/admin"
+                                                        className={`flex flex-col items-center p-3 rounded-lg transition-colors duration-200 group ${mobileCardBgClass} ${mobileHoverBgClass}`}
+                                                        onClick={toggleMobileMenu}
+                                                    >
+                                                        <i data-feather="shield" className="w-5 h-5 text-blue-400 mb-1 group-hover:scale-110 transition-transform"></i>
+                                                        <span className={`text-xs group-hover:scale-105 transition-transform ${isDark ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-900'}`}>Admin Dashboard</span>
+                                                    </Link>
+                                                )}
                                             </div>
                                         </div>
                                     )}

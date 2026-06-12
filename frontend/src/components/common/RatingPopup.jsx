@@ -13,6 +13,7 @@ const RatingPopup = () => {
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const failureCountRef = React.useRef(0);
 
   // Derived theme for CSS
   const currentTheme = isDark ? 'dark' : 'light';
@@ -57,12 +58,22 @@ const RatingPopup = () => {
 
     try {
       const response = await statsAPI.checkRatingStatus();
+      failureCountRef.current = 0;
 
       if (response.data.success && response.data.showRating && !showPopup) {
         showRatingPopup();
       }
     } catch (error) {
-      console.error('Error checking rating status:', error);
+      failureCountRef.current++;
+      if (failureCountRef.current > 3) {
+        console.warn('Rating status polling stopped after repeated failures');
+        return;
+      }
+      if (error.code === 'ERR_NETWORK') {
+        console.warn('Rating status check failed (network):', error.message);
+      } else {
+        console.error('Error checking rating status:', error);
+      }
     }
   }, [isLoggedIn, showPopup, showRatingPopup]);
 
