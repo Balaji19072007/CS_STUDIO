@@ -17,6 +17,14 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
       const response = await api.get('/api/auth/me');
 
       if (response.status === 200) {
