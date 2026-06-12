@@ -19,11 +19,11 @@ const handleResponse = async (response) => {
  */
 export const fetchDailyProblem = async () => {
     const token = localStorage.getItem('token');
-    const headers = {};
+    const headers = { 'Cache-Control': 'no-cache' };
     if (token) headers['x-auth-token'] = token;
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/daily?version=${Date.now()}&timezone=${encodeURIComponent(timezone)}`), {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/daily?timezone=${encodeURIComponent(timezone)}`), {
         method: 'GET',
         headers,
         credentials: 'include'
@@ -36,10 +36,10 @@ export const fetchDailyProblem = async () => {
  */
 export const fetchRecommendedProblems = async () => {
     const token = localStorage.getItem('token');
-    const headers = {};
+    const headers = { 'Cache-Control': 'no-cache' };
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended?t=${Date.now()}`), {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended`), {
         method: 'GET',
         headers,
         credentials: 'include'
@@ -55,7 +55,7 @@ export const fetchAllProblems = async () => {
     const headers = {};
     if (token) headers['x-auth-token'] = token;
 
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}?t=${Date.now()}`), {
+    const response = await fetch(buildApiUrl(`${API_BASE_URL}`), {
         method: 'GET',
         headers,
         credentials: 'include'

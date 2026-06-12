@@ -1,11 +1,18 @@
 // controllers/leaderboardController.js
 const User = require('../models/User');
+const { cache } = require('../util/cache');
 
 // @route   GET /api/leaderboard
 // @desc    Get top users sorted by problems solved and points
 // @access  Public
 exports.getGlobalLeaderboard = async (req, res) => {
     try {
+        const cacheKey = 'leaderboard:global';
+        const cached = cache.get(cacheKey);
+        if (cached) {
+            return res.json(cached);
+        }
+
         // 1. Fetch Top Users
         const topUsers = await User.getTopUsers(100);
 
@@ -23,6 +30,7 @@ exports.getGlobalLeaderboard = async (req, res) => {
             updatedAt: user.updatedAt
         }));
 
+        cache.set(cacheKey, leaderboardData, 120); // Cache for 2 minutes
         res.json(leaderboardData);
     } catch (err) {
         console.error('Leaderboard error:', err.message);

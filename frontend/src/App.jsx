@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
@@ -13,38 +13,40 @@ import Footer from './components/common/Footer.jsx';
 import MobileTopBar from './components/common/MobileTopBar.jsx';
 import MobileBottomNav from './components/common/MobileBottomNav.jsx';
 
-// Page imports
-import Home from './pages/Home.jsx';
-import UserHomePage from './pages/UserHomePage.jsx';
+// Lazy-loaded page components for code splitting
+const Home = lazy(() => import('./pages/Home.jsx'));
+const UserHomePage = lazy(() => import('./pages/UserHomePage.jsx'));
 
-import SignIn from './pages/SignIn.jsx';
-import SignUp from './pages/SignUp.jsx';
-import Settings from './pages/Settings.jsx';
-import AuthCallback from './components/auth/AuthCallback.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
-import Problems from './pages/Problems.jsx';
-import Courses from './pages/Courses.jsx';
-import CourseDetail from './pages/CourseDetail.jsx';
-import CourseLearning from './pages/CourseLearning.jsx';
-import PhaseTopics from './pages/PhaseTopics.jsx';
-import TopicContent from './pages/TopicContent.jsx';
-import QuizPage from './pages/QuizPage.jsx';
-import Leaderboard from './pages/Leaderboard.jsx';
-import Community from './pages/Community.jsx';
-import Code from './pages/Code.jsx';
-import CodeVerification from './pages/CodeVerification.jsx';
-import SolveProblem from './pages/SolveProblem.jsx';
-import CourseChallenge from './pages/CourseChallenge.jsx';
-import CourseChallengePage from './pages/CourseChallengePage.jsx';
-import ProjectEditorPage from './pages/ProjectEditorPage.jsx';
-import MyCourses from './pages/MyCourses.jsx';
-import MyProgress from './pages/MyProgress.jsx';
-import MyProblemStats from './pages/MyProblemStats.jsx';
-import Notifications from './pages/Notifications.jsx';
-import MyCertificates from './pages/MyCertificates.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
-import VerifyCertificate from './pages/VerifyCertificate.jsx';
+const SignIn = lazy(() => import('./pages/SignIn.jsx'));
+const SignUp = lazy(() => import('./pages/SignUp.jsx'));
+const Settings = lazy(() => import('./pages/Settings.jsx'));
+const AuthCallback = lazy(() => import('./components/auth/AuthCallback.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
+const Problems = lazy(() => import('./pages/Problems.jsx'));
+const Courses = lazy(() => import('./pages/Courses.jsx'));
+const CourseDetail = lazy(() => import('./pages/CourseDetail.jsx'));
+const CourseLearning = lazy(() => import('./pages/CourseLearning.jsx'));
+const PhaseTopics = lazy(() => import('./pages/PhaseTopics.jsx'));
+const TopicContent = lazy(() => import('./pages/TopicContent.jsx'));
+const QuizPage = lazy(() => import('./pages/QuizPage.jsx'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard.jsx'));
+const Community = lazy(() => import('./pages/Community.jsx'));
+const Code = lazy(() => import('./pages/Code.jsx'));
+const CodeVerification = lazy(() => import('./pages/CodeVerification.jsx'));
+const SolveProblem = lazy(() => import('./pages/SolveProblem.jsx'));
+const CourseChallenge = lazy(() => import('./pages/CourseChallenge.jsx'));
+const CourseChallengePage = lazy(() => import('./pages/CourseChallengePage.jsx'));
+const ProjectEditorPage = lazy(() => import('./pages/ProjectEditorPage.jsx'));
+const MyCourses = lazy(() => import('./pages/MyCourses.jsx'));
+const MyProgress = lazy(() => import('./pages/MyProgress.jsx'));
+const MyProblemStats = lazy(() => import('./pages/MyProblemStats.jsx'));
+const Notifications = lazy(() => import('./pages/Notifications.jsx'));
+const MyCertificates = lazy(() => import('./pages/MyCertificates.jsx'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
+const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate.jsx'));
+
+// Keep these eagerly loaded since they render on most pages
 import RatingPopup from './components/common/RatingPopup.jsx';
 import CodeEditorFloatingIcon from './components/common/CodeEditorFloatingIcon.jsx';
 import './App.css';
@@ -97,6 +99,13 @@ function AppContent() {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Skip to main content - accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[100] focus:p-4 focus:bg-blue-600 focus:text-white focus:outline-none"
+      >
+        Skip to main content
+      </a>
 
       {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve page */}
       {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
@@ -105,10 +114,22 @@ function AppContent() {
       {!(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
 
       <main
+        id="main-content"
+        tabIndex={-1}
         className={`flex-grow flex flex-col ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0' : 'pt-14 lg:pt-16')} pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden`}
         style={{ minHeight: '60vh' }}
       >
 
+        <ErrorBoundary>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          </div>
+        }>
         <Routes>
           <Route path="/" element={isLoggedIn ? <UserHomePage /> : <Home />} />
           <Route path="/signin" element={<SignIn />} />
@@ -150,6 +171,8 @@ function AppContent() {
           {/* Catch-all route - 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
+        </ErrorBoundary>
       </main>
 
       <RatingPopup />

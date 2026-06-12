@@ -7,13 +7,24 @@ const TestInputCleaner = require('../util/testInputCleaner');
 exports.getProblems = async (req, res) => {
     try {
         const userId = req.user ? req.user.id : null;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+        const offset = (page - 1) * limit;
+        const difficulty = req.query.difficulty;
+        const language = req.query.language;
 
-        // 1. Fetch Problems
-        const { data: problems, error } = await supabase
+        // 1. Fetch Problems with pagination
+        let query = supabase
             .from('problems')
-            .select('id, title, language, difficulty, category, is_course_problem')
-            .eq('is_course_problem', false)
-            .order('id', { ascending: true });
+            .select('id, title, language, difficulty, category, is_course_problem', { count: 'exact' })
+            .eq('is_course_problem', false);
+
+        if (difficulty) query = query.eq('difficulty', difficulty);
+        if (language) query = query.eq('language', language);
+
+        const { data: problems, error, count } = await query
+            .order('id', { ascending: true })
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
 
@@ -31,7 +42,7 @@ exports.getProblems = async (req, res) => {
         }
 
         // 3. Map status
-        const projected = problems.map(p => ({
+        const projected = (problems || []).map(p => ({
             id: p.id,
             problemId: p.id,
             title: p.title,
@@ -41,7 +52,16 @@ exports.getProblems = async (req, res) => {
             status: userProgressMap[p.id] || 'todo'
         }));
 
-        res.json(projected);
+        res.json({
+            success: true,
+            problems: projected,
+            pagination: {
+                page,
+                limit,
+                total: count || 0,
+                totalPages: Math.ceil((count || 0) / limit)
+            }
+        });
     } catch (err) {
         console.error('getProblems error:', err.message);
         res.status(500).json({ msg: 'Server Error fetching problems' });

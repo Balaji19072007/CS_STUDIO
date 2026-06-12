@@ -1,7 +1,14 @@
 const { supabase } = require('../config/supabase');
+const { cache } = require('../util/cache');
 
 exports.getAllCourses = async (req, res) => {
     try {
+        const cacheKey = 'courses:all';
+        const cached = cache.get(cacheKey);
+        if (cached) {
+            return res.json({ success: true, courses: cached });
+        }
+
         const { data: courses, error } = await supabase
             .from('courses')
             .select('*');
@@ -34,6 +41,9 @@ exports.getAllCourses = async (req, res) => {
                 coverImage: course.cover_image || '/api/placeholder/400/300'
             };
         }));
+
+        // Cache for 5 minutes
+        cache.set(cacheKey, enrichedCourses, 300);
 
         res.json({
             success: true,

@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth.jsx";
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { useNotifications } from '../../hooks/useNotifications.js';
 import * as feather from 'feather-icons';
-import SearchBar from './SearchBar.jsx';
+import GlobalSearch from './GlobalSearch.jsx';
 
 // Data that describes all navigation links
 const PRIMARY_NAV_ITEMS = [
@@ -297,8 +297,8 @@ const Navbar = () => {
         return <span className="font-bold text-white flex items-center justify-center w-full h-full">{userInitials}</span>;
     }
 
-    const renderSearch = (isMobile = false) => {
-        return <SearchBar isMobile={isMobile} />;
+    const renderSearch = () => {
+        return <GlobalSearch />;
     }
 
     const handleLogout = () => {
@@ -521,7 +521,7 @@ const Navbar = () => {
                         {/* Desktop Search Bar */}
                         {isLoggedIn && (
                             <div className="hidden sm:block w-48 lg:w-64 mr-4">
-                                {renderSearch(false)}
+                                {renderSearch()}
                             </div>
                         )}
 
@@ -857,7 +857,7 @@ const Navbar = () => {
                                     {/* Search Bar */}
                                     {isLoggedIn && (
                                         <div className={`p-4 border-b ${mobileBorderClass}`}>
-                                            {renderSearch(true)}
+                                            {renderSearch()}
                                         </div>
                                     )}
 

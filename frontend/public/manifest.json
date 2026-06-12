@@ -1,0 +1,20 @@
+{
+  "name": "CS Studio",
+  "short_name": "CS Studio",
+  "description": "Learn to code with interactive problems, courses, and AI-powered guidance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "programming"],
+  "lang": "en-US",
+  "orientation": "any"
+}

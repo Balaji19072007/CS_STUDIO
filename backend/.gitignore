@@ -109,3 +109,9 @@ dist
 
 # macos
 .DS_Store
+
+# Temp execution directories
+temp_exec/
+temp/socket_exec/
+util/temp/
+util/temp_exec/

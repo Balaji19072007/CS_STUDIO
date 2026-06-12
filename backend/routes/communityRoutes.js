@@ -3,6 +3,7 @@ const router = express.Router();
 const Discussion = require('../models/Discussion');
 const User = require('../models/User'); // Import User model for manual fetching
 const authMiddleware = require('../middleware/authMiddleware');
+const xss = require('xss');
 
 // Helper to hydrate author details
 const hydrateAuthor = async (authorId) => {
@@ -90,10 +91,19 @@ router.post('/', authMiddleware, async (req, res) => {
     try {
         const { title, content, tags } = req.body;
 
+        // Sanitize inputs
+        const sanitizedTitle = xss(title?.trim().substring(0, 200) || '');
+        const sanitizedContent = xss(content?.trim() || '');
+        const sanitizedTags = (tags || []).map(t => xss(t?.trim().substring(0, 50) || '')).filter(Boolean);
+
+        if (!sanitizedTitle || !sanitizedContent) {
+            return res.status(400).json({ msg: 'Title and content are required' });
+        }
+
         const newDiscussion = new Discussion({
-            title,
-            content,
-            tags: tags || [],
+            title: sanitizedTitle,
+            content: sanitizedContent,
+            tags: sanitizedTags,
             author: req.user.id // Store ID string
         });
 
@@ -135,8 +145,13 @@ router.post('/:id/comment', authMiddleware, async (req, res) => {
             return res.status(404).json({ msg: 'Discussion not found' });
         }
 
+        const sanitizedContent = xss(req.body.content?.trim() || '');
+        if (!sanitizedContent) {
+            return res.status(400).json({ msg: 'Comment content is required' });
+        }
+
         const newComment = {
-            content: req.body.content,
+            content: sanitizedContent,
             author: user.id
         };
 

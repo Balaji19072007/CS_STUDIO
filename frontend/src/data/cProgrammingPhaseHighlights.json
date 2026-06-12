@@ -1,0 +1,110 @@
+[
+  {
+    "id": "c-phase-1",
+    "title": "Phase 1: Introduction to C Programming",
+    "duration": "About 6 focused study hours",
+    "challengeTime": "Each lesson in Introduction to C Programming closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-2",
+    "title": "Phase 2: Data Types and Variables",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Data Types and Variables closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-3",
+    "title": "Phase 3: Operators and Expressions",
+    "duration": "About 7 focused study hours",
+    "challengeTime": "Each lesson in Operators and Expressions closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-4",
+    "title": "Phase 4: Input and Output",
+    "duration": "About 6 focused study hours",
+    "challengeTime": "Each lesson in Input and Output closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-5",
+    "title": "Phase 5: Control Flow - Decision Making",
+    "duration": "About 7 focused study hours",
+    "challengeTime": "Each lesson in Control Flow - Decision Making closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-6",
+    "title": "Phase 6: Control Flow - Loops",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Control Flow - Loops closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-7",
+    "title": "Phase 7: Functions - Basics",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Functions - Basics closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-8",
+    "title": "Phase 8: Functions - Advanced",
+    "duration": "About 9 focused study hours",
+    "challengeTime": "Each lesson in Functions - Advanced closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-9",
+    "title": "Phase 9: Arrays - Basics",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Arrays - Basics closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-10",
+    "title": "Phase 10: Strings",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Strings closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-11",
+    "title": "Phase 11: Pointers - Fundamentals",
+    "duration": "About 10 focused study hours",
+    "challengeTime": "Each lesson in Pointers - Fundamentals closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-12",
+    "title": "Phase 12: Pointers - Advanced",
+    "duration": "About 10 focused study hours",
+    "challengeTime": "Each lesson in Pointers - Advanced closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-13",
+    "title": "Phase 13: Structures and Unions",
+    "duration": "About 9 focused study hours",
+    "challengeTime": "Each lesson in Structures and Unions closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-14",
+    "title": "Phase 14: Dynamic Memory Allocation",
+    "duration": "About 9 focused study hours",
+    "challengeTime": "Each lesson in Dynamic Memory Allocation closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-15",
+    "title": "Phase 15: File Handling",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in File Handling closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-16",
+    "title": "Phase 16: Preprocessor Directives",
+    "duration": "About 7 focused study hours",
+    "challengeTime": "Each lesson in Preprocessor Directives closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-17",
+    "title": "Phase 17: Advanced Topics",
+    "duration": "About 8 focused study hours",
+    "challengeTime": "Each lesson in Advanced Topics closes with a mastery task so learners prove the idea instead of only reading it."
+  },
+  {
+    "id": "c-phase-18",
+    "title": "Phase 18: Best Practices and Projects",
+    "duration": "About 10 focused study hours",
+    "challengeTime": "Each lesson in Best Practices and Projects closes with a mastery task so learners prove the idea instead of only reading it."
+  }
+]

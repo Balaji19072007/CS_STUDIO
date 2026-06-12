@@ -256,9 +256,7 @@ async function runCodeTest(language, code, input, testArgs = []) {
     }
     return { stdout: '', stderr: error.message + debugInfo, exitCode: 1 };
   } finally {
-    // Cleanup temporary files
-    // cleanupFiles(tempFiles); // DISABLED FOR DEBUGGING
-    console.log('Skipping cleanup for debug');
+    cleanupFiles(tempFiles);
   }
 }
 

@@ -142,3 +142,39 @@ for each row execute function update_updated_at_column();
 
 create trigger update_subscriptions_updated_at before update on public.subscriptions
 for each row execute function update_updated_at_column();
+
+-- ============================================
+-- PERFORMANCE INDEXES
+-- ============================================
+
+-- Progress table indexes
+create index if not exists idx_progress_user_id on public.progress(user_id);
+create index if not exists idx_progress_problem_id on public.progress(problem_id);
+create index if not exists idx_progress_status on public.progress(status);
+create index if not exists idx_progress_solved_at on public.progress(solved_at);
+
+-- Problems table indexes
+create index if not exists idx_problems_difficulty on public.problems(difficulty);
+create index if not exists idx_problems_language on public.problems(language);
+create index if not exists idx_problems_category on public.problems(category);
+create index if not exists idx_problems_is_course on public.problems(is_course_problem);
+
+-- Courses table indexes
+create index if not exists idx_courses_category on public.courses(category);
+create index if not exists idx_courses_is_premium on public.courses(is_premium);
+
+-- Course phases indexes
+create index if not exists idx_course_phases_course_id on public.course_phases(course_id);
+
+-- Course topics indexes
+create index if not exists idx_course_topics_course_id on public.course_topics(course_id);
+create index if not exists idx_course_topics_phase_id on public.course_topics(phase_id);
+create index if not exists idx_course_topics_type on public.course_topics(type);
+
+-- Users table indexes
+create index if not exists idx_users_role on public.users(role);
+create index if not exists idx_users_total_points on public.users(total_points desc);
+
+-- Subscriptions table indexes
+create index if not exists idx_subscriptions_plan on public.subscriptions(plan);
+create index if not exists idx_subscriptions_active on public.subscriptions(active);

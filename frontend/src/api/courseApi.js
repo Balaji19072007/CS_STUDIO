@@ -310,7 +310,7 @@ export const getTopicLearningMeta = (topicId) =>
 
 export const getCourseChallenge = async (topicId) => {
   try {
-    const res = await fetch(`${buildApiUrl(`/api/course-challenges/topic/${topicId}`)}?t=${Date.now()}`, {
+    const res = await fetch(buildApiUrl(`/api/course-challenges/topic/${topicId}`), {
       headers: {
         ...getAuthHeaders(),
         'Cache-Control': 'no-cache',

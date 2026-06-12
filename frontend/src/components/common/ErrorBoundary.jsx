@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import monitoring from '../../services/monitoring';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -19,32 +20,11 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error Boundary Caught:', error, errorInfo);
-    
-    // Log error to monitoring service (you can integrate with Sentry, LogRocket, etc.)
-    this.logErrorToService(error, errorInfo);
-    
+    monitoring.captureException(error, { componentStack: errorInfo?.componentStack });
     this.setState({
       error: error,
       errorInfo: errorInfo
     });
-  }
-
-  logErrorToService = (error, errorInfo) => {
-    // Here you can integrate with your error monitoring service
-    // Example: Sentry.captureException(error, { extra: errorInfo });
-    
-    // For now, we'll just enhance console logging
-    const errorDetails = {
-      message: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
-      url: window.location.href,
-      userAgent: navigator.userAgent
-    };
-    
-    console.error('Application Error Details:', errorDetails);
   }
 
   handleReload = () => {

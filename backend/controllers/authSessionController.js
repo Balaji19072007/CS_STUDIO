@@ -3,6 +3,26 @@ const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const emailService = require('../util/emailService');
 
+// Helper to create a supabase client acting on behalf of a user
+// Uses the service role key + user's access token for MFA operations
+const createUserClient = (userToken) => {
+  if (!userToken) return null;
+  const { createClient } = require('@supabase/supabase-js');
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) return null;
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    global: { headers: { Authorization: `Bearer ${userToken}` } }
+  });
+};
+
+const getUserToken = (req) => {
+  return req.cookies?.access_token ||
+    req.headers['x-auth-token'] ||
+    req.headers.authorization?.split(' ')[1] ||
+    null;
+};
+
 // In-memory store for OTPs: email -> { otp, userData, expiresAt }
 global.otpStore = global.otpStore || new Map();
 
@@ -66,12 +86,19 @@ exports.login = async (req, res) => {
       // 3. Set HttpOnly cookies
       setCookies(res, data.session);
       
-      // Check AAL
-      const { createClient } = require('@supabase/supabase-js');
-      const client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-        global: { headers: { Authorization: `Bearer ${data.session.access_token}` } }
-      });
-      const { data: aalData } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
+      // Check AAL using user-scoped client
+      const userClient = createUserClient(data.session.access_token);
+      if (userClient) {
+        try {
+          const { data: aalData } = await userClient.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
+            logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required');
+            return res.json({ success: true, user: data.user, mfa_required: true });
+          }
+        } catch (mfaErr) {
+          console.error('MFA check error (non-fatal):', mfaErr.message);
+        }
+      }
       
       if (aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
           logAuthEvent('LOGIN_ATTEMPT', email, req.ip, 'PARTIAL_SUCCESS', 'MFA Required');
@@ -354,20 +381,14 @@ function setCookies(res, session) {
   }
 }
 
-const getClient = (req) => {
-  const token = req.cookies.access_token || req.headers['x-auth-token'] || req.headers.authorization?.split(' ')[1];
-  if (!token) return null;
-  const { createClient } = require('@supabase/supabase-js');
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } }
-  });
-};
-
 exports.mfaEnroll = async (req, res) => {
-  const client = getClient(req);
-  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
   try {
-    const { data, error } = await client.auth.mfa.enroll({ factorType: 'totp' });
+    const token = getUserToken(req);
+    if (!token) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+    const userClient = createUserClient(token);
+    if (!userClient) return res.status(500).json({ success: false, msg: 'Server configuration error' });
+    
+    const { data, error } = await userClient.auth.mfa.enroll({ factorType: 'totp' });
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -377,10 +398,12 @@ exports.mfaEnroll = async (req, res) => {
 
 exports.mfaChallenge = async (req, res) => {
   const { factorId } = req.body;
-  const client = getClient(req);
-  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const token = getUserToken(req);
+  if (!token) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const userClient = createUserClient(token);
+  if (!userClient) return res.status(500).json({ success: false, msg: 'Server configuration error' });
   try {
-    const { data, error } = await client.auth.mfa.challenge({ factorId });
+    const { data, error } = await userClient.auth.mfa.challenge({ factorId });
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -390,10 +413,12 @@ exports.mfaChallenge = async (req, res) => {
 
 exports.mfaVerifyEnroll = async (req, res) => {
   const { factorId, challengeId, code } = req.body;
-  const client = getClient(req);
-  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const token = getUserToken(req);
+  if (!token) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const userClient = createUserClient(token);
+  if (!userClient) return res.status(500).json({ success: false, msg: 'Server configuration error' });
   try {
-    const { data, error } = await client.auth.mfa.verify({ factorId, challengeId, code });
+    const { data, error } = await userClient.auth.mfa.verify({ factorId, challengeId, code });
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -403,10 +428,12 @@ exports.mfaVerifyEnroll = async (req, res) => {
 
 exports.mfaUnenroll = async (req, res) => {
   const { factorId } = req.body;
-  const client = getClient(req);
-  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const token = getUserToken(req);
+  if (!token) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const userClient = createUserClient(token);
+  if (!userClient) return res.status(500).json({ success: false, msg: 'Server configuration error' });
   try {
-    const { data, error } = await client.auth.mfa.unenroll({ factorId });
+    const { data, error } = await userClient.auth.mfa.unenroll({ factorId });
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error) {
@@ -415,12 +442,14 @@ exports.mfaUnenroll = async (req, res) => {
 };
 
 exports.mfaStatus = async (req, res) => {
-  const client = getClient(req);
-  if (!client) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const token = getUserToken(req);
+  if (!token) return res.status(401).json({ success: false, msg: 'Unauthorized' });
+  const userClient = createUserClient(token);
+  if (!userClient) return res.status(500).json({ success: false, msg: 'Server configuration error' });
   try {
-    const { data, error } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
+    const { data, error } = await userClient.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error) throw error;
-    const { data: factorsData } = await client.auth.mfa.listFactors();
+    const { data: factorsData } = await userClient.auth.mfa.listFactors();
     res.json({ success: true, aal: data, factors: factorsData?.totp || [] });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });

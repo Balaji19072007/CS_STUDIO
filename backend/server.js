@@ -2,16 +2,26 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+const Sentry = require('@sentry/node');
+const { nodeProfilingIntegration } = require('@sentry/profiling-node');
+const { validateEnv } = require('./util/envValidation');
+
+// Validate required environment variables
+validateEnv();
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 const http = require('http');
 const { Server } = require('socket.io');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const { v2: cloudinary } = require('cloudinary');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
+const logger = require('./util/logger');
+const { cache } = require('./util/cache');
 
 // --- Supabase Init ---
 const { supabase } = require('./config/supabase');
@@ -19,6 +29,19 @@ const { supabase } = require('./config/supabase');
 const app = express();
 app.set('trust proxy', 1); // Trust the Render reverse proxy for rate limit
 const server = http.createServer(app);
+
+// Initialize Sentry in production
+if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV,
+    integrations: [nodeProfilingIntegration()],
+    tracesSampleRate: 0.1,
+    profilesSampleRate: 0.1,
+  });
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.tracingHandler());
+}
 
 // --- Model Imports ---
 // Models are now largely deprecated in favor of direct Supabase queries in controllers
@@ -44,6 +67,51 @@ const statsRoutes = require('./routes/statsRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const practiceProblemRoutes = require('./routes/practiceProblemRoutes');
 
+// Security: Helmet for secure HTTP headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://challenges.cloudflare.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com', 'https://*.supabase.co'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.openai.com', 'https://challenges.cloudflare.com'],
+      frameSrc: ["'self'", 'https://challenges.cloudflare.com'],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  } : false,
+}));
+
+// Compress all responses
+app.use(compression());
+
+// Add X-Response-Time header
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    res.setHeader('X-Response-Time', `${duration}ms`);
+    if (duration > 1000) {
+      logger.warn('Slow response', { url: req.originalUrl, method: req.method, duration: `${duration}ms` });
+    }
+  });
+  next();
+});
+
+// HTTPS redirect in production
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https' && req.headers.host !== 'localhost') {
+      return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
+
 // Enable CORS
 const allowedOrigins = [
   'http://localhost:5173', 
@@ -65,7 +133,7 @@ app.use(cors({
     // Strip trailing slash from origin just in case
     const normalizedOrigin = origin.replace(/\/$/, '');
     
-    if (allowedOrigins.includes(normalizedOrigin) || normalizedOrigin.endsWith('.vercel.app')) {
+    if (allowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
       console.warn(`CORS blocked request from origin: ${origin}`);
@@ -82,11 +150,11 @@ app.use(cors({
 // Body Parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET || 'cs-studio-secret'));
 
-// Debug logging
+// Structured request logging
 app.use((req, res, next) => {
-  console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  logger.info(`${req.method} ${req.originalUrl}`, { ip: req.ip, origin: req.get('origin') });
   next();
 });
 
@@ -116,6 +184,28 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 app.use('/api/auth', authLimiter);
+
+// Code Execution Rate Limiting
+const executionLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 20,
+  message: { success: false, msg: 'Too many code execution requests, please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/problems', executionLimiter);
+app.use('/api/course-challenges', executionLimiter);
+app.use('/api/practice-problems', executionLimiter);
+
+// Community Rate Limiting
+const communityLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: { success: false, msg: 'Too many community requests, please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/community', communityLimiter);
 
 // --- CLOUDINARY ---
 if (process.env.CLOUDINARY_CLOUD_NAME) {
@@ -188,9 +278,19 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Sentry error handler (must be before global handler)
+if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
+  logger.error('Unhandled Error', {
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    url: req.originalUrl,
+    method: req.method
+  });
   
   if (err instanceof multer.MulterError) {
     return res.status(400).json({ success: false, msg: err.message });
@@ -198,8 +298,7 @@ app.use((err, req, res, next) => {
   
   res.status(err.status || 500).json({
     success: false,
-    msg: err.message,
-    stack: err.stack
+    msg: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
   });
 });
 

@@ -347,9 +347,7 @@ class CodeExecutionService {
 
     process.on('close', (code) => {
       const executionTime = Date.now() - startTime;
-      // DISABLED CLEANUP FOR DEBUGGING
-      // this.cleanupFiles(tempFiles);
-      console.log('Skipping cleanup for debug');
+      this.cleanupFiles(tempFiles);
 
       if (code !== 0 || errorOutput) {
         // INJECT DEBUG INFO HERE if available

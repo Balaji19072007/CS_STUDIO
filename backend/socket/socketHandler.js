@@ -65,6 +65,16 @@ module.exports = (io) => {
                 // Store process for input/stop handling
                 activeExecutions.set(socket.id, { process: child, tempFiles });
 
+                // Enforce execution timeout (30 seconds)
+                const executionTimeout = setTimeout(() => {
+                    if (!child.killed) {
+                        child.kill('SIGKILL');
+                        socket.emit('execution-output', { output: '\nExecution timed out after 30 seconds.\n', isError: true });
+                        socket.emit('execution-result', { success: false, output: '' });
+                        cleanupExecution(socket.id);
+                    }
+                }, 30000);
+
                 // Handle Input (if initial input provided)
                 if (input) {
                     child.stdin.write(input);
@@ -80,12 +90,14 @@ module.exports = (io) => {
                 });
 
                 child.on('close', (code) => {
+                    clearTimeout(executionTimeout);
                     socket.emit('execution-output', { output: `\nProcess exited with code ${code}\n`, isError: code !== 0 });
                     socket.emit('execution-result', { success: code === 0, output: '' });
                     cleanupExecution(socket.id);
                 });
 
                 child.on('error', (err) => {
+                    clearTimeout(executionTimeout);
                     socket.emit('execution-output', { output: `Execution Start Error: ${err.message}\n`, isError: true });
                     cleanupExecution(socket.id);
                 });
