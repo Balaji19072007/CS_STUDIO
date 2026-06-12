@@ -310,10 +310,10 @@ export const getPracticeProblems = async (topicId) => {
       .order('order_index');
 
     if (error) throw error;
-    return data;
+    return data || [];
   } catch (error) {
     console.error('Error fetching practice problems:', error);
-    throw error;
+    return [];
   }
 };
 

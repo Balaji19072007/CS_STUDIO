@@ -62,10 +62,10 @@ export const getQuizQuestions = async (quizId) => {
             .order('order_index');
 
         if (error) throw error;
-        return data;
+        return data || [];
     } catch (error) {
         console.error('Error fetching quiz questions:', error);
-        throw error;
+        return [];
     }
 };
 
@@ -79,10 +79,10 @@ export const getQuestionOptions = async (questionId) => {
             .order('order_index');
 
         if (error) throw error;
-        return data;
+        return data || [];
     } catch (error) {
         console.error('Error fetching question options:', error);
-        throw error;
+        return [];
     }
 };
 
