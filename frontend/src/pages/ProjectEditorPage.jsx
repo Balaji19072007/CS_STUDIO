@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { buildApiUrl } from '../config/api.js';
@@ -737,3 +737,4 @@ const ProjectEditorPage = () => {
 };
 
 export default ProjectEditorPage;
+

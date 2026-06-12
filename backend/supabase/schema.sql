@@ -178,3 +178,33 @@ create index if not exists idx_users_total_points on public.users(total_points d
 -- Subscriptions table indexes
 create index if not exists idx_subscriptions_plan on public.subscriptions(plan);
 create index if not exists idx_subscriptions_active on public.subscriptions(active);
+
+-- Atomic increment for user stats (race-condition-safe)
+create or replace function public.increment_user_stats(
+  p_user_id uuid,
+  p_solved_inc int default 1,
+  p_points_inc int default 100
+) returns void
+  language sql
+as $$
+  update public.users set
+    problems_solved = problems_solved + p_solved_inc,
+    total_points = total_points + p_points_inc,
+    updated_at = now()
+  where id = p_user_id;
+$$;
+
+-- Atomic increment for streak (no read-modify-write race)
+create or replace function public.update_user_streak(
+  p_user_id uuid,
+  p_new_streak int,
+  p_last_update timestamptz
+) returns void
+  language sql
+as $$
+  update public.users set
+    current_streak = p_new_streak,
+    last_streak_update = p_last_update,
+    updated_at = now()
+  where id = p_user_id;
+$$;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import CourseLearning from './CourseLearning';
 
 const Courses = () => {
@@ -164,3 +164,4 @@ const Courses = () => {
 };
 
 export default Courses;
+

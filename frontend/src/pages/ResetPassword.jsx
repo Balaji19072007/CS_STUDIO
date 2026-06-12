@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
 import { Lock, Check, AlertCircle } from 'lucide-react';
 
@@ -161,3 +161,4 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
+

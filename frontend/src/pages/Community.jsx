@@ -1,7 +1,7 @@
 // frontend/src/pages/Community.jsx
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { communityAPI } from '../api/communityApi';
 import { useAuth } from '../hooks/useAuth';
 
@@ -747,3 +747,4 @@ const Community = () => {
 };
 
 export default Community;
+

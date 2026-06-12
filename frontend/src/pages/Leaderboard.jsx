@@ -1,7 +1,7 @@
 // frontend/src/pages/Leaderboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { fetchLeaderboard, fetchUserRank, fetchTotalUsers } from '../api/leaderboardApi.js';
 import TopUserStats from '../components/TopUserStats.jsx';
@@ -580,3 +580,4 @@ const Leaderboard = () => {
 };
 
 export default Leaderboard;
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, Award, Bell, Moon, Sun, BarChart2, BookOpen, Clock } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
@@ -142,4 +142,4 @@ const MobileTopBar = () => {
     );
 };
 
-export default MobileTopBar;
+export default memo(MobileTopBar);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 
 const Icon = ({ name, className = '' }) => {
     if (!name || !feather.icons[name]) return null;
@@ -176,3 +176,4 @@ const ProjectCalculatorUI = ({ onClose }) => {
 };
 
 export default ProjectCalculatorUI;
+

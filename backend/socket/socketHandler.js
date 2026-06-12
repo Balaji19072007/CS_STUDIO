@@ -4,10 +4,63 @@ const path = require('path');
 
 // Store active processes: socket.id -> { process, tempFiles }
 const activeExecutions = new Map();
+const MAX_CONCURRENT_EXECUTIONS = 50;
+const MAX_CODE_SIZE = 512 * 1024; // 512KB max code input
+const TEMP_FILE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
 const TEMP_DIR = path.join(__dirname, '../temp/socket_exec');
 if (!fs.existsSync(TEMP_DIR)) {
     fs.mkdirSync(TEMP_DIR, { recursive: true });
+}
+
+// Startup: clean any orphaned temp files from previous runs
+try {
+    const entries = fs.readdirSync(TEMP_DIR);
+    for (const entry of entries) {
+        const fullPath = path.join(TEMP_DIR, entry);
+        try {
+            const stat = fs.statSync(fullPath);
+            if (Date.now() - stat.mtimeMs > TEMP_FILE_MAX_AGE_MS) {
+                if (stat.isDirectory()) {
+                    fs.rmSync(fullPath, { recursive: true, force: true });
+                } else {
+                    fs.unlinkSync(fullPath);
+                }
+            }
+        } catch (e) {
+            // Skip files we can't access
+        }
+    }
+} catch (e) {
+    console.error('Temp directory cleanup error:', e.message);
+}
+
+// Periodic cleanup: every 10 minutes remove files older than 30 minutes
+const CLEANUP_INTERVAL = setInterval(() => {
+    try {
+        const entries = fs.readdirSync(TEMP_DIR);
+        for (const entry of entries) {
+            const fullPath = path.join(TEMP_DIR, entry);
+            try {
+                const stat = fs.statSync(fullPath);
+                if (Date.now() - stat.mtimeMs > TEMP_FILE_MAX_AGE_MS) {
+                    if (stat.isDirectory()) {
+                        fs.rmSync(fullPath, { recursive: true, force: true });
+                    } else {
+                        fs.unlinkSync(fullPath);
+                    }
+                }
+            } catch (e) {
+                // Skip
+            }
+        }
+    } catch (e) {
+        // Skip
+    }
+}, 10 * 60 * 1000);
+
+if (typeof process !== 'undefined' && process.on) {
+    process.on('exit', () => clearInterval(CLEANUP_INTERVAL));
 }
 
 module.exports = (io) => {
@@ -22,6 +75,20 @@ module.exports = (io) => {
         socket.on('execute-code', async ({ code, language, input, args: cmdArgsStr }) => {
             if (!code) {
                 socket.emit('execution-output', { output: 'No code provided.\n', isError: true });
+                return;
+            }
+
+            // Input size validation
+            if (code.length > MAX_CODE_SIZE) {
+                socket.emit('execution-output', { output: `Code exceeds maximum size of ${MAX_CODE_SIZE / 1024}KB.\n`, isError: true });
+                socket.emit('execution-result', { success: false, output: '' });
+                return;
+            }
+
+            // Concurrency limit
+            if (activeExecutions.size >= MAX_CONCURRENT_EXECUTIONS) {
+                socket.emit('execution-output', { output: 'Server is busy. Please try again later.\n', isError: true });
+                socket.emit('execution-result', { success: false, output: '' });
                 return;
             }
 

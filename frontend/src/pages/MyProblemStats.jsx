@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { buildApiUrl } from '../config/api.js';
 
@@ -203,3 +203,4 @@ const MyProblemStats = () => {
 };
 
 export default MyProblemStats;
+

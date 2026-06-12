@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, List, BookOpen, Users, Trophy } from 'lucide-react';
 
@@ -41,4 +41,4 @@ const MobileBottomNav = () => {
     );
 };
 
-export default MobileBottomNav;
+export default memo(MobileBottomNav);

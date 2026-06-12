@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 
 import { useTheme } from '../hooks/useTheme.jsx';
 

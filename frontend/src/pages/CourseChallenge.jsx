@@ -4,7 +4,7 @@ import { getPracticeProblemById, runPracticeProblem, submitPracticeProblem } fro
 import Loader from '../components/common/Loader.jsx';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
 import { ProblemManager } from '../utils/problemManager.js';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 
 // Constants
 const CHALLENGE_DURATION_SECONDS = 300; // 5 minutes
@@ -369,3 +369,4 @@ const CourseChallenge = () => {
 };
 
 export default CourseChallenge;
+

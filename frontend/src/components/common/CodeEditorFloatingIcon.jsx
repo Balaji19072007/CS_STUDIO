@@ -1,7 +1,7 @@
 // frontend/src/components/common/CodeEditorFloatingIcon.jsx
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../../util/featherIcons';
 
 const CodeEditorFloatingIcon = () => {
     const [isMobile, setIsMobile] = useState(false);
@@ -40,4 +40,5 @@ const CodeEditorFloatingIcon = () => {
     );
 };
 
-export default CodeEditorFloatingIcon;
+export default memo(CodeEditorFloatingIcon);
+

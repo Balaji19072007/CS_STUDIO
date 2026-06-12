@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases, fetchProblemProgress, updateProblemProgress, sendInputToProgram } from '../api/problemApi.js';
 // import { testAPI } from '../config/api.js';
 import Loader from '../components/common/Loader.jsx';

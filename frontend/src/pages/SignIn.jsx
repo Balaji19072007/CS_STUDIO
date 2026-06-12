@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
 import { Navbar as SiteNavbar } from '../components/site/Navbar';
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -473,3 +473,4 @@ const SignIn = () => {
 };
 
 export default SignIn;
+

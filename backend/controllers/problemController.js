@@ -280,28 +280,17 @@ exports.submitProblem = async (req, res) => {
             throw new Error(`Failed to save progress: ${upsertError.message}`);
         }
 
-        // Update User Stats (Simplified)
+        // Update User Stats (atomic increment via RPC — race-condition-free)
         if (isSolved && (!existingProgress || existingProgress.status !== 'solved')) {
-            // Increment problems_solved and total_points via RPC or direct update
-            // Using RPC is safer for concurrency but direct update is fine for now
-            // We need to fetch user first
-            const { data: user, error: fetchUserError } = await supabase.from('users').select('problems_solved, total_points').eq('id', userId).single();
-
-            if (!fetchUserError && user) {
-                const { error: updateUserError } = await supabase.from('users').update({
-                    problems_solved: (user.problems_solved || 0) + 1,
-                    total_points: (user.total_points || 0) + 100
-                }).eq('id', userId);
-
-                if (updateUserError) {
-                    console.error('User Stats Update Error:', updateUserError); // Non-blocking but log it
-                }
-            }
+            const { error: rpcError } = await supabase.rpc('increment_user_stats', {
+                p_user_id: userId,
+                p_solved_inc: 1,
+                p_points_inc: 100
+            });
+            if (rpcError) console.error('User Stats RPC Error:', rpcError);
         }
 
-        // --- STREAK UPDATE LOGIC ---
-        // We run this regardless of whether it's the *first* solve, because a user might solve a repeat problem to keep streak?
-        // Usually streaks are for *any* activity. But let's assume solving any problem counts.
+        // --- STREAK UPDATE LOGIC (atomic via RPC) ---
         if (isSolved) {
             const { data: streakUser, error: streakFetchError } = await supabase
                 .from('users')
@@ -310,17 +299,13 @@ exports.submitProblem = async (req, res) => {
                 .single();
 
             if (!streakFetchError && streakUser) {
-                // Use User's Timezone or default to UTC
                 const userTimezone = req.body.timezone || 'UTC';
                 const now = new Date();
 
-                // Helper to get date string in specific timezone
                 const getDateInTimezone = (date, timeZone) => {
-                    return new Intl.DateTimeFormat('en-CA', { // YYYY-MM-DD format
+                    return new Intl.DateTimeFormat('en-CA', {
                         timeZone: timeZone,
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
+                        year: 'numeric', month: '2-digit', day: '2-digit'
                     }).format(date);
                 };
 
@@ -328,49 +313,27 @@ exports.submitProblem = async (req, res) => {
 
                 let lastStr = null;
                 if (streakUser.last_streak_update) {
-                    const lastUpdateDate = new Date(streakUser.last_streak_update);
-                    lastStr = getDateInTimezone(lastUpdateDate, userTimezone);
+                    lastStr = getDateInTimezone(new Date(streakUser.last_streak_update), userTimezone);
                 }
 
-                // Create Yesterday Date in User's Timezone
-                // Note: Simply subtracting 24h from 'now' might fail around DST changes, 
-                // but checking the "Calendar Date" is safer.
-                // We need the string for "Yesterday" in that timezone.
-                // Construct a date object representing "Yesterday" relative to "Now" in that timezone
-                // A safe way: Get "Today" stats, subtract 1 day.
-
-                // 1. Get current time in target timezone
-                // We'll trust the string comparison mostly. 
-                // To find if it was "Yesterday", we can check if the date strings are consecutive.
-
-                // Simple approach: usage of simple Date diffing might be buggy with TZ.
-                // Let's rely on string parsing/creation.
                 const yesterday = new Date(now);
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yesterdayStr = getDateInTimezone(yesterday, userTimezone);
 
-                // If last update was TODAY, do nothing.
                 if (lastStr !== todayStr) {
                     let newStreak = 1;
-
                     if (lastStr === yesterdayStr) {
-                        // Consecutive day
                         newStreak = (streakUser.current_streak || 0) + 1;
-                    } else {
-                        // Reset to 1 (gap > 1 day or first time)
-                        newStreak = 1;
                     }
 
-                    // Update DB with CURRENT SERVER TIME (UTC standard), but logic was based on local day
                     const { error: streakUpdateError } = await supabase
-                        .from('users')
-                        .update({
-                            current_streak: newStreak,
-                            last_streak_update: now.toISOString()
-                        })
-                        .eq('id', userId);
+                        .rpc('update_user_streak', {
+                            p_user_id: userId,
+                            p_new_streak: newStreak,
+                            p_last_update: now.toISOString()
+                        });
 
-                    if (streakUpdateError) console.error('Streak Update Error:', streakUpdateError);
+                    if (streakUpdateError) console.error('Streak Update RPC Error:', streakUpdateError);
                 }
             }
         }

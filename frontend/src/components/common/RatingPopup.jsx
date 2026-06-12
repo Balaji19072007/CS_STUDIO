@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { statsAPI } from '../../config/api';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
@@ -277,4 +277,4 @@ const RatingPopup = () => {
   );
 };
 
-export default RatingPopup;
+export default memo(RatingPopup);

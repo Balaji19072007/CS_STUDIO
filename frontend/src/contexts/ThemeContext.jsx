@@ -1,6 +1,6 @@
 // frontend/src/contexts/ThemeContext.jsx
 import { createContext, useState, useEffect } from 'react';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 
 export const ThemeContext = createContext();
 

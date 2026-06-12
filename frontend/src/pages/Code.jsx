@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import CodeEditor from '../components/problems/CodeEditor.jsx';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import socketService from '../services/socketService.js';
 
 const Code = () => {

@@ -1,10 +1,10 @@
 // frontend/src/components/common/Navbar.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { memo, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { useNotifications } from '../../hooks/useNotifications.js';
-import * as feather from 'feather-icons';
+import * as feather from '../../util/featherIcons';
 import GlobalSearch from './GlobalSearch.jsx';
 
 // Data that describes all navigation links
@@ -920,4 +920,4 @@ const Navbar = () => {
     );
 };
 
-export default Navbar;
+export default memo(Navbar);

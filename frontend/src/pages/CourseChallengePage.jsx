@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { buildApiUrl } from '../config/api.js';
 import { ChallengeSkeleton } from '../components/common/SkeletonLoader';
 import { setupCompilerSocket, sendCodeForExecution, sendInputToProgram, stopCodeExecution } from '../api/problemApi.js';
@@ -813,3 +813,4 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
 };
 
 export default CourseChallengePage;
+

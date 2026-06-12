@@ -1,6 +1,19 @@
 const { supabase } = require('../config/supabase');
 const { cache } = require('../util/cache');
 
+const _problemCache = { data: null, loaded: false };
+
+async function _getCachedProblems() {
+  if (!_problemCache.loaded) {
+    const { loadAllProblems } = require('../util/problemUtils');
+    _problemCache.data = await loadAllProblems();
+    _problemCache.loaded = true;
+  }
+  return _problemCache.data;
+}
+
+exports.refreshProblemCache = () => { _problemCache.loaded = false; };
+
 exports.getAllCourses = async (req, res) => {
     try {
         const cacheKey = 'courses:all';
@@ -15,31 +28,33 @@ exports.getAllCourses = async (req, res) => {
 
         if (error) throw error;
 
-        // Fetch counts for modules and topics separately if not in main table
-        const enrichedCourses = await Promise.all(courses.map(async (course) => {
-            const { count: modulesCount } = await supabase
-                .from('phases')
-                .select('*', { count: 'exact', head: true })
-                .eq('course_id', course.id);
+        // Batch queries instead of N+1 — 3 queries total vs 2N+1
+        const { data: phases } = await supabase
+            .from('phases')
+            .select('course_id');
 
-            const { count: topicsCount } = await supabase
-                .from('topics')
-                .select('*, phases!inner(*)', { count: 'exact', head: true })
-                .eq('phases.course_id', course.id);
+        const { data: topics } = await supabase
+            .from('topics')
+            .select('*, phases!inner(course_id)');
 
-            return {
-                id: course.id,
-                title: course.title,
-                description: course.description,
-                icon: course.icon || '💻',
-                category: course.category || 'programming',
-                difficulty: course.difficulty || 'Beginner',
-                duration: course.duration || '8 weeks',
-                modules: modulesCount || 0,
-                topics: topicsCount || 0,
-                isPremium: course.is_premium || false,
-                coverImage: course.cover_image || '/api/placeholder/400/300'
-            };
+        const moduleCountMap = {};
+        if (phases) phases.forEach(p => { moduleCountMap[p.course_id] = (moduleCountMap[p.course_id] || 0) + 1; });
+
+        const topicCountMap = {};
+        if (topics) topics.forEach(t => { topicCountMap[t.phases.course_id] = (topicCountMap[t.phases.course_id] || 0) + 1; });
+
+        const enrichedCourses = (courses || []).map(course => ({
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            icon: course.icon || '💻',
+            category: course.category || 'programming',
+            difficulty: course.difficulty || 'Beginner',
+            duration: course.duration || '8 weeks',
+            modules: moduleCountMap[course.id] || 0,
+            topics: topicCountMap[course.id] || 0,
+            isPremium: course.is_premium || false,
+            coverImage: course.cover_image || '/api/placeholder/400/300'
         }));
 
         // Cache for 5 minutes
@@ -148,7 +163,7 @@ exports.getLastActiveCourse = async (req, res) => {
             .from('progress')
             .select('problem_id, last_submission')
             .eq('user_id', userId)
-            .gte('problem_id', 1001) // Course problems only
+            .gte('problem_id', 1001)
             .order('last_submission', { ascending: false })
             .limit(1)
             .single();
@@ -161,9 +176,8 @@ exports.getLastActiveCourse = async (req, res) => {
             return res.json({ success: true, course: null });
         }
 
-        // 2. Map problemId to Course
-        const { loadAllProblems } = require('../util/problemUtils');
-        const allProblems = await loadAllProblems();
+        // 2. Map problemId to Course (uses cached problem data)
+        const allProblems = await _getCachedProblems();
         const lastProblem = allProblems.find(p => p.id === lastProgress.problem_id);
 
         if (!lastProblem) {
@@ -172,7 +186,6 @@ exports.getLastActiveCourse = async (req, res) => {
 
         let courseId = lastProblem.courseId;
 
-        // Fallback: Map by Language if courseId is missing
         if (!courseId && lastProblem.language) {
             const LANG_MAP = {
                 'C': 'c-programming',
@@ -236,87 +249,92 @@ exports.getLastActiveCourse = async (req, res) => {
 exports.getEnrolledCourses = async (req, res) => {
     try {
         const userId = req.user.id;
-        
-        const { loadAllProblems } = require('../util/problemUtils');
-        const allProblems = await loadAllProblems();
-        
-        // Fetch all courses
+
+        const allProblems = await _getCachedProblems();
+
         const { data: allCoursesData, error: coursesError } = await supabase.from('courses').select('*');
         if (coursesError) throw coursesError;
-        
-        // Fetch user's problem progress
+
         const { data: problemProgress } = await supabase
             .from('progress')
             .select('problem_id, status')
             .eq('user_id', userId);
-            
-        // Fetch user_course_progress
+
         const { data: userCourseProgress } = await supabase
             .from('user_course_progress')
             .select('*')
             .eq('user_id', userId);
 
+        // Hoist user_progress count outside the loop (was N+1 before)
+        const { count: topicProgressCount, error: tpError } = await supabase
+            .from('user_progress')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId);
+
+        if (tpError) {
+            console.error("Error fetching topic progress:", tpError);
+        }
+
+        // Build a Set of problem IDs with progress for O(1) lookups
+        const progressByProblemId = {};
+        if (problemProgress) {
+            problemProgress.forEach(p => { progressByProblemId[p.problem_id] = p; });
+        }
+
+        // Build a Map for user_course_progress lookups
+        const ucpMap = {};
+        if (userCourseProgress) {
+            userCourseProgress.forEach(p => { ucpMap[p.course_id] = p; });
+        }
+
+        // Pre-compute course language mapping
+        const courseLanguageMap = {
+            'c-lang': { lang: 'C', mapTo: 'c-programming' },
+            'c-programming': { lang: 'C', mapTo: 'c-programming' },
+            'java-lang': { lang: 'Java', mapTo: 'java-lang' },
+            'python-lang': { lang: 'Python', mapTo: 'python-lang' },
+            'cpp-lang': { lang: 'C++', mapTo: 'cpp-lang' },
+        };
+
         const courses = [];
-        
+
         for (const courseData of (allCoursesData || [])) {
-            const courseIdMap = courseData.id === 'c-lang' ? 'c-programming' : courseData.id;
-            const courseLanguage = (courseData.id === 'c-lang' || courseData.id === 'c-programming') ? 'C' : 
-                                  courseData.id === 'java-lang' ? 'Java' : 
-                                  courseData.id === 'python-lang' ? 'Python' : 
-                                  courseData.id === 'cpp-lang' ? 'C++' : null;
-                                  
+            const langInfo = courseLanguageMap[courseData.id];
+            const courseIdMap = langInfo ? langInfo.mapTo : courseData.id;
+            const courseLanguage = langInfo ? langInfo.lang : null;
+
             const courseProblems = allProblems.filter(p =>
                 p.courseId === courseData.id || p.courseId === courseIdMap ||
                 (courseLanguage && p.language === courseLanguage && p.id >= 1001)
             );
-            
+
             const totalTopics = courseProblems.length;
             let solvedCount = 0;
             let attemptedCount = 0;
-            
-            if (problemProgress && courseProblems.length > 0) {
-                const courseProblemIds = new Set(courseProblems.map(p => p.id));
-                const userCourseProblemProgress = problemProgress.filter(p => courseProblemIds.has(p.problem_id));
-                
-                solvedCount = userCourseProblemProgress.filter(p => p.status === 'solved').length;
-                attemptedCount = userCourseProblemProgress.length;
+
+            if (courseProblems.length > 0) {
+                for (const p of courseProblems) {
+                    const prog = progressByProblemId[p.id];
+                    if (prog) {
+                        attemptedCount++;
+                        if (prog.status === 'solved') solvedCount++;
+                    }
+                }
             }
-            
+
             const problemProgressPercent = totalTopics > 0 ? Math.round((solvedCount / totalTopics) * 100) : 0;
-            
-            const ucp = userCourseProgress ? userCourseProgress.find(p => p.course_id === courseData.id || p.course_id === courseIdMap) : null;
-            
-            // Prefer the official course progress (from topics/quizzes) if it exists, otherwise fallback to coding problems progress
+
+            const ucp = ucpMap[courseData.id] || ucpMap[courseIdMap];
+
             let finalProgress = problemProgressPercent;
             if (ucp && ucp.progress_percentage !== undefined) {
                 finalProgress = ucp.progress_percentage;
             }
-            
-            // User is enrolled if they have an explicit user_course_progress entry, OR they've attempted/solved at least one problem in the course
-            // ALSO consider them enrolled if they have any topic progress in user_progress table
-            
-            // We fetch the topic progress for this user to check enrollment
-            const { count: topicProgressCount, error: tpError } = await supabase
-                .from('user_progress')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', userId);
-                
-            if (tpError) {
-                console.error("Error fetching topic progress:", tpError);
-            }
-                
-            // If they have topic progress and the course is C, they are likely enrolled in C.
-            // A more robust check would join topics -> phases -> course_id, but if ucp exists it catches most.
-            // Since they completed the course, ucp WILL exist as long as we check both c-lang and c-programming.
-            // Wait, what if they don't have ucp? Then finalProgress might be 0. Let's assume if they completed, they have ucp.
-            // If they don't, we'll calculate it from topicProgressCount approximately (max 100).
+
             if (!ucp && courseLanguage === 'C' && topicProgressCount > 0) {
-                // Approximate fallback if no ucp. 135 topics + 43 quizzes = 178 total
                 const approxPercent = Math.min(100, Math.round((topicProgressCount / 178) * 100));
                 finalProgress = Math.max(finalProgress, approxPercent);
             }
-
-            console.log(`Course ${courseData.id}: ucp=${!!ucp}, attemptedCount=${attemptedCount}, topicProgressCount=${topicProgressCount}, finalProgress=${finalProgress}`);
 
             if (ucp || attemptedCount > 0 || (courseLanguage === 'C' && topicProgressCount > 0)) {
                 courses.push({
@@ -330,11 +348,9 @@ exports.getEnrolledCourses = async (req, res) => {
                 });
             }
         }
-        
-        // Sort by lastAccessed descending
+
         courses.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
 
-        console.log("Returning courses:", courses.length);
         res.json({ success: true, courses });
     } catch (error) {
         console.error('Error fetching enrolled courses:', error);

@@ -1,7 +1,7 @@
 // frontend/src/components/common/SearchBar.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../../util/featherIcons';
 import { FaSearch, FaArrowRight } from 'react-icons/fa';
 
 // --- Mock Search Data Source (Consolidated Example) ---

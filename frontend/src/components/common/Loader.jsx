@@ -1,6 +1,6 @@
 // frontend/src/components/common/Loader.jsx
 import React, { useEffect } from 'react';
-import * as feather from 'feather-icons';
+import * as feather from '../../util/featherIcons';
 
 const Loader = ({ size = 'md', message = 'Loading...', className = '', showText = true }) => {
     // Sizes are mapped to Tailwind classes

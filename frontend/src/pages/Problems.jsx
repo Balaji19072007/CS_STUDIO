@@ -1,7 +1,7 @@
 // frontend/src/pages/Problems.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import * as feather from 'feather-icons';
+import * as feather from '../util/featherIcons';
 import { fetchAllProblems } from '../api/problemApi.js';
 import { ProblemManager } from '../utils/problemManager.js';
 import ProblemCard from '../components/problems/ProblemCard.jsx';
@@ -296,3 +296,4 @@ const Problems = () => {
 };
 
 export default Problems;
+

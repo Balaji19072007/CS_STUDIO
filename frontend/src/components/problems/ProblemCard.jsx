@@ -1,5 +1,5 @@
 // src/components/problems/ProblemCard.jsx
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.jsx';
 import { Code, Check, Edit2 } from 'lucide-react';
@@ -124,4 +124,4 @@ const ProblemCard = ({ problem }) => {
     );
 };
 
-export default ProblemCard;
+export default memo(ProblemCard);
