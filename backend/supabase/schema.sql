@@ -208,3 +208,199 @@ as $$
     updated_at = now()
   where id = p_user_id;
 $$;
+
+-- ============================================
+-- CERTIFICATES TABLE
+-- ============================================
+create table if not exists public.certificates (
+  id uuid primary key,
+  user_id uuid references public.users(id) on delete cascade,
+  user_name text,
+  course_title text not null,
+  issued_at timestamptz default now(),
+  verification_url text,
+  pdf_url text,
+  created_at timestamptz default now()
+);
+
+alter table public.certificates enable row level security;
+create policy "Users can view own certificates" on public.certificates
+  for select using (auth.uid() = user_id);
+create policy "Anyone can verify a certificate" on public.certificates
+  for select using (true);
+
+-- ============================================
+-- CERTIFICATE VERIFICATIONS TABLE
+-- ============================================
+create table if not exists public.certificate_verifications (
+  id uuid default uuid_generate_v4() primary key,
+  certificate_id uuid references public.certificates(id) on delete cascade,
+  verified_by text,
+  payment_status text default 'unpaid',
+  verification_type text default 'standard',
+  verified_at timestamptz default now(),
+  created_at timestamptz default now()
+);
+
+alter table public.certificate_verifications enable row level security;
+create policy "Anyone can insert verifications" on public.certificate_verifications
+  for insert with check (true);
+create policy "Anyone can view verifications" on public.certificate_verifications
+  for select using (true);
+
+-- ============================================
+-- USER PROGRESS TABLE (topic-level tracking)
+-- ============================================
+create table if not exists public.user_progress (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade,
+  topic_id text,
+  course_id text,
+  completed boolean default false,
+  status text default 'pending',
+  completed_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique(user_id, topic_id)
+);
+
+alter table public.user_progress enable row level security;
+create policy "Users can view own topic progress" on public.user_progress
+  for select using (auth.uid() = user_id);
+create policy "Users can upsert own topic progress" on public.user_progress
+  for all using (auth.uid() = user_id);
+
+-- ============================================
+-- USER COURSE PROGRESS TABLE
+-- ============================================
+create table if not exists public.user_course_progress (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade,
+  course_id text,
+  progress_percentage float default 0,
+  last_accessed_at timestamptz default now(),
+  completed_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique(user_id, course_id)
+);
+
+alter table public.user_course_progress enable row level security;
+create policy "Users can view own course progress" on public.user_course_progress
+  for select using (auth.uid() = user_id);
+create policy "Users can upsert own course progress" on public.user_course_progress
+  for all using (auth.uid() = user_id);
+
+-- ============================================
+-- PRACTICE PROBLEMS TABLE
+-- ============================================
+create table if not exists public.practice_problems (
+  id uuid default uuid_generate_v4() primary key,
+  topic_id text,
+  title text not null,
+  description text,
+  difficulty text default 'Easy',
+  language text default 'C',
+  order_index int default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.practice_problems enable row level security;
+create policy "Anyone can view practice problems" on public.practice_problems
+  for select using (true);
+
+-- ============================================
+-- COURSE CHALLENGES TABLE
+-- ============================================
+create table if not exists public.course_challenges (
+  id uuid default uuid_generate_v4() primary key,
+  topic_id text,
+  title text not null,
+  description text,
+  difficulty text default 'Medium',
+  language text default 'C',
+  order_index int default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.course_challenges enable row level security;
+create policy "Anyone can view course challenges" on public.course_challenges
+  for select using (true);
+
+-- ============================================
+-- COURSE CHALLENGE STATUS TABLE
+-- ============================================
+create table if not exists public.course_challenge_status (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade,
+  challenge_id uuid references public.course_challenges(id) on delete cascade,
+  status text default 'pending',
+  code_submission text,
+  passed boolean default false,
+  attempts int default 0,
+  completed_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique(user_id, challenge_id)
+);
+
+alter table public.course_challenge_status enable row level security;
+create policy "Users can view own challenge status" on public.course_challenge_status
+  for select using (auth.uid() = user_id);
+create policy "Users can upsert own challenge status" on public.course_challenge_status
+  for all using (auth.uid() = user_id);
+
+-- ============================================
+-- TOPIC CONTENT TABLE
+-- ============================================
+create table if not exists public.topic_content (
+  id uuid default uuid_generate_v4() primary key,
+  topic_id text,
+  title text,
+  content text,
+  type text default 'text',
+  order_index int default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.topic_content enable row level security;
+create policy "Anyone can view topic content" on public.topic_content
+  for select using (true);
+
+-- ============================================
+-- QUIZZES TABLE
+-- ============================================
+create table if not exists public.quizzes (
+  id uuid default uuid_generate_v4() primary key,
+  topic_id text,
+  title text,
+  questions jsonb,
+  passing_score float default 70,
+  order_index int default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.quizzes enable row level security;
+create policy "Anyone can view quizzes" on public.quizzes
+  for select using (true);
+
+-- ============================================
+-- QUIZ ATTEMPTS TABLE
+-- ============================================
+create table if not exists public.quiz_attempts (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade,
+  quiz_id uuid references public.quizzes(id) on delete cascade,
+  score float default 0,
+  passed boolean default false,
+  answers jsonb,
+  completed_at timestamptz,
+  created_at timestamptz default now(),
+  unique(user_id, quiz_id)
+);
+
+alter table public.quiz_attempts enable row level security;
+create policy "Users can view own quiz attempts" on public.quiz_attempts
+  for select using (auth.uid() = user_id);
+create policy "Users can insert own quiz attempts" on public.quiz_attempts
+  for all using (auth.uid() = user_id);

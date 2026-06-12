@@ -17,7 +17,7 @@ const FLAT_TOPICS = C_PROGRAMMING_PHASES.flatMap((phase) =>
 
 const TOPICS_BY_ID = new Map(FLAT_TOPICS.map((entry) => [entry.id, entry]));
 
-export const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'C';
+export const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'c-lang' || courseId === 'C';
 
 export const getFallbackPhases = (courseId) => {
   if (courseId && !isCProgrammingCourse(courseId)) return [];

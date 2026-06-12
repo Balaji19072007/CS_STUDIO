@@ -17,7 +17,7 @@ const getJavaModule = (() => {
   };
 })();
 
-const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'C';
+const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'c-lang' || courseId === 'C';
 const isJavaProgrammingCourse = (courseId) => courseId === 'java-programming' || courseId === 'Java';
 
 const getAuthHeaders = (includeJson = false) => {

@@ -127,19 +127,25 @@ const CourseLearning = ({ embeddedCourseId }) => {
                 // For each phase, fetch topics AND quizzes, then merge by order_index
                 const phasesWithItems = await Promise.all(
                     phasesData.map(async (phase) => {
+                        let topics = [];
+                        let quizzes = [];
                         try {
-                            const [topics, quizzes] = await Promise.all([
-                                getTopics(phase.id),
-                                getQuizzes(phase.id)
-                            ]);
-
+                            topics = await getTopics(phase.id);
                             console.log(`Phase ${phase.id} - Topics:`, topics);
+                        } catch (err) {
+                            console.error(`Error fetching topics for phase ${phase.id}:`, err);
+                        }
+                        try {
+                            quizzes = await getQuizzes(phase.id);
                             console.log(`Phase ${phase.id} - Quizzes:`, quizzes);
+                        } catch (err) {
+                            console.error(`Error fetching quizzes for phase ${phase.id}:`, err);
+                        }
 
-                            // Dynamically inject quizzes for C programming if needed
-                            let items = [];
-                            const isCCourse = (courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming');
-                            const isJavaCourse = (courseData?.title?.toLowerCase().includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
+                        // Dynamically inject quizzes for C programming if needed
+                        let items = [];
+                        const isCCourse = (courseData?.title?.toLowerCase().includes('c programming') || phase.id.startsWith('c-phase') || courseId === 'c-programming' || courseId === 'c-lang');
+                        const isJavaCourse = (courseData?.title?.toLowerCase().includes('java') || phase.id.startsWith('java-') || courseId === 'java-programming');
                             if ((isCCourse && phase.order_index !== 18) || (isJavaCourse && phase.order_index !== 22)) {
                                 const topicItems = topics.map(t => ({ ...t, type: 'topic' }));
                                 const quizItems = quizzes.map(q => ({ ...q, type: 'quiz' })).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
@@ -193,10 +199,6 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                 ...phase,
                                 items // Combined topics + quizzes
                             };
-                        } catch (err) {
-                            console.error(`Error fetching items for phase ${phase.id}:`, err);
-                            return { ...phase, items: [] };
-                        }
                     })
                 );
 

@@ -13,31 +13,62 @@ exports.getProblems = async (req, res) => {
         const difficulty = req.query.difficulty;
         const language = req.query.language;
 
-        // 1. Fetch Problems with pagination
-        let query = supabase
-            .from('problems')
-            .select('id, title, language, difficulty, category, is_course_problem', { count: 'exact' })
-            .eq('is_course_problem', false);
+        // 1. Try Supabase first
+        let problems, count, error;
 
-        if (difficulty) query = query.eq('difficulty', difficulty);
-        if (language) query = query.eq('language', language);
+        try {
+            let query = supabase
+                .from('problems')
+                .select('id, title, language, difficulty, category, is_course_problem', { count: 'exact' })
+                .eq('is_course_problem', false);
 
-        const { data: problems, error, count } = await query
-            .order('id', { ascending: true })
-            .range(offset, offset + limit - 1);
+            if (difficulty) query = query.eq('difficulty', difficulty);
+            if (language) query = query.eq('language', language);
 
-        if (error) throw error;
+            const result = await query
+                .order('id', { ascending: true })
+                .range(offset, offset + limit - 1);
+
+            problems = result.data;
+            error = result.error;
+            count = result.count;
+
+            if (error) throw error;
+        } catch (supaErr) {
+            console.warn('Supabase unavailable, falling back to local JSON:', supaErr.message);
+            // Fallback: load from local JSON files
+            const { loadAllProblems } = require('../util/problemUtils');
+            const allProblems = await loadAllProblems();
+            const regularOnly = allProblems.filter(p =>
+                p.problemType === 'regular' &&
+                (!difficulty || p.difficulty === difficulty) &&
+                (!language || p.language === language)
+            );
+            problems = regularOnly.slice(offset, offset + limit).map(p => ({
+                id: p.id,
+                title: p.title,
+                language: p.language,
+                difficulty: p.difficulty,
+                category: p.category,
+                is_course_problem: false
+            }));
+            count = regularOnly.length;
+        }
 
         // 2. Fetch User Progress if logged in
         let userProgressMap = {};
         if (userId) {
-            const { data: progress } = await supabase
-                .from('progress')
-                .select('problem_id, status')
-                .eq('user_id', userId);
+            try {
+                const { data: progress } = await supabase
+                    .from('progress')
+                    .select('problem_id, status')
+                    .eq('user_id', userId);
 
-            if (progress) {
-                progress.forEach(p => userProgressMap[p.problem_id] = p.status);
+                if (progress) {
+                    progress.forEach(p => userProgressMap[p.problem_id] = p.status);
+                }
+            } catch (_) {
+                // Progress read failure is non-fatal
             }
         }
 

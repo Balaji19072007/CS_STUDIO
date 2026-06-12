@@ -7,19 +7,31 @@ import { supabase } from '../config/supabase';
 // Get quizzes for a phase
 export const getQuizzes = async (phaseId) => {
     try {
-        // Fetch quizzes from Supabase for all phases
-
-        const { data, error } = await supabase
+        // Try fetching by phase_id first, then fall back to topic_id-based lookup
+        let { data, error } = await supabase
             .from('quizzes')
             .select('*')
             .eq('phase_id', phaseId)
             .order('order_index');
 
+        if (error || !data || data.length === 0) {
+            // Retry using topic_id column if phase_id didn't work
+            const { data: topicData, error: topicError } = await supabase
+                .from('quizzes')
+                .select('*')
+                .eq('topic_id', phaseId)
+                .order('order_index');
+            if (!topicError && topicData) {
+                data = topicData;
+                error = null;
+            }
+        }
+
         if (error) throw error;
-        return data;
+        return data || [];
     } catch (error) {
         console.error('Error fetching quizzes:', error);
-        throw error;
+        return [];
     }
 };
 

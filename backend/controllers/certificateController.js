@@ -82,16 +82,53 @@ const countCompletedProgressRows = (rows) => {
 };
 
 const getCompletionCounts = async (userId, courseId) => {
-  const { count: totalTopics } = await supabase
-    .from('topics')
-    .select('id, phases!inner(id, course_id)', { count: 'exact', head: true })
-    .eq('phases.course_id', courseId);
+  let totalTopics = 0;
+  try {
+    const { count } = await supabase
+      .from('topics')
+      .select('id, phases!inner(course_id)', { count: 'exact', head: true })
+      .eq('phases.course_id', courseId);
+    totalTopics = count || 0;
+  } catch (supaErr) {
+    console.warn('Supabase unavailable for certificate count:', supaErr.message);
+  }
 
-  const { data: progressRows } = await supabase
-    .from('user_progress')
-    .select('*, topics!inner(id, phases!inner(id, course_id))')
-    .eq('user_id', userId)
-    .eq('topics.phases.course_id', courseId);
+  // Fallback if Supabase topic count is 0: use problem-based counting
+  if (!totalTopics) {
+    try {
+      const { loadAllProblems } = require('../util/problemUtils');
+      const allProblems = await loadAllProblems();
+      const courseProblems = allProblems.filter(p =>
+        p.courseId === courseId ||
+        (p.language && String(courseId).toLowerCase().includes(p.language.toLowerCase()))
+      );
+      totalTopics = courseProblems.length || 18; // min reasonable default
+    } catch (_) {
+      totalTopics = 18; // reasonable fallback for a full course
+    }
+  }
+
+  let progressRows = [];
+  try {
+    const { data } = await supabase
+      .from('progress')
+      .select('*')
+      .eq('user_id', userId);
+    if (data) {
+      // Filter locally for course progress
+      const { loadAllProblems } = require('../util/problemUtils');
+      const allProblems = await loadAllProblems();
+      const courseProblemIds = new Set(
+        allProblems.filter(p =>
+          p.courseId === courseId ||
+          (p.language && String(courseId).toLowerCase().includes(p.language.toLowerCase()))
+        ).map(p => p.id)
+      );
+      progressRows = data.filter(p => courseProblemIds.has(p.problem_id));
+    }
+  } catch (supaErr) {
+    console.warn('Supabase unavailable for certificate progress:', supaErr.message);
+  }
 
   return {
     totalTopics: totalTopics || 0,

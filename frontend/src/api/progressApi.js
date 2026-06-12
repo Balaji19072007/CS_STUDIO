@@ -163,7 +163,9 @@ export const getUserTopicProgress = async (userId, topicId) => {
 export const getAllUserProgressForCourse = async (userId, courseId) => {
   try {
     const queryCourseId = courseId === 'c-programming' ? 'c-lang' : courseId;
-    const { data, error } = await supabase
+
+    // Try the complex join query first
+    let { data, error } = await supabase
       .from('user_progress')
       .select(`
         *,
@@ -178,8 +180,16 @@ export const getAllUserProgressForCourse = async (userId, courseId) => {
       .eq('user_id', userId)
       .eq('topics.phases.course_id', queryCourseId);
 
+    // If join query fails, fall back to fetching all user progress
     if (error) {
-      throw error;
+      console.warn('Join query failed, fetching plain progress:', error.message);
+      const { data: plainData, error: plainError } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (plainError) throw plainError;
+      data = plainData;
     }
 
     return normalizeProgressRows(data);
@@ -226,40 +236,53 @@ export const markTopicComplete = async (userId, topicId) => {
 export const updateCourseProgress = async (userId, courseId) => {
   try {
     const queryCourseId = courseId === 'c-programming' ? 'c-lang' : courseId;
-    const { count: totalTopics, error: totalTopicsError } = await supabase
-      .from('topics')
-      .select(
-        `
-          id,
-          phases!inner(course_id)
-        `,
-        { count: 'exact', head: true }
-      )
-      .eq('phases.course_id', queryCourseId);
 
-    if (totalTopicsError) {
-      throw totalTopicsError;
+    // Try to count topics using the join query
+    let totalTopics = 0;
+    try {
+      const { count, error } = await supabase
+        .from('topics')
+        .select(
+          `
+            id,
+            phases!inner(course_id)
+          `,
+          { count: 'exact', head: true }
+        )
+        .eq('phases.course_id', queryCourseId);
+      if (!error) totalTopics = count || 0;
+    } catch (e) {
+      console.warn('Could not count topics via join, using fallback:', e.message);
     }
 
+    // If no topics found, return early
     if (!totalTopics) {
       return null;
     }
 
-    const { data: progressRows, error: progressError } = await supabase
-      .from('user_progress')
-      .select(
-        `
-          *,
-          topics!inner(
-            phases!inner(course_id)
-          )
-        `
-      )
-      .eq('user_id', userId)
-      .eq('topics.phases.course_id', queryCourseId);
-
-    if (progressError) {
-      throw progressError;
+    // Try to fetch progress with join
+    let progressRows = [];
+    try {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select(
+          `
+            *,
+            topics!inner(
+              phases!inner(course_id)
+            )
+          `
+        )
+        .eq('user_id', userId)
+        .eq('topics.phases.course_id', queryCourseId);
+      if (!error) progressRows = data || [];
+    } catch (e) {
+      console.warn('Could not fetch progress with join, using plain query:', e.message);
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId);
+      if (!error) progressRows = data || [];
     }
 
     const completedTopics = normalizeProgressRows(progressRows).filter(isProgressCompleted).length;
@@ -309,32 +332,41 @@ export const updateCourseProgress = async (userId, courseId) => {
 // Get phase progress
 export const getPhaseProgress = async (userId, phaseId) => {
   try {
-    const { count: totalTopics, error: totalTopicsError } = await supabase
-      .from('topics')
-      .select('*', { count: 'exact', head: true })
-      .eq('phase_id', phaseId);
-
-    if (totalTopicsError) {
-      throw totalTopicsError;
+    let totalTopics = 0;
+    try {
+      const { count, error } = await supabase
+        .from('topics')
+        .select('*', { count: 'exact', head: true })
+        .eq('phase_id', phaseId);
+      if (!error) totalTopics = count || 0;
+    } catch (e) {
+      console.warn('Could not count phase topics:', e.message);
     }
 
     if (!totalTopics) {
       return { total: 0, completed: 0, percentage: 0 };
     }
 
-    const { data: progressRows, error: progressError } = await supabase
-      .from('user_progress')
-      .select(
-        `
-          *,
-          topics!inner(phase_id)
-        `
-      )
-      .eq('user_id', userId)
-      .eq('topics.phase_id', phaseId);
-
-    if (progressError) {
-      throw progressError;
+    let progressRows = [];
+    try {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select(
+          `
+            *,
+            topics!inner(phase_id)
+          `
+        )
+        .eq('user_id', userId)
+        .eq('topics.phase_id', phaseId);
+      if (!error) progressRows = data || [];
+    } catch (e) {
+      console.warn('Could not fetch phase progress with join:', e.message);
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId);
+      if (!error) progressRows = data || [];
     }
 
     const completedTopics = normalizeProgressRows(progressRows).filter(isProgressCompleted).length;
