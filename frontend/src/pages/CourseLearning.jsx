@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCourse, getPhases, getTopics } from '../api/courseApi';
 import { getQuizzes } from '../api/quizApi';
@@ -62,6 +62,21 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const [showCourseRating, setShowCourseRating] = useState(false);
     const [hasRatedCourse, setHasRatedCourse] = useState(false);
     const { isBookmarked } = useBookmarks();
+
+    const prevCourseIdRef = useRef(courseId);
+
+    useEffect(() => {
+        if (prevCourseIdRef.current !== courseId) {
+            setLocalTopicId(null);
+            setLocalQuizId(null);
+            setSelectedPhaseId(null);
+            if (isEmbedded) {
+                sessionStorage.removeItem('cs_embedded_topic');
+                sessionStorage.removeItem('cs_embedded_quiz');
+            }
+            prevCourseIdRef.current = courseId;
+        }
+    }, [courseId, isEmbedded]);
 
     // Check if user already rated this course
     useEffect(() => {
@@ -655,11 +670,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        {!isQuiz && (
-                                                            <div className="flex items-center gap-1.5 mt-1">
-                                                                <DifficultyBadge difficulty={item.difficulty} />
-                                                            </div>
-                                                        )}
+
                                                         {isQuiz && isCompleted && userProgress[item.id]?.completed_at && (
                                                             <div className="text-[10px] text-green-600 dark:text-green-400 mt-0.5 font-medium">
                                                                 Completed: {new Date(userProgress[item.id].completed_at).toLocaleDateString()} {new Date(userProgress[item.id].completed_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}

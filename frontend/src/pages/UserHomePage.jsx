@@ -10,7 +10,7 @@ import { fetchDailyProblem, fetchRecommendedProblems } from '../api/problemApi.j
 import { getEnrolledCourses } from '../api/courseApi.js';
 import { buildApiUrl } from '../config/api.js';
 import TopUserStats from '../components/TopUserStats.jsx';
-import FullPageLoader from '../components/common/FullPageLoader.jsx';
+import { DashboardSkeleton } from '../components/common/SkeletonLoader.jsx';
 
 // Inline SVG Activity Graph Component
 const ActivityGraph = ({ history }) => {
@@ -170,7 +170,6 @@ const UserHomePage = () => {
     const [userStats, setUserStats] = useState(null);
     const [difficultyStats, setDifficultyStats] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [showDashLoader, setShowDashLoader] = useState(true);
 
     // New Data States
     // const [dailyProblem, setDailyProblem] = useState(null);
@@ -310,16 +309,8 @@ const UserHomePage = () => {
 
     if (!user) return null;
 
-    // Keep FullPageLoader mounted (as position:fixed overlay) until its
-    // animation completes — then it fades out and we render the dashboard
-    if (showDashLoader) {
-        return (
-            <FullPageLoader
-                message="Loading Dashboard..."
-                isReady={!loading}
-                onComplete={() => setShowDashLoader(false)}
-            />
-        );
+    if (loading) {
+        return <DashboardSkeleton />;
     }
 
     // --- STREAK CALCULATION ---

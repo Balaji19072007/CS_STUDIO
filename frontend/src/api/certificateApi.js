@@ -3,7 +3,7 @@ import { buildApiUrl, getHeaders } from '../config/api.js';
 export const getMyCertificates = async () => {
   try {
     const response = await fetch(buildApiUrl('/api/certificates/my-certificates'), {
-      headers: getHeaders(false),
+      headers: getHeaders(true),
     });
 
     if (!response.ok) {
