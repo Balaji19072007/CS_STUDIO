@@ -12,12 +12,14 @@ const DifficultyBadge = ({ difficulty }) => {
     'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300',
   ];
 
-  const idx = Math.min(Math.max(Math.floor(difficulty) - 1, 0), 4);
+  const diffNum = Number(difficulty);
+  const idx = Number.isFinite(diffNum) ? Math.min(Math.max(Math.floor(diffNum) - 1, 0), 4) : 0;
   const label = labels[idx];
+  const colorClass = colors[idx];
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${colors[idx]}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${colors[idx].split(' ')[0].replace('border-', 'bg-')}`} />
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${colorClass.split(' ')[0].replace('border-', 'bg-')}`} />
       {label}
     </span>
   );

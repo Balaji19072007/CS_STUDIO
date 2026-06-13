@@ -278,7 +278,7 @@ const Community = () => {
 
             // Collect unique users from all authors & comment authors for mentions
             const usersMap = new Map();
-            response.data.forEach(d => {
+            (response.data || []).forEach(d => {
                 if (d.author && d.author.username) {
                     usersMap.set(d.author.username, d.author);
                 }
