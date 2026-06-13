@@ -9,6 +9,7 @@ import { downloadCertificate } from '../utils/certificateUtils.js';
 import TopicContent from './TopicContent';
 import QuizPage from './QuizPage';
 import { LearningSkeleton } from '../components/common/SkeletonLoader';
+import { ErrorPage } from '../components/common/ErrorPages';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { supabase } from '../config/supabase';
@@ -51,6 +52,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const [phases, setPhases] = useState([]);
     const [expandedPhaseId, setExpandedPhaseId] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
     const [userProgress, setUserProgress] = useState({});
     const [selectedPhaseId, setSelectedPhaseId] = useState(null);
@@ -211,8 +213,9 @@ const CourseLearning = ({ embeddedCourseId }) => {
                 // Auto-expand logic is now handled in a separate useEffect
 
                 setLoading(false);
-            } catch (error) {
-                console.error('Error fetching course data:', error);
+            } catch (err) {
+                console.error('Error fetching course data:', err);
+                setError(err?.message || 'Failed to load course data');
                 setLoading(false);
             }
         };
@@ -536,6 +539,10 @@ const CourseLearning = ({ embeddedCourseId }) => {
     };
 
 
+
+    if (error) {
+        return <ErrorPage title="Failed to load course" description={error} onRetry={() => window.location.reload()} />;
+    }
 
     if (loading) {
         return <LearningSkeleton />;

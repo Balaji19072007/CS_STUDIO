@@ -8,61 +8,72 @@ import { API_ENDPOINTS, getHeaders, buildApiUrl } from '../config/api.js';
  * @param {string} category - e.g., 'all', 'easy', 'medium', 'hard'
  */
 export const fetchLeaderboard = async (timeframe = 'all-time', category = 'all') => {
-    // Construct query parameters
-    const query = new URLSearchParams({ timeframe, category }).toString();
-    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.GET}?${query}`);
-    
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: getHeaders(false),
-    });
+    try {
+        const query = new URLSearchParams({ timeframe, category }).toString();
+        const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.GET}?${query}`);
 
-    const data = await response.json();
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getHeaders(false),
+        });
 
-    if (!response.ok) {
-        throw new Error(data.msg || `Failed to fetch leaderboard data: ${response.statusText}`);
+        if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(text ? JSON.parse(text).msg || `HTTP ${response.status}` : `HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        if (err.message && err.message.startsWith('HTTP')) throw err;
+        throw new Error(err.message || 'Failed to fetch leaderboard data');
     }
-
-    return data;
 };
 
 /**
  * Fetch current user's rank and stats
  */
 export const fetchUserRank = async () => {
-    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.USER_RANK}`);
-    
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: getHeaders(true),
-        credentials: 'include',
-    });
+    try {
+        const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.USER_RANK}`);
 
-    const data = await response.json();
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getHeaders(true),
+            credentials: 'include',
+        });
 
-    if (!response.ok) {
-        throw new Error(data.msg || `Failed to fetch user rank: ${response.statusText}`);
+        if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(text ? JSON.parse(text).msg || `HTTP ${response.status}` : `HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        if (err.message && err.message.startsWith('HTTP')) throw err;
+        throw new Error(err.message || 'Failed to fetch user rank');
     }
-
-    return data;
 };
 
 /**
  * Fetch total number of users with solved problems
  */
 export const fetchTotalUsers = async () => {
-    const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.TOTAL_USERS}`);
-    
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: getHeaders(false),
-    });
+    try {
+        const url = buildApiUrl(`${API_ENDPOINTS.LEADERBOARD.TOTAL_USERS}`);
 
-    const data = await response.json();
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getHeaders(false),
+        });
 
-    if (!response.ok) {
-        throw new Error(data.msg || `Failed to fetch total users: ${response.statusText}`);
+        if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(text ? JSON.parse(text).msg || `HTTP ${response.status}` : `HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        if (err.message && err.message.startsWith('HTTP')) throw err;
+        throw new Error(err.message || 'Failed to fetch total users');
     }
-
-    return data;
 };

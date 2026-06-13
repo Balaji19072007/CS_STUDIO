@@ -23,6 +23,7 @@ import LessonBookmarkButton from '../components/learning/LessonBookmarkButton';
 import LessonReadingProgress from '../components/learning/LessonReadingProgress';
 import LessonNavigation, { DifficultyBadge, ReadingTime } from '../components/learning/LessonNavigation';
 import LessonCompletionAnimation from '../components/learning/LessonCompletionAnimation';
+import { ErrorPage } from '../components/common/ErrorPages';
 
 const getSolvedTopicKey = (topicId) => `course_challenge_solved_${topicId}`;
 
@@ -90,6 +91,7 @@ const TopicContent = ({
     const [courseChallenge, setCourseChallenge] = useState(null);
     const [resolvedCourseTitle, setResolvedCourseTitle] = useState(courseTitle || '');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [, setCompleting] = useState(false);
     const [showCompletion, setShowCompletion] = useState(false);
     const scrollContainerRef = useRef(null);
@@ -127,8 +129,9 @@ const TopicContent = ({
                 setPracticeProblems(problems);
                 setCourseChallenge(mergeSolvedState(challenge, resolvedTopicId));
                 setResolvedCourseTitle(courseData?.title || courseTitle || '');
-            } catch (error) {
-                console.error('Error fetching topic content:', error);
+            } catch (err) {
+                console.error('Error fetching topic content:', err);
+                setError(err?.message || 'Failed to load topic content');
             } finally {
                 setLoading(false);
                 setTimeout(() => {
@@ -493,6 +496,10 @@ const TopicContent = ({
                 );
         }
     };
+
+    if (error) {
+        return <ErrorPage title="Failed to load topic" description={error} onRetry={() => window.location.reload()} />;
+    }
 
     if (loading) {
         return <TopicSkeleton />;

@@ -12,6 +12,7 @@ import QuizTimer from '../components/learning/QuizTimer';
 import QuestionNavigator from '../components/learning/QuestionNavigator';
 import QuizAchievementBadge from '../components/learning/QuizAchievementBadge';
 import QuizReviewMode from '../components/learning/QuizReviewMode';
+import { ErrorPage } from '../components/common/ErrorPages';
 
 const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst, isLast }) => {
     const { courseId, quizId: paramQuizId } = useParams();
@@ -26,6 +27,7 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
     const [history, setHistory] = useState([]);
     const [answers, setAnswers] = useState({});
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [results, setResults] = useState(null);
     const [showAnswers, setShowAnswers] = useState(false); // Toggle review mode
@@ -59,8 +61,9 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
                 }
 
                 setLoading(false);
-            } catch (error) {
-                console.error('Error fetching quiz:', error);
+            } catch (err) {
+                console.error('Error fetching quiz:', err);
+                setError(err?.message || 'Failed to load quiz');
                 setLoading(false);
             }
         };
@@ -623,6 +626,10 @@ const QuizPage = ({ embedded = false, quizId = null, onNext, onPrevious, isFirst
         </div>
         );
     };
+
+    if (error) {
+        return <ErrorPage title="Failed to load quiz" description={error} onRetry={() => window.location.reload()} />;
+    }
 
     if (loading) return <QuizSkeleton />;
 

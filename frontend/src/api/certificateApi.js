@@ -1,57 +1,56 @@
-import { buildApiUrl } from '../config/api.js';
-
-const getAuthHeaders = (includeJson = false) => {
-  const headers = {};
-  const token = localStorage.getItem('token');
-
-  if (includeJson) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  return headers;
-};
+import { buildApiUrl, getHeaders } from '../config/api.js';
 
 export const getMyCertificates = async () => {
-  const response = await fetch(buildApiUrl('/api/certificates/my-certificates'), {
-    headers: getAuthHeaders(),
-  });
+  try {
+    const response = await fetch(buildApiUrl('/api/certificates/my-certificates'), {
+      headers: getHeaders(false),
+    });
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to load certificates');
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(text ? JSON.parse(text).error : `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.certificates || [];
+  } catch (err) {
+    if (err.message && !err.message.startsWith('HTTP')) throw err;
+    throw new Error('Failed to load certificates');
   }
-
-  return data.certificates || [];
 };
 
 export const issueCourseCertificate = async (courseId) => {
-  const response = await fetch(buildApiUrl(`/api/certificates/issue/${courseId}`), {
-    method: 'POST',
-    headers: getAuthHeaders(true),
-    body: JSON.stringify({}),
-  });
+  try {
+    const response = await fetch(buildApiUrl(`/api/certificates/issue/${courseId}`), {
+      method: 'POST',
+      headers: getHeaders(true),
+    });
 
-  const data = await response.json();
-  if (!response.ok) {
-    const error = new Error(data.error || 'Failed to issue certificate');
-    error.details = data;
-    throw error;
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      const err = new Error(text ? JSON.parse(text).error || 'Failed to issue certificate' : 'Failed to issue certificate');
+      throw err;
+    }
+
+    return await response.json();
+  } catch (err) {
+    if (err.message && !err.message.startsWith('Failed')) throw err;
+    throw new Error('Failed to issue certificate');
   }
-
-  return data;
 };
 
 export const verifyCertificate = async (certificateId) => {
-  const response = await fetch(buildApiUrl(`/api/certificates/verify/${certificateId}`));
-  const data = await response.json();
+  try {
+    const response = await fetch(buildApiUrl(`/api/certificates/verify/${certificateId}`));
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to verify certificate');
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(text ? JSON.parse(text).error || 'Failed to verify certificate' : 'Failed to verify certificate');
+    }
+
+    return await response.json();
+  } catch (err) {
+    if (err.message && !err.message.startsWith('Failed')) throw err;
+    throw new Error('Failed to verify certificate');
   }
-
-  return data;
 };
