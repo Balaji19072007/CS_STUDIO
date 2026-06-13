@@ -68,7 +68,7 @@ const Navbar = () => {
         }, 100);
 
         return () => clearTimeout(timer);
-    }, [location.pathname, isDropdownOpen]);
+    }, [location.pathname, isDropdownOpen, isDark]);
 
     // Handle content spacing for fixed navbars
     useEffect(() => {
