@@ -646,7 +646,7 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                         <button
                             onClick={handleRunCode}
                             disabled={running || submitting}
-                            className={`flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors flex items-center justify-center ${running || submitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+                            className={`flex-none px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors flex items-center justify-center ${running || submitting ? 'opacity-75 cursor-not-allowed' : ''}`}
                         >
                             {running || submitting ? <Icon name="loader" className="h-4 w-4 animate-spin" /> : <Icon name="play" className="h-4 w-4" />}
                         </button>
@@ -727,25 +727,25 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                             <button
                                 onClick={handleRunCode}
                                 disabled={running || submitting}
-                                className="flex items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-700 px-5 py-2 text-sm font-medium text-gray-800 dark:text-white transition-colors hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
+                                className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
                             >
                                 {running ? <Icon name="loader" className="h-4 w-4 animate-spin" /> : <Icon name="play" className="h-4 w-4" />}
                                 <span>{running ? 'Running...' : 'Run'}</span>
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                disabled={running || submitting || isSolved}
-                                className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50 ${isSolved ? 'cursor-default bg-green-600' : 'bg-blue-600 hover:bg-blue-500'
+                                disabled={running || submitting}
+                                className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50 ${isSolved ? 'bg-green-600 hover:bg-green-500' : 'bg-blue-600 hover:bg-blue-500'
                                     }`}
                             >
                                 {submitting ? (
                                     <Icon name="loader" className="h-4 w-4 animate-spin" />
                                 ) : isSolved ? (
-                                    <Icon name="check" className="h-4 w-4" />
+                                    <Icon name="check-circle" className="h-4 w-4" />
                                 ) : (
                                     <Icon name="send" className="h-4 w-4" />
                                 )}
-                                <span>{isSolved ? 'Solved' : submitting ? 'Submitting...' : 'Submit'}</span>
+                                <span>{submitting ? 'Submitting...' : isSolved ? 'Resolve' : 'Submit'}</span>
                             </button>
                             </div>
                         </div>
@@ -800,18 +800,18 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
                         <div className="lg:hidden p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                              <button
                                 onClick={handleSubmit}
-                                disabled={running || submitting || isSolved}
-                                className={`w-full flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50 ${isSolved ? 'cursor-default bg-green-600' : 'bg-blue-600 hover:bg-blue-500'
+                                disabled={running || submitting}
+                                className={`w-full flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50 ${isSolved ? 'bg-green-600 hover:bg-green-500' : 'bg-blue-600 hover:bg-blue-500'
                                     }`}
                             >
                                 {submitting ? (
                                     <Icon name="loader" className="h-4 w-4 animate-spin" />
                                 ) : isSolved ? (
-                                    <Icon name="check" className="h-4 w-4" />
+                                    <Icon name="check-circle" className="h-4 w-4" />
                                 ) : (
                                     <Icon name="send" className="h-4 w-4" />
                                 )}
-                                <span>{isSolved ? 'Solved' : submitting ? 'Submitting...' : 'Submit Challenge'}</span>
+                                <span>{submitting ? 'Submitting...' : isSolved ? 'Resolve Challenge' : 'Submit Challenge'}</span>
                             </button>
                         </div>
                     </div>

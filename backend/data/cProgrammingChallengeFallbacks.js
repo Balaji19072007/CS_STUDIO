@@ -20,6 +20,7 @@ const getFallbackChallengeById = (id) => {
         title: "Hello, World!",
         description: "Write a standard 'Hello, World!' program.",
         reference_output: "Hello, World!",
+        output_format: "Hello, World!",
         test_input: "None",
         test_args: [],
         starter_code: "",

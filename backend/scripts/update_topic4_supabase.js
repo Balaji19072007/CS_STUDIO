@@ -63,7 +63,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is it? This is called a preprocessor directive.\n\nPurpose: It tells the compiler to include the contents of the Standard Input Output header file (stdio.h) before compilation.\n\nWhy is it needed? The function printf() is defined inside stdio.h. Without including this header file, the compiler will not know what printf() is.\n\nLine 2',
+            content_text: '<strong>What is it?</strong><br />This is called a preprocessor directive.<br /><br /><strong>Purpose:</strong><br />It tells the compiler to include the contents of the Standard Input Output header file (<code>stdio.h</code>) before compilation.<br /><br /><strong>Why is it needed?</strong><br />The function <code>printf()</code> is defined inside <code>stdio.h</code>. Without including this header file, the compiler will not know what <code>printf()</code> is.<br /><br /><span class="text-sm text-gray-500 font-mono">Line 2</span>',
             order_index: 8
         },
         {
@@ -75,7 +75,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is main()? main() is the entry point of a C program. Execution always starts from the main() function. Every C program must contain exactly one main() function.\n\nComponents:\n• int: Represents the return type of the function. It means the function returns an integer value to the operating system.\n• main: The name of the function.\n• (): Parentheses are used to specify parameters.\n\nLine 3',
+            content_text: '<strong>What is main()?</strong><br /><code>main()</code> is the entry point of a C program. Execution always starts from the <code>main()</code> function. Every C program must contain exactly one <code>main()</code> function.<br /><br /><strong>Components:</strong><br /><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>int</strong>: Represents the return type of the function. It means the function returns an integer value to the operating system.</li><li><strong>main</strong>: The name of the function.</li><li><strong>()</strong>: Parentheses are used to specify parameters.</li></ul><br /><span class="text-sm text-gray-500 font-mono">Line 3</span>',
             order_index: 10
         },
         {
@@ -87,7 +87,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is this? An opening curly brace.\n\nPurpose: It marks the beginning of the function body. Everything inside the braces belongs to the main() function.\n\nLine 4',
+            content_text: '<strong>What is this?</strong><br />An opening curly brace.<br /><br /><strong>Purpose:</strong><br />It marks the beginning of the function body. Everything inside the braces belongs to the <code>main()</code> function.<br /><br /><span class="text-sm text-gray-500 font-mono">Line 4</span>',
             order_index: 12
         },
         {
@@ -99,7 +99,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is printf()? printf() is a library function used to display output on the screen. The word printf stands for: Print Formatted.\n\nString Literal: The text enclosed within double quotes is called a string literal.\n\nImportant Rule: Every statement in C must end with a semicolon.\n\nLine 5',
+            content_text: '<strong>What is printf()?</strong><br /><code>printf()</code> is a library function used to display output on the screen.<br />The word <strong>printf</strong> stands for: <em>Print Formatted</em>.<br /><br /><strong>String Literal:</strong><br />The text enclosed within double quotes is called a string literal.<br /><br /><strong>Important Rule:</strong><br />Every statement in C must end with a semicolon.<br /><br /><span class="text-sm text-gray-500 font-mono">Line 5</span>',
             order_index: 14
         },
         {
@@ -111,7 +111,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What does return mean? The return statement ends the execution of the function and sends a value back to the operating system.\n\nWhy return 0? It indicates that the program executed successfully.\n\nLine 6',
+            content_text: '<strong>What does return mean?</strong><br />The <code>return</code> statement ends the execution of the function and sends a value back to the operating system.<br /><br /><strong>Why return 0?</strong><br />It indicates that the program executed successfully.<br /><br /><span class="text-sm text-gray-500 font-mono">Line 6</span>',
             order_index: 16
         },
         {
@@ -123,7 +123,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is it? Closing curly brace.\n\nPurpose: Marks the end of the main() function. Every opening brace must have a matching closing brace.\n\nProgram Execution Flow\nStep 1: Preprocessor processes #include <stdio.h>\nStep 2: Compiler compiles the program.\nStep 3: Execution enters main()\nStep 4: The statement printf() is executed.\nStep 5: Output appears on the screen.\nStep 6: return 0; returns control to OS.\nStep 7: Program terminates successfully.\n\nModified Example Using New Line',
+            content_text: '<strong>What is it?</strong><br />Closing curly brace.<br /><br /><strong>Purpose:</strong><br />Marks the end of the <code>main()</code> function. Every opening brace must have a matching closing brace.<br /><br /><strong>Program Execution Flow</strong><br /><ul class="list-disc pl-5 mt-2 space-y-1"><li>Preprocessor processes <code>#include &lt;stdio.h&gt;</code></li><li>Compiler compiles the program.</li><li>Execution enters <code>main()</code></li><li>The statement <code>printf()</code> is executed.</li><li>Output appears on the screen.</li><li><code>return 0;</code> returns control to OS.</li><li>Program terminates successfully.</li></ul><br /><strong>Modified Example Using New Line</strong>',
             order_index: 18
         },
         {
@@ -135,7 +135,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'Output:',
+            content_text: '<strong>Output:</strong>',
             order_index: 20
         },
         {
@@ -147,7 +147,7 @@ async function run() {
         {
             topic_id: topicId,
             content_type: 'explanation',
-            content_text: 'What is \\n? \\n is called a newline character. It moves the cursor to the next line after printing.\n\nCommon Mistakes\n1. Missing Header File: Compiler may not recognize printf().\n2. Missing Semicolon: Syntax error will occur.\n3. Missing Curly Braces: Function body won\'t be recognized.\n4. Incorrect Quotes: Strings must use double quotes (" ").',
+            content_text: '<strong>What is \\n?</strong><br /><code>\\n</code> is called a newline character. It moves the cursor to the next line after printing.<br /><br /><strong>Common Mistakes</strong><br /><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Missing Header File:</strong> Compiler may not recognize <code>printf()</code>.</li><li><strong>Missing Semicolon:</strong> Syntax error will occur.</li><li><strong>Missing Curly Braces:</strong> Function body won\'t be recognized.</li><li><strong>Incorrect Quotes:</strong> Strings must use double quotes (<code>" "</code>).</li></ul>',
             order_index: 22
         }
     ];
