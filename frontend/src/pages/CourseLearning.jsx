@@ -380,7 +380,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
         }
     };
 
-    const allItems = phases.flatMap(p => p.items);
+    const allItems = phases.flatMap(p => p.items || []);
     const currentIndex = allItems.findIndex(item => item.id === (topicId || quizId));
     const isFirst = currentIndex === 0;
     const isLast = currentIndex === allItems.length - 1;
@@ -406,15 +406,15 @@ const CourseLearning = ({ embeddedCourseId }) => {
         }
     };
 
-    const totalCourseTopics = phases.reduce((acc, phase) => acc + phase.items.filter(i => i.type === 'topic').length, 0);
+    const totalCourseTopics = phases.reduce((acc, phase) => acc + (phase.items || []).filter(i => i.type === 'topic').length, 0);
     const completedCourseTopics = phases.reduce((acc, phase) => acc + (userProgress[phase.id]?.completed || 0), 0);
     
-    const totalCourseQuizzes = phases.reduce((acc, phase) => acc + phase.items.filter(i => i.type === 'quiz').length, 0);
-    const completedCourseQuizzes = phases.reduce((acc, phase) => acc + phase.items.filter(i => i.type === 'quiz' && isProgressCompleted(userProgress[i.id])).length, 0);
+    const totalCourseQuizzes = phases.reduce((acc, phase) => acc + (phase.items || []).filter(i => i.type === 'quiz').length, 0);
+    const completedCourseQuizzes = phases.reduce((acc, phase) => acc + (phase.items || []).filter(i => i.type === 'quiz' && isProgressCompleted(userProgress[i.id])).length, 0);
 
     const firstIncompleteItem = useMemo(() => {
         for (const phase of phases) {
-            for (const item of phase.items) {
+            for (const item of (phase.items || [])) {
                 if (!isProgressCompleted(userProgress[item.id])) return { item, phaseId: phase.id };
             }
         }
@@ -828,7 +828,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                 if (firstIncompleteItem) {
                                                     setExpandedPhaseId(firstIncompleteItem.phaseId);
                                                     selectItem(firstIncompleteItem.item);
-                                                } else if (phases.length > 0 && phases[0].items.length > 0) {
+                                                } else if (phases.length > 0 && (phases[0].items || []).length > 0) {
                                                     setExpandedPhaseId(phases[0].id);
                                                     selectItem(phases[0].items[0]);
                                                 }
@@ -940,7 +940,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                     key={phase.id}
                                                     onClick={() => {
                                                         setExpandedPhaseId(phase.id);
-                                                        if (phase.items.length > 0) selectItem(phase.items[0]);
+                                                        if ((phase.items || []).length > 0) selectItem(phase.items[0]);
                                                     }}
                                                     className="flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md group
                                                         bg-white dark:bg-slate-800/50
@@ -958,8 +958,8 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                             {phase.title}
                                                         </div>
                                                         <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                                            {phase.items.filter(i => i.type === 'topic').length} topics
-                                                            {phase.items.filter(i => i.type === 'quiz').length > 0 && ` · ${phase.items.filter(i => i.type === 'quiz').length} quiz`}
+                                                            {(phase.items || []).filter(i => i.type === 'topic').length} topics
+                                                            {(phase.items || []).filter(i => i.type === 'quiz').length > 0 && ` · ${(phase.items || []).filter(i => i.type === 'quiz').length} quiz`}
                                                         </div>
                                                         {isStarted && (
                                                             <div className="mt-1.5 h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">

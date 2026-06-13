@@ -273,12 +273,13 @@ const Community = () => {
     const fetchDiscussions = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await communityAPI.getAllDiscussions();
-            setDiscussions(response.data);
+            const data = await communityAPI.getAllDiscussions();
+            const discussionsArray = Array.isArray(data) ? data : [];
+            setDiscussions(discussionsArray);
 
             // Collect unique users from all authors & comment authors for mentions
             const usersMap = new Map();
-            (response.data || []).forEach(d => {
+            discussionsArray.forEach(d => {
                 if (d.author && d.author.username) {
                     usersMap.set(d.author.username, d.author);
                 }
