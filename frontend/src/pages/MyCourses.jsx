@@ -3,29 +3,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, CheckCircle, Clock, PlayCircle, ArrowRight, Award, ArrowLeft } from 'lucide-react';
 import { getEnrolledCourses } from '../api/courseApi';
 import FullPageLoader from '../components/common/FullPageLoader';
+import { ErrorPage } from '../components/common/ErrorPages';
 
 const MyCourses = () => {
     const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchCourses = async () => {
+        setError(null);
+        setLoading(true);
+        try {
+            const data = await getEnrolledCourses();
+            setCourses(data || []);
+        } catch (err) {
+            console.error("Failed to fetch enrolled courses", err);
+            setError(err?.message || 'Failed to load your courses');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                const data = await getEnrolledCourses();
-                setCourses(data || []);
-            } catch (error) {
-                console.error("Failed to fetch enrolled courses", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCourses();
     }, []);
 
     if (loading) {
         return <FullPageLoader message="Loading your courses..." />;
+    }
+
+    if (error) {
+        return <ErrorPage title="Failed to load courses" description={error} onRetry={fetchCourses} />;
     }
 
     const ongoingCourses = courses.filter(c => c.progress < 100);

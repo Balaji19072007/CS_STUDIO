@@ -3,37 +3,48 @@ import { Link } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { buildApiUrl } from '../config/api.js';
+import { SkeletonDashboard } from '../components/common/SkeletonLoader';
+import EmptyState from '../components/common/EmptyState';
 
 const MyProblemStats = () => {
     const { isLoggedIn, loading: authLoading } = useAuth();
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all'); // all, solved, attempted
 
-    useEffect(() => {
-        const fetchHistory = async () => {
-            if (!isLoggedIn) return;
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(buildApiUrl('/api/progress/history'), {
-                    headers: {
-                        'x-auth-token': token
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        setHistory(data.history);
-                    }
-                }
-            } catch (error) {
-                console.error("Failed to fetch history:", error);
-            } finally {
+    const fetchHistory = async () => {
+        if (!isLoggedIn) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
                 setLoading(false);
+                return;
             }
-        };
+            const response = await fetch(buildApiUrl('/api/progress/history'), {
+                headers: { 'x-auth-token': token }
+            });
 
+            if (!response.ok) {
+                throw new Error(`Failed to load history (${response.status})`);
+            }
+            const data = await response.json();
+            if (data.success) {
+                setHistory(data.history);
+            } else {
+                throw new Error(data.msg || 'Failed to load history');
+            }
+        } catch (err) {
+            console.error("Failed to fetch history:", err);
+            setError(err?.message || 'Failed to load problem history');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchHistory();
     }, [isLoggedIn]);
 
@@ -67,9 +78,22 @@ const MyProblemStats = () => {
     });
 
     if (authLoading || loading) {
+        return <SkeletonDashboard />;
+    }
+
+    if (error) {
         return (
-            <div className="min-h-screen dark-gradient-secondary flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            <div className="min-h-screen dark-gradient-secondary pt-6 pb-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8">
+                        <div className="text-center">
+                            <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
+                            <button onClick={fetchHistory} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -184,16 +208,18 @@ const MyProblemStats = () => {
                             </table>
                         </div>
                     ) : (
-                        <div className="text-center py-20 px-4">
-                            <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                                <i data-feather="code" className="w-8 h-8"></i>
-                            </div>
-                            <h3 className="text-lg font-medium text-white mb-2">No problems found</h3>
-                            <p className="text-gray-400 mb-6">You haven't attempted any problems in this category yet.</p>
-                            <Link to="/problems" className="dark-btn px-6 py-2 rounded-lg inline-flex items-center">
-                                Browse Problems
-                            </Link>
-                        </div>
+                        <EmptyState
+                            title="No problems found"
+                            description="You haven't attempted any problems in this category yet."
+                            action={
+                                <Link
+                                    to="/problems"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/20"
+                                >
+                                    Browse Problems
+                                </Link>
+                            }
+                        />
                     )}
                 </div>
 

@@ -3,6 +3,9 @@ import * as feather from '../util/featherIcons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Link } from 'react-router-dom';
 import { buildApiUrl } from '../config/api.js';
+import { SkeletonDashboard } from '../components/common/SkeletonLoader';
+import { ErrorPage } from '../components/common/ErrorPages';
+import EmptyState from '../components/common/EmptyState';
 
 const MyProgress = () => {
   const { isLoggedIn } = useAuth();
@@ -10,46 +13,50 @@ const MyProgress = () => {
   const [history, setHistory] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [heatmapData, setHeatmapData] = useState({});
 
-  // Fetch integration
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!isLoggedIn) return;
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const headers = { 'x-auth-token': token };
-
-        // 1. Fetch Stats (Summary + Difficulty)
-        const statsRes = await fetch(buildApiUrl('/api/progress/user-stats'), { headers });
-        const statsData = await statsRes.json();
-
-        // 2. Fetch History (For Heatmap)
-        const historyRes = await fetch(buildApiUrl('/api/progress/history'), { headers });
-        const historyData = await historyRes.json();
-
-        // 3. Fetch Enrolled Courses
-        const coursesRes = await fetch(buildApiUrl('/api/courses/enrolled'), { headers });
-        const coursesData = await coursesRes.json();
-
-        if (statsData.success) setStats(statsData);
-        if (historyData.success) {
-          setHistory(historyData.history);
-          processHeatmap(historyData.history);
-        }
-        if (coursesData.success) {
-          setEnrolledCourses(coursesData.courses);
-        }
-
-      } catch (error) {
-        console.error("Failed to fetch progress data:", error);
-      } finally {
+  const fetchData = async () => {
+    if (!isLoggedIn) return;
+    setFetchError(null);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
         setLoading(false);
+        return;
       }
-    };
 
+      const headers = { 'x-auth-token': token };
+
+      const [statsRes, historyRes, coursesRes] = await Promise.all([
+        fetch(buildApiUrl('/api/progress/user-stats'), { headers }),
+        fetch(buildApiUrl('/api/progress/history'), { headers }),
+        fetch(buildApiUrl('/api/courses/enrolled'), { headers }),
+      ]);
+
+      const statsData = await statsRes.json();
+      const historyData = await historyRes.json();
+      const coursesData = await coursesRes.json();
+
+      if (statsData.success) setStats(statsData);
+      if (historyData.success) {
+        setHistory(historyData.history);
+        processHeatmap(historyData.history);
+      }
+      if (coursesData.success) {
+        setEnrolledCourses(coursesData.courses);
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch progress data:", error);
+      setFetchError(error?.message || 'Failed to load progress data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [isLoggedIn]);
 
@@ -103,27 +110,26 @@ const MyProgress = () => {
   };
 
   if (loading) {
+    return <SkeletonDashboard />;
+  }
+
+  if (fetchError) {
     return (
-      <div className="min-h-screen dark-gradient-secondary flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-      </div>
+      <ErrorPage
+        title="Unable to load progress"
+        description={fetchError}
+        onRetry={fetchData}
+      />
     );
   }
 
   if (!stats) {
     return (
-      <div className="min-h-screen dark-gradient-secondary flex flex-col items-center justify-center pt-20">
-        <div className="bg-gray-800 p-8 rounded-2xl text-center max-w-md shadow-xl border border-gray-700">
-          <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i data-feather="cloud-off" className="w-8 h-8 text-gray-400"></i>
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Unable to load progress</h2>
-          <p className="text-gray-400 mb-6">We couldn't fetch your latest stats. Please try again later.</p>
-          <button onClick={() => window.location.reload()} className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-            Retry
-          </button>
-        </div>
-      </div>
+      <ErrorPage
+        title="Unable to load progress"
+        description="We couldn't fetch your latest stats. Please try again later."
+        onRetry={fetchData}
+      />
     );
   }
 
@@ -169,7 +175,7 @@ const MyProgress = () => {
           <div className="lg:col-span-2 space-y-8">
 
             {/* 0. Enrolled Courses */}
-            {enrolledCourses.length > 0 && (
+            {enrolledCourses.length > 0 ? (
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-xl relative overflow-hidden">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                   <i data-feather="book-open" className="w-5 h-5 text-indigo-500 dark:text-indigo-400"></i>
@@ -202,6 +208,21 @@ const MyProgress = () => {
                     </Link>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-xl">
+                <EmptyState
+                  icon="📚"
+                  iconType="primary"
+                  title="No enrolled courses"
+                  description="Enroll in a course to start tracking your progress here."
+                  compact
+                  action={
+                    <Link to="/courses" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors">
+                      Browse Courses
+                    </Link>
+                  }
+                />
               </div>
             )}
 
@@ -260,22 +281,32 @@ const MyProgress = () => {
                 </Link>
               </div>
 
-              <div className="space-y-4">
-                {history.slice(0, 5).map(item => (
-                  <div key={item.problemId} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-2 h-2 rounded-full ${item.status === 'solved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</h4>
-                        <p className="text-xs text-gray-500">{item.lastSubmission || item.solvedAt ? new Date(item.lastSubmission || item.solvedAt).toLocaleDateString() : 'N/A'}</p>
+              {history.length > 0 ? (
+                <div className="space-y-4">
+                  {history.slice(0, 5).map(item => (
+                    <div key={item.problemId} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-2 h-2 rounded-full ${item.status === 'solved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</h4>
+                          <p className="text-xs text-gray-500">{item.lastSubmission || item.solvedAt ? new Date(item.lastSubmission || item.solvedAt).toLocaleDateString() : 'N/A'}</p>
+                        </div>
                       </div>
+                      <span className="text-xs font-mono text-gray-400">
+                        {item.bestAccuracy || 0}% Acc
+                      </span>
                     </div>
-                    <span className="text-xs font-mono text-gray-400">
-                      {item.bestAccuracy || 0}% Acc
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon="⏳"
+                  iconType="default"
+                  title="No recent activity"
+                  description="Solve your first problem to start building your history."
+                  compact
+                />
+              )}
             </div>
 
           </div>

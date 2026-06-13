@@ -1,15 +1,10 @@
 // frontend/src/config/api.js
 import axios from 'axios';
+import { handleApiError } from '../services/errorService.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-
-const redirectToSignIn = () => {
-  if (window.location.hash !== '#/signin') {
-    window.location.assign('/#/signin');
-  }
-};
 
 export const buildApiUrl = (path = '') => {
   if (!path) return API_BASE_URL;
@@ -32,7 +27,6 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      // CRITICAL: Use ONLY x-auth-token for backend authentication
       config.headers['x-auth-token'] = token;
     }
     return config;
@@ -42,28 +36,14 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle common errors
+// Response interceptor with global error handling via errorService
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
-      // Auto logout if 401 response returned from api
-      console.log('Authentication failed, clearing tokens...');
-      localStorage.removeItem('token');
-      localStorage.removeItem('userData');
-
-      // Do NOT auto redirect here because it ruins silent token refreshes
-      // AuthContext handles the redirect if the session is truly invalid
-      // redirectToSignIn();
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      console.error('Network error:', error.message);
-    }
-
+    const url = error.config?.url || 'unknown';
+    handleApiError(error, { source: 'config/api.js', url });
     return Promise.reject(error);
   }
 );

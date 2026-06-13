@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
 import { communityAPI } from '../api/communityApi';
 import { useAuth } from '../hooks/useAuth';
+import { SkeletonDashboard } from '../components/common/SkeletonLoader';
+import EmptyState from '../components/common/EmptyState';
+import { ErrorPage } from '../components/common/ErrorPages';
 
 
 // ─────────────────────────────────────────────
@@ -446,13 +449,18 @@ const Community = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
                 {loading ? (
-                    <div className="text-center py-20 text-gray-400">Loading discussions...</div>
+                    <SkeletonDashboard />
                 ) : error ? (
-                    <div className="text-center py-20 text-red-400">{error}</div>
+                    <ErrorPage title="Failed to load discussions" description={error} onRetry={fetchDiscussions} />
                 ) : (
                     <div className="grid grid-cols-1 gap-6">
                         {discussions.length === 0 ? (
-                            <div className="text-center py-20 text-gray-500">No discussions yet. Be the first to post!</div>
+                            <EmptyState
+                                iconType="default"
+                                title="No posts yet"
+                                description="Be the first to share something with the community!"
+                                action={<button className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium">Create Post</button>}
+                            />
                         ) : (
                             discussions.map(discussion => (
                                 <div

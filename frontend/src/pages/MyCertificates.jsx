@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyCertificates } from '../api/certificateApi.js';
 import CertificatePreview from '../components/certificates/CertificatePreview.jsx';
-import Loader from '../components/common/Loader';
+import { SkeletonCard } from '../components/common/SkeletonLoader';
+import EmptyState from '../components/common/EmptyState';
+import { ErrorPage } from '../components/common/ErrorPages';
 import { downloadCertificate, formatCertificateDate } from '../utils/certificateUtils.js';
 
 const MyCertificates = () => {
@@ -38,8 +40,18 @@ const MyCertificates = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <Loader size="lg" message="Loading certificates..." />
+      <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <div className="h-8 w-48 bg-gray-800 animate-pulse rounded-lg mb-2" />
+            <div className="h-4 w-64 bg-gray-800/50 animate-pulse rounded" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -61,8 +73,8 @@ const MyCertificates = () => {
         </div>
 
         {error && (
-          <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded mb-6">
-            {error}
+          <div className="mb-6">
+            <ErrorPage title="Failed to load certificates" description={error} onRetry={() => window.location.reload()} fullPage={false} />
           </div>
         )}
 
@@ -73,21 +85,19 @@ const MyCertificates = () => {
         )}
 
         {certificates.length === 0 ? (
-          <div className="bg-gray-800 rounded-2xl p-12 text-center border border-gray-700">
-            <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-              C
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Certificates Yet</h3>
-            <p className="text-gray-400 mb-6">
-              Complete a course and issue your certificate from the learning page.
-            </p>
-            <button
-              onClick={() => navigate('/courses')}
-              className="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
-            >
-              Explore Courses
-            </button>
-          </div>
+          <EmptyState
+            iconType="default"
+            title="No Certificates Yet"
+            description="Complete courses to earn certificates. Each certificate verifies your mastery of the subject."
+            action={
+              <button
+                onClick={() => navigate('/courses')}
+                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-all duration-200 shadow-lg shadow-indigo-600/20"
+              >
+                Browse Courses
+              </button>
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {certificates.map((certificate) => (

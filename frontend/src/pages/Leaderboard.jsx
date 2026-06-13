@@ -5,6 +5,8 @@ import * as feather from '../util/featherIcons';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { fetchLeaderboard, fetchUserRank, fetchTotalUsers } from '../api/leaderboardApi.js';
 import TopUserStats from '../components/TopUserStats.jsx';
+import { SkeletonDashboard } from '../components/common/SkeletonLoader';
+import EmptyState from '../components/common/EmptyState';
 
 // --- HELPER FUNCTIONS ---
 const generateInitials = (name) => {
@@ -446,25 +448,20 @@ const Leaderboard = () => {
                 )}
 
                 {/* Loading State */}
-                {isLoading && (
-                    <div className="text-center py-16">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto"></div>
-                        <p className="text-gray-400 mt-4 text-lg">Loading leaderboard...</p>
-                    </div>
-                )}
+                {isLoading && <SkeletonDashboard />}
 
                 {/* Error State */}
                 {error && !isLoading && (
-                    <div className="text-center py-16">
-                        <i data-feather="alert-triangle" className="w-16 h-16 text-red-400 mx-auto mb-4"></i>
-                        <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to Load Leaderboard</h3>
-                        <p className="text-gray-400">{error}</p>
-                        <button
-                            onClick={() => fetchLeaderboardData(timeframe, category)}
-                            className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                        >
-                            Try Again
-                        </button>
+                    <div className="py-8">
+                        <div className="text-center">
+                            <p className="text-red-400 mb-4">{error}</p>
+                            <button
+                                onClick={() => fetchLeaderboardData(timeframe, category)}
+                                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                            >
+                                Try Again
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -481,10 +478,18 @@ const Leaderboard = () => {
 
                 {/* No Data State */}
                 {!isLoading && !error && allUsers.length === 0 && (
-                    <div className="text-center py-16">
-                        <i data-feather="users" className="w-16 h-16 text-gray-600 mx-auto mb-4"></i>
-                        <h3 className="text-xl font-semibold text-gray-400 mb-2">No Leaderboard Data Yet</h3>
-                    </div>
+                    <EmptyState
+                        title="No Leaderboard Data Yet"
+                        description="Start solving problems to appear on the leaderboard!"
+                        action={
+                            <Link
+                                to="/problems"
+                                className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/20"
+                            >
+                                Browse Problems
+                            </Link>
+                        }
+                    />
                 )}
 
                 {/* Leaderboard Table for ALL users (Starts from 1) */}

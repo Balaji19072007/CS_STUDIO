@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../hooks/useNotifications';
 import { useTheme } from '../hooks/useTheme';
+import { InlineLoading } from '../components/common/LoadingOverlay';
+import EmptyState from '../components/common/EmptyState';
 import {
     Bell,
     BellOff,
@@ -21,6 +23,7 @@ const Notifications = () => {
     const {
         notifications,
         loading,
+        error,
         markAsRead,
         markAllAsRead,
         deleteNotification,
@@ -107,23 +110,21 @@ const Notifications = () => {
                     </div>
                 </div>
 
-                {loading ? (
-                    <div className="text-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-                        <p className="text-gray-400">Loading notifications...</p>
+                {error ? (
+                    <div className="bg-red-500/10 border border-red-500 text-red-700 dark:text-red-200 p-4 rounded-lg flex items-center justify-between">
+                        <span>{error}</span>
+                        <button onClick={refreshNotifications} className="ml-4 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            Retry
+                        </button>
                     </div>
+                ) : loading ? (
+                    <InlineLoading message="Loading notifications..." />
                 ) : (!Array.isArray(notifications) || notifications.length === 0) ? (
-                    <div className={`text-center py-20 rounded-2xl border ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'
-                        }`}>
-                        <div className={`bg-gray-700/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isDark ? 'text-gray-500' : 'text-gray-400'
-                            }`}>
-                            <BellOff className="w-10 h-10" />
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">No notifications yet</h3>
-                        <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                            We'll notify you when something important happens
-                        </p>
-                    </div>
+                    <EmptyState
+                        iconType="default"
+                        title="No notifications yet"
+                        description="We'll notify you when something important happens"
+                    />
                 ) : (
                     <div className="space-y-4">
                         {notifications.map((notification) => (

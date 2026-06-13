@@ -1,196 +1,60 @@
 import socketService from '../services/socketService';
-import { buildApiUrl } from '../config/api.js';
+import { api } from '../utils/apiFetchWrapper.js';
 
 const API_BASE_URL = '/api/problems';
 
-/**
- * Utility function to handle API response parsing and error checking.
- */
-const handleResponse = async (response) => {
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error(data.message || data.msg || `API Error: ${response.statusText}`);
-    }
-    return data;
-};
-
-/**
- * Fetch the daily problem
- */
 export const fetchDailyProblem = async () => {
-    const token = localStorage.getItem('token');
-    const headers = { 'Cache-Control': 'no-cache' };
-    if (token) headers['x-auth-token'] = token;
-
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/daily?timezone=${encodeURIComponent(timezone)}`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    return handleResponse(response);
+    return api.get(`${API_BASE_URL}/daily`, { timezone });
 };
 
-/**
- * Fetch recommended problems
- */
 export const fetchRecommendedProblems = async () => {
-    const token = localStorage.getItem('token');
-    const headers = { 'Cache-Control': 'no-cache' };
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/recommended`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    return handleResponse(response);
+    return api.get(`${API_BASE_URL}/recommended`);
 };
 
-/**
- * Fetch all coding problems
- */
 export const fetchAllProblems = async () => {
-    const token = localStorage.getItem('token');
-    const headers = {};
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    const data = await handleResponse(response);
-    return data.problems || data; // data.problems for backend response shape
+    const data = await api.get(`${API_BASE_URL}`);
+    return data.problems || data;
 };
 
-/**
- * Fetch a single problem by ID
- */
 export const fetchProblemById = async (id) => {
-    const token = localStorage.getItem('token');
-    const headers = {};
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    return handleResponse(response);
+    return api.get(`${API_BASE_URL}/${id}`);
 };
 
-/**
- * Fetch user progress for a specific problem
- */
 export const fetchProblemProgress = async (id) => {
     const token = localStorage.getItem('token');
-    if (!token) return null; // Logic in component handles "if loggedIn" check separately, but good safety.
-
-    const headers = { 'x-auth-token': token };
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    return handleResponse(response);
+    if (!token) return null;
+    return api.get(`${API_BASE_URL}/${id}/progress`);
 };
 
-/**
- * Fetch all test cases for a problem
- */
 export const fetchProblemTestCases = async (id) => {
-    const token = localStorage.getItem('token');
-    const headers = {};
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/test-cases`), {
-        method: 'GET',
-        headers,
-        credentials: 'include'
-    });
-    return handleResponse(response);
+    return api.get(`${API_BASE_URL}/${id}/test-cases`);
 };
 
-/**
- * Submit a solution for evaluation
- */
 export const submitSolution = async (id, code, language, timeSpent, timezone) => {
-    const token = localStorage.getItem('token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/submit`), {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({ code, language, timeSpent, timezone })
-    });
-    return handleResponse(response);
+    return api.post(`${API_BASE_URL}/${id}/submit`, { code, language, timeSpent, timezone });
 };
 
-/**
- * Run code against test cases (HTTP based execution)
- */
 export const runTestCases = async (id, code, language) => {
-    const token = localStorage.getItem('token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['x-auth-token'] = token;
-
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/run-tests`), {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({ code, language })
-    });
-    return handleResponse(response);
+    return api.post(`${API_BASE_URL}/${id}/run-tests`, { code, language });
 };
 
-// --- Socket Related Functions ---
-
-/**
- * Setup listeners for real-time compiler output
- */
 export const setupCompilerSocket = (onOutputCallback) => {
     socketService.setupCompilerListeners(onOutputCallback);
 };
 
-/**
- * Send code for real-time execution via socket
- */
 export const sendCodeForExecution = (code, language, input = '', args = '') => {
     socketService.executeCode(code, language, input, args);
 };
 
-/**
- * Send input to running program via socket
- */
 export const sendInputToProgram = (input) => {
     socketService.sendInput(input);
 };
 
-/**
- * Stop running code via socket
- */
 export const stopCodeExecution = () => {
     socketService.stopExecution();
 };
 
-/**
- * Update user progress for a specific problem (e.g. mark attempting)
- */
 export const updateProblemProgress = async (id, payload) => {
-    const token = localStorage.getItem('token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['x-auth-token'] = token;
-
-    // payload: { status: 'attempted', timeSpent: 123 }
-    const response = await fetch(buildApiUrl(`${API_BASE_URL}/${id}/progress`), {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify(payload)
-    });
-    return handleResponse(response);
+    return api.post(`${API_BASE_URL}/${id}/progress`, payload);
 };

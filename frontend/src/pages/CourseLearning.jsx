@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCourse, getPhases, getTopics } from '../api/courseApi';
 import { getQuizzes } from '../api/quizApi';
@@ -14,6 +14,8 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { supabase } from '../config/supabase';
 import { courseRatingAPI } from '../config/api';
 import CourseRatingModal from '../components/common/CourseRatingModal';
+import { DifficultyBadge } from '../components/learning/LessonNavigation';
+import { useBookmarks } from '../components/learning/LessonBookmarkButton';
 
 const isProgressCompleted = (entry) =>
     Boolean(entry?.completed === true || entry?.status === 'completed' || entry?.completed_at);
@@ -57,6 +59,7 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const [certificateError, setCertificateError] = useState('');
     const [showCourseRating, setShowCourseRating] = useState(false);
     const [hasRatedCourse, setHasRatedCourse] = useState(false);
+    const { isBookmarked } = useBookmarks();
 
     // Check if user already rated this course
     useEffect(() => {
@@ -406,6 +409,15 @@ const CourseLearning = ({ embeddedCourseId }) => {
     const totalCourseQuizzes = phases.reduce((acc, phase) => acc + phase.items.filter(i => i.type === 'quiz').length, 0);
     const completedCourseQuizzes = phases.reduce((acc, phase) => acc + phase.items.filter(i => i.type === 'quiz' && isProgressCompleted(userProgress[i.id])).length, 0);
 
+    const firstIncompleteItem = useMemo(() => {
+        for (const phase of phases) {
+            for (const item of phase.items) {
+                if (!isProgressCompleted(userProgress[item.id])) return { item, phaseId: phase.id };
+            }
+        }
+        return null;
+    }, [phases, userProgress]);
+
     const totalItems = totalCourseTopics + totalCourseQuizzes;
     const completedItems = completedCourseTopics + completedCourseQuizzes;
     const courseProgressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
@@ -626,7 +638,21 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                         )}
                                                     </div>
                                                     <div className={`flex-1 text-left truncate relative z-10 transition-colors ${isActive ? 'text-blue-700 dark:text-blue-300' : ''}`}>
-                                                        <div className={`text-sm ${isActive ? 'font-semibold' : ''}`}>{item.title}</div>
+                                                        <div className={`text-sm ${isActive ? 'font-semibold' : ''}`}>
+                                                            {item.title}
+                                                            {isBookmarked(item.id) && (
+                                                                <span className="inline-flex ml-1.5 align-middle" title="Bookmarked">
+                                                                    <svg className="w-3 h-3 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24" stroke="none">
+                                                                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                                                    </svg>
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {!isQuiz && (
+                                                            <div className="flex items-center gap-1.5 mt-1">
+                                                                <DifficultyBadge difficulty={item.difficulty} />
+                                                            </div>
+                                                        )}
                                                         {isQuiz && isCompleted && userProgress[item.id]?.completed_at && (
                                                             <div className="text-[10px] text-green-600 dark:text-green-400 mt-0.5 font-medium">
                                                                 Completed: {new Date(userProgress[item.id].completed_at).toLocaleDateString()} {new Date(userProgress[item.id].completed_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -638,6 +664,13 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                                             <div className={`w-4 h-4 rounded-full flex items-center justify-center text-white shadow-sm transition-transform ${isActive ? 'scale-110' : ''} ${isActive ? 'bg-blue-500 shadow-blue-500/50' : 'bg-green-500 shadow-green-500/40'}`}>
                                                                 <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                                             </div>
+                                                        </div>
+                                                    )}
+                                                    {!isQuiz && isBookmarked(item.id) && (
+                                                        <div className="flex-shrink-0 ml-1 relative z-10">
+                                                            <svg className="w-3 h-3 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24" stroke="none">
+                                                                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                                            </svg>
                                                         </div>
                                                     )}
                                                 </button>
@@ -785,14 +818,17 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                     <div className="flex flex-wrap gap-4 items-center">
                                         <button
                                             onClick={() => {
-                                                if (phases.length > 0 && phases[0].items.length > 0) {
+                                                if (firstIncompleteItem) {
+                                                    setExpandedPhaseId(firstIncompleteItem.phaseId);
+                                                    selectItem(firstIncompleteItem.item);
+                                                } else if (phases.length > 0 && phases[0].items.length > 0) {
                                                     setExpandedPhaseId(phases[0].id);
                                                     selectItem(phases[0].items[0]);
                                                 }
                                             }}
                                             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-blue-500/40 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 text-sm"
                                         >
-                                            Start Learning
+                                            {courseProgressPercentage > 0 ? 'Continue Learning' : 'Start Learning'}
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                                         </button>
                                         <div className="flex items-center gap-5 text-sm text-blue-200/70 font-medium">

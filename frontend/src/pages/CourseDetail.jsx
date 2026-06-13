@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getCourse, getPhases, getTopics } from '../api/courseApi';
 import { getCourseOverview } from '../data/courseOverviewData.js';
 import { getCoursePresentation } from '../data/coursePresentation.js';
+import { SkeletonLesson } from '../components/common/SkeletonLoader';
+import { CourseNotFoundPage } from '../components/common/ErrorPages';
+import EmptyState from '../components/common/EmptyState';
 
 const getCourseIcon = (title) => {
   const lowerTitle = title?.toLowerCase() || '';
@@ -83,31 +86,11 @@ const CourseDetail = () => {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
-        <div className="text-center">
-          <div className="inline-block w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4" />
-          <div className="text-xl font-semibold text-gray-300">Loading course...</div>
-        </div>
-      </div>
-    );
+    return <SkeletonLesson />;
   }
 
   if (!course) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dark-gradient-secondary">
-        <div className="text-center">
-          <div className="text-6xl mb-4">X</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Course not found</h2>
-          <button
-            onClick={() => navigate('/courses')}
-            className="mt-4 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-          >
-            Back to Courses
-          </button>
-        </div>
-      </div>
-    );
+    return <CourseNotFoundPage courseName={course?.title} />;
   }
 
   const overview = getCourseOverview(course.title);
@@ -289,9 +272,11 @@ const CourseDetail = () => {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-gray-800 bg-slate-900/60 p-6 text-gray-400">
-              Curriculum details will appear here once phases are available for this course.
-            </div>
+            <EmptyState
+              title="Curriculum coming soon"
+              description="Curriculum details will appear here once phases are available for this course."
+              compact
+            />
           )}
         </section>
       </div>

@@ -8,6 +8,8 @@ import * as feather from '../util/featherIcons';
 import { fetchProblemById, submitSolution, runTestCases, fetchProblemTestCases, fetchProblemProgress, updateProblemProgress, sendInputToProgram } from '../api/problemApi.js';
 // import { testAPI } from '../config/api.js';
 import Loader from '../components/common/Loader.jsx';
+import { ChallengeSkeleton } from '../components/common/SkeletonLoader';
+import { ErrorPage } from '../components/common/ErrorPages';
 import CodeEditorForSolvePage from '../components/problems/CodeEditorForSolvePage.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { ProblemManager } from '../utils/problemManager.js';
@@ -752,8 +754,8 @@ const SolveProblem = () => {
   const sanitizedProblemStatement = problem?.problemStatement || '<p>No statement provided.</p>';
   const sanitizedSolutionExplanation = problem?.solution?.explanation || '<p>Solution explanation not available.</p>';
 
-  if (isLoading) return <Loader message="Loading problem details..." size="lg" />;
-  if (error || !problem) return <div className={`min-h-screen ${containerBg} p-12 text-center text-red-400`}>{error || 'Problem data is unavailable.'}</div>;
+  if (isLoading) return <ChallengeSkeleton />;
+  if (error || !problem) return <ErrorPage title="Problem Not Found" description={error || 'Problem data is unavailable.'} onRetry={() => window.location.reload()} />;
 
   const displayId = (problem && (problem.problemId ?? problem.id)) ?? problemId;
 

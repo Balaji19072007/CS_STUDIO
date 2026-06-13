@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Activity, CheckCircle, Clock, ShieldAlert, BookOpen, Download, List } from 'lucide-react';
 import api from '../services/apiService';
 import FullPageLoader from '../components/common/FullPageLoader';
+import EmptyState from '../components/common/EmptyState';
 
 const AdminDashboard = () => {
   const { user, isLoggedIn, loading } = useAuth();
@@ -79,7 +80,13 @@ const AdminDashboard = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <ShieldAlert className="w-16 h-16 text-red-500 mb-4" />
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Access Error</h2>
-        <p className="text-gray-600 dark:text-gray-400">{error}</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -148,7 +155,7 @@ const AdminDashboard = () => {
           </div>
           <div className="p-5 flex-grow overflow-y-auto max-h-[400px]">
             {(!updates?.recentUsers || updates.recentUsers.length === 0) ? (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recent signups found.</p>
+              <EmptyState iconType="default" title="No recent signups" description="No new signups in the latest period." />
             ) : (
               <div className="space-y-4">
                 {updates?.recentUsers?.map(user => (
@@ -186,7 +193,7 @@ const AdminDashboard = () => {
           </div>
           <div className="p-5 flex-grow overflow-y-auto max-h-[400px]">
             {(!updates?.recentProgress || updates.recentProgress.length === 0) ? (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-8">No recent activity found.</p>
+              <EmptyState iconType="default" title="No recent activity" description="No recent progress updates found." />
             ) : (
               <div className="space-y-4">
                 {updates?.recentProgress?.map(progress => (
@@ -232,7 +239,7 @@ const AdminDashboard = () => {
             <tbody>
               {!auditLogs || auditLogs.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="py-8 text-center text-gray-500 dark:text-gray-400">No audit logs found.</td>
+                  <td colSpan="4" className="py-8"><EmptyState iconType="default" title="No audit logs" description="No audit log entries recorded." compact /></td>
                 </tr>
               ) : (
                 auditLogs?.map(log => (

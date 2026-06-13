@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getTopics, getPhase } from '../api/courseApi';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { SkeletonLesson } from '../components/common/SkeletonLoader';
+import EmptyState from '../components/common/EmptyState';
+import { CourseNotFoundPage, ErrorPage } from '../components/common/ErrorPages';
 
 const PhaseTopics = () => {
     const { courseId, phaseId } = useParams();
@@ -10,6 +13,7 @@ const PhaseTopics = () => {
     const [topics, setTopics] = useState([]);
     const [phase, setPhase] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,6 +28,7 @@ const PhaseTopics = () => {
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setError(error);
                 setLoading(false);
             }
         };
@@ -86,13 +91,18 @@ const PhaseTopics = () => {
         );
     };
 
+    if (error) {
+        return <ErrorPage error={error} onRetry={() => window.location.reload()} />;
+    }
+
+    if (!phase && !loading) {
+        return <CourseNotFoundPage />;
+    }
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
-                <div className="text-center">
-                    <div className="inline-block w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <div className="text-xl font-semibold text-gray-700 dark:text-gray-300">Loading topics...</div>
-                </div>
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 flex items-start justify-center">
+                <SkeletonLesson />
             </div>
         );
     }
@@ -198,13 +208,12 @@ const PhaseTopics = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                                <div className="text-6xl mb-4">📭</div>
-                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No topics yet</h3>
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Topics for this phase are being prepared. Check back soon!
-                                </p>
-                            </div>
+                            <EmptyState
+                                icon="📭"
+                                iconType="primary"
+                                title="No topics yet"
+                                description="Topics for this phase are being prepared. Check back soon!"
+                            />
                         )}
                     </div>
 

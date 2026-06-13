@@ -1,6 +1,7 @@
 // frontend/src/services/apiService.js
 import axios from 'axios';
 import { API_CONFIG } from '../config/api.js';
+import { handleApiError } from './errorService.js';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -46,27 +47,24 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh + global error handling
 api.interceptors.response.use(
   (response) => {
-    // Log response for debugging
     if (process.env.NODE_ENV === 'development') {
       console.log(`API Response: ${response.status} ${response.config.url}`, response.data);
     }
     return response;
   },
   async (error) => {
-    // Enhanced error logging
-    if (process.env.NODE_ENV === 'development') {
-      console.error('API Error:', error.response?.data || error.message);
-    }
-
     const originalRequest = error.config;
+    const url = originalRequest?.url || 'unknown';
+
+    // Skip auth/signin endpoints to avoid toast on login failures (handled by components)
+    const isAuthEndpoint = url?.includes('/api/auth/signin') || url?.includes('/api/auth/signup');
 
     // If error is 401 and we haven't already tried to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // If already refreshing, add to queue
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then(token => {
@@ -81,7 +79,6 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Attempt to refresh token
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) {
           throw new Error('No refresh token available');
@@ -93,24 +90,17 @@ api.interceptors.response.use(
 
         const { token } = response.data;
         
-        // Update stored token
         localStorage.setItem('token', token);
-        
-        // Update authorization header
         api.defaults.headers.common['x-auth-token'] = token;
         originalRequest.headers['x-auth-token'] = token;
 
-        // Process queued requests
         processQueue(null, token);
-
-        // Retry original request
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed - clear tokens and redirect to login
         processQueue(refreshError, null);
         clearAuthData();
+        handleApiError(refreshError, { source: 'apiService/refresh-token', url });
         
-        // Redirect to login page if we're not already there
         if (!window.location.pathname.includes('/signin')) {
           window.location.href = '/signin';
         }
@@ -119,6 +109,11 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // Handle non-401 errors globally (skip auth endpoints - components handle those)
+    if (!isAuthEndpoint) {
+      handleApiError(error, { source: 'services/apiService.js', url });
     }
 
     return Promise.reject(error);

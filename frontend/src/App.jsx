@@ -2,11 +2,19 @@
 
 import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { useAuth } from './hooks/useAuth.jsx';
 import { useTheme } from './hooks/useTheme.jsx';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
+import {
+  DashboardErrorBoundary,
+  CourseErrorBoundary,
+  QuizErrorBoundary,
+  CommunityErrorBoundary,
+  AdminErrorBoundary,
+} from './components/common/routeErrorBoundaries.jsx';
 import Navbar from './components/common/Navbar.jsx';
 import Footer from './components/common/Footer.jsx';
 
@@ -49,10 +57,16 @@ const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate.jsx'));
 // Keep these eagerly loaded since they render on most pages
 import RatingPopup from './components/common/RatingPopup.jsx';
 import CodeEditorFloatingIcon from './components/common/CodeEditorFloatingIcon.jsx';
+import { Toaster } from './components/ui/sonner.tsx';
+import { NotFoundPage } from './components/common/ErrorPages.jsx';
+import { SkeletonDashboard, SkeletonLesson, SkeletonQuiz, ChallengeSkeleton } from './components/common/SkeletonLoader.jsx';
 import './App.css';
 
 // Custom hook to use the auth context
 import FullPageLoader from './components/common/FullPageLoader.jsx';
+import RouteTransition from './components/common/RouteTransition.jsx';
+import NavigationProgress from './components/common/NavigationProgress.jsx';
+import { NavigationProgressProvider } from './hooks/useNavigationProgress.jsx';
 
 function App() {
   return (
@@ -98,7 +112,20 @@ function AppContent() {
   // Page refresh handling is now done in index.html for better reliability
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <>
+      <Toaster
+        richColors
+        closeButton
+        position="top-right"
+        toastOptions={{
+          style: {
+            fontFamily: '"Plus Jakarta Sans", Inter, system-ui, sans-serif',
+          },
+        }}
+      />
+      <NavigationProgressProvider>
+      <NavigationProgress />
+      <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       {/* Skip to main content - accessibility */}
       <a
         href="#main-content"
@@ -120,59 +147,353 @@ function AppContent() {
         style={{ minHeight: '60vh' }}
       >
 
-        <ErrorBoundary>
-        <Suspense fallback={
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" role="status">
-                <span className="sr-only">Loading...</span>
-              </div>
-            </div>
-          </div>
-        }>
-        <Routes>
-          <Route path="/" element={isLoggedIn ? <UserHomePage /> : <Home />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/problems" element={<ProtectedRoute><Problems /></ProtectedRoute>} />
-          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
-          <Route path="/courses/:courseId" element={<ProtectedRoute><Navigate to="learn" replace /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/learn" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/learn/topic/:topicId" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/learn/quiz/:quizId" element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
+        <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              {isLoggedIn ? <UserHomePage /> : <Home />}
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/signin" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <SignIn />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/signup" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <SignUp />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/auth/callback" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <AuthCallback />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/forgot-password" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonLesson />}>
+              <ForgotPassword />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/reset-password" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonLesson />}>
+              <ResetPassword />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/problems" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Problems />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/courses" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Courses />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/courses/:courseId" element={<DashboardErrorBoundary><ProtectedRoute><RouteTransition><Navigate to="learn" replace /></RouteTransition></ProtectedRoute></DashboardErrorBoundary>} />
+          <Route path="/courses/:courseId/learn" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <CourseLearning />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
+          <Route path="/courses/:courseId/learn/topic/:topicId" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <CourseLearning />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
+          <Route path="/courses/:courseId/learn/quiz/:quizId" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonQuiz />}>
+                <CourseLearning />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
 
           {/* Legacy routes - redirected or fallback */}
-          <Route path="/courses/:courseId/topic/:topicId" element={<ProtectedRoute><TopicContent /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/quiz/:quizId" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/topic/:topicId" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <TopicContent />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
+          <Route path="/courses/:courseId/quiz/:quizId" element={
+            <QuizErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonQuiz />}>
+                <QuizPage />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </QuizErrorBoundary>
+          } />
           {/* Legacy routes - kept for backward compatibility */}
-          <Route path="/courses/:courseId/phases/:phaseId" element={<ProtectedRoute><PhaseTopics /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/phases/:phaseId/topics/:topicId" element={<ProtectedRoute><TopicContent /></ProtectedRoute>} />
-          <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/solve" element={<ProtectedRoute><SolveProblem /></ProtectedRoute>} />
-          <Route path="/challenge/:problemId" element={<ProtectedRoute><CourseChallenge /></ProtectedRoute>} />
-          <Route path="/course-challenge/:challengeId" element={<ProtectedRoute><CourseChallengePage /></ProtectedRoute>} />
-          <Route path="/course-project/:projectId" element={<ProtectedRoute><ProjectEditorPage /></ProtectedRoute>} />
-          <Route path="/code" element={<ProtectedRoute><Code /></ProtectedRoute>} />
-          <Route path="/code-verification" element={<ProtectedRoute><CodeVerification /></ProtectedRoute>} />
-          <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
-          <Route path="/my-progress" element={<ProtectedRoute><MyProgress /></ProtectedRoute>} />
-          <Route path="/problem-stats" element={<ProtectedRoute><MyProblemStats /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/certificates" element={<ProtectedRoute><MyCertificates /></ProtectedRoute>} />
-          <Route path="/certificates/verify/:certificateId" element={<VerifyCertificate />} />
-          <Route path="/verify-certificate" element={<VerifyCertificate />} />
+          <Route path="/courses/:courseId/phases/:phaseId" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <PhaseTopics />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
+          <Route path="/courses/:courseId/phases/:phaseId/topics/:topicId" element={
+            <CourseErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <TopicContent />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CourseErrorBoundary>
+          } />
+          <Route path="/leaderboard" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Leaderboard />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/community" element={
+            <CommunityErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Community />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </CommunityErrorBoundary>
+          } />
+          <Route path="/settings" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Settings />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/solve" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<ChallengeSkeleton />}>
+                <SolveProblem />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/challenge/:problemId" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<ChallengeSkeleton />}>
+                <CourseChallenge />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/course-challenge/:challengeId" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<ChallengeSkeleton />}>
+                <CourseChallengePage />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/course-project/:projectId" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<ChallengeSkeleton />}>
+                <ProjectEditorPage />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/code" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Code />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/code-verification" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonLesson />}>
+                <CodeVerification />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/my-courses" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <MyCourses />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/my-progress" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <MyProgress />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/problem-stats" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <MyProblemStats />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/notifications" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Notifications />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/admin" element={
+            <AdminErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <AdminDashboard />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </AdminErrorBoundary>
+          } />
+          <Route path="/certificates" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <MyCertificates />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/certificates/verify/:certificateId" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <VerifyCertificate />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/verify-certificate" element={
+            <DashboardErrorBoundary>
+            <RouteTransition>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <VerifyCertificate />
+            </Suspense>
+            </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
 
           {/* Catch-all route - 404 */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<DashboardErrorBoundary><RouteTransition><NotFoundPage /></RouteTransition></DashboardErrorBoundary>} />
         </Routes>
-        </Suspense>
-        </ErrorBoundary>
+        </AnimatePresence>
       </main>
 
       <RatingPopup />
@@ -198,6 +519,8 @@ function AppContent() {
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
       {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
     </div>
+    </NavigationProgressProvider>
+    </>
   );
 }
 

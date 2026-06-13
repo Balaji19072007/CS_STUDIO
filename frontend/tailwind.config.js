@@ -170,6 +170,11 @@ export default {
         'bounce-slow': {
           '0%, 100%': { transform: 'translateY(-10%)', animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)' },
           '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)' },
+        },
+        'progress-indeterminate': {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(100%)' },
         }
       },
       animation: {
@@ -180,6 +185,7 @@ export default {
         marquee: 'marquee 25s linear infinite',
         'pulse-slow': 'pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce-slow 3s infinite',
+        'progress-indeterminate': 'progress-indeterminate 1.8s ease-in-out infinite',
       }
     },
   },

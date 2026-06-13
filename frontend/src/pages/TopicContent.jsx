@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -19,6 +19,10 @@ import {
     getFallbackTopicLearningMeta,
     hasFallbackTopicContent,
 } from '../data/cProgrammingPhaseFallbacks.js';
+import LessonBookmarkButton from '../components/learning/LessonBookmarkButton';
+import LessonReadingProgress from '../components/learning/LessonReadingProgress';
+import LessonNavigation, { DifficultyBadge, ReadingTime } from '../components/learning/LessonNavigation';
+import LessonCompletionAnimation from '../components/learning/LessonCompletionAnimation';
 
 const getSolvedTopicKey = (topicId) => `course_challenge_solved_${topicId}`;
 
@@ -87,6 +91,9 @@ const TopicContent = ({
     const [resolvedCourseTitle, setResolvedCourseTitle] = useState(courseTitle || '');
     const [loading, setLoading] = useState(true);
     const [, setCompleting] = useState(false);
+    const [showCompletion, setShowCompletion] = useState(false);
+    const scrollContainerRef = useRef(null);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         if (courseTitle) {
@@ -175,9 +182,8 @@ const TopicContent = ({
         };
     }, [courseTitle, resolvedCourseId, resolvedTopicId]);
 
-    const handleMarkComplete = async () => {
+    const handleMarkComplete = async (showAnimation = false) => {
         if (!user) {
-            // Allow anonymous users to continue without saving progress
             return true;
         }
 
@@ -192,6 +198,7 @@ const TopicContent = ({
                     },
                 })
             );
+            if (showAnimation) setShowCompletion(true);
             return true;
         } catch (error) {
             console.error('Error marking topic complete:', error);
@@ -201,6 +208,30 @@ const TopicContent = ({
             setCompleting(false);
         }
     };
+
+    const saveScrollPosition = useCallback(() => {
+        if (!resolvedTopicId) return;
+        try {
+            const el = scrollContainerRef.current || document.getElementById('topic-scroll-container');
+            if (el) {
+                localStorage.setItem(`cs_scroll_${resolvedTopicId}`, String(el.scrollTop));
+            }
+        } catch {}
+    }, [resolvedTopicId]);
+
+    useEffect(() => {
+        if (!resolvedTopicId || loading) return;
+        const timer = setTimeout(() => {
+            try {
+                const saved = localStorage.getItem(`cs_scroll_${resolvedTopicId}`);
+                if (saved) {
+                    const el = scrollContainerRef.current || document.getElementById('topic-scroll-container');
+                    if (el) el.scrollTop = parseInt(saved, 10);
+                }
+            } catch {}
+        }, 200);
+        return () => clearTimeout(timer);
+    }, [resolvedTopicId, loading]);
 
     const presentation = useMemo(
         () => getCoursePresentation(resolvedCourseTitle),
@@ -251,6 +282,12 @@ const TopicContent = ({
 
         return contentBlocks;
     }, [contentBlocks, resolvedCourseTitle, topic]);
+
+    const topicDifficulty = useMemo(() => {
+        if (topic?.difficulty != null) return topic.difficulty;
+        if (fallbackLessonMeta?.difficulty != null) return fallbackLessonMeta.difficulty;
+        return null;
+    }, [topic, fallbackLessonMeta]);
 
     const topicDescription =
         topic?.description && topic.description.trim().length > 30
@@ -462,7 +499,11 @@ const TopicContent = ({
     }
 
     return (
-        <div className={embedded ? 'h-full overflow-y-auto bg-gray-50 dark:bg-[#0F172A] transition-colors' : 'min-h-screen bg-gray-50 dark:bg-[#0F172A] transition-colors'}>
+        <div
+            ref={scrollContainerRef}
+            className={embedded ? 'h-full overflow-y-auto bg-gray-50 dark:bg-[#0F172A] transition-colors' : 'min-h-screen bg-gray-50 dark:bg-[#0F172A] transition-colors'}
+            onScroll={saveScrollPosition}
+        >
             {!embedded && (
                 <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-[#1E293B] px-4 py-3 shadow-lg transition-colors">
                     <button
@@ -474,18 +515,20 @@ const TopicContent = ({
                         </svg>
                     </button>
                     <h1 className="text-lg font-bold text-gray-900 dark:text-white">{topic?.title}</h1>
-                    <div className="w-10"></div>
+                    <LessonBookmarkButton topicId={resolvedTopicId} />
                 </header>
             )}
 
-            <main className={`max-w-7xl space-y-12 py-10 text-left ${embedded ? 'px-8 sm:px-12 lg:px-16' : 'mx-auto px-4 sm:px-6 lg:px-8'}`}>
+            <main ref={contentRef} className={`max-w-7xl space-y-12 py-10 text-left ${embedded ? 'px-8 sm:px-12 lg:px-16' : 'mx-auto px-4 sm:px-6 lg:px-8'}`}>
+                <LessonReadingProgress containerRef={scrollContainerRef} />
                 <div className="space-y-4 border-b border-gray-300 dark:border-gray-800 pb-8 transition-colors">
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.24em] ${presentation.chipClass}`}>
                             {presentation.trackLabel}
                         </span>
                         {resolvedCourseTitle ? <span className="text-sm text-gray-500 dark:text-gray-400">{resolvedCourseTitle}</span> : null}
-                        {lessonMeta.estimatedTime ? <span className="text-sm text-gray-500 dark:text-gray-500">{lessonMeta.estimatedTime}</span> : null}
+                        <DifficultyBadge difficulty={topicDifficulty} />
+                        <ReadingTime minutes={lessonMeta.estimatedTime} />
                     </div>
                     <h1 className="bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl transition-colors">
                         {topic?.title}
@@ -658,47 +701,37 @@ const TopicContent = ({
 
                 {/* Tips are now rendered sequentially above */}
 
-                <div className="mt-8 sm:mt-12 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 gap-3">
-                    <button
-                        onClick={onPrevious}
-                        disabled={isFirst}
-                        className={`rounded-xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${isFirst ? 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600' : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
-                    >
-                        <span className="hidden sm:inline">Previous Lesson</span>
-                        <span className="sm:hidden">Previous</span>
-                    </button>
-
-                    <button
-                        onClick={async () => {
-                            if (courseChallenge && !courseChallenge.solved) {
-                                return;
-                            }
-
-                            const progressUpdated = courseChallenge?.solved ? true : await handleMarkComplete();
+                <div className="mt-8 sm:mt-12 border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8">
+                    <LessonNavigation
+                        onPrevious={onPrevious}
+                        onNext={onNext}
+                        onMarkComplete={async () => {
+                            if (courseChallenge && !courseChallenge.solved) return false;
 
                             if (courseChallenge?.solved) {
                                 window.dispatchEvent(
                                     new CustomEvent('course-progress-updated', {
-                                        detail: {
-                                            courseId: resolvedCourseId,
-                                        },
+                                        detail: { courseId: resolvedCourseId },
                                     })
                                 );
+                                return true;
                             }
 
-                            if (progressUpdated && onNext) {
-                                onNext();
-                            }
+                            return handleMarkComplete(true);
                         }}
-                        disabled={courseChallenge && !courseChallenge.solved}
-                        title={courseChallenge && !courseChallenge.solved ? 'Complete the challenge to continue' : ''}
-                        className={`rounded-xl px-5 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold transition-all whitespace-nowrap ${courseChallenge && !courseChallenge.solved ? 'cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-600' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500'}`}
-                    >
-                        <span className="hidden sm:inline">{isLast ? 'Finish Course' : 'Next Lesson'}</span>
-                        <span className="sm:hidden">{isLast ? 'Finish' : 'Next'}</span>
-                    </button>
+                        isFirst={isFirst}
+                        isLast={isLast}
+                        prevTitle=""
+                        nextTitle=""
+                        hasChallenge={!!courseChallenge && !courseChallenge.solved}
+                        challengeSolved={courseChallenge?.solved}
+                    />
                 </div>
             </main>
+            <LessonCompletionAnimation
+                show={showCompletion}
+                onComplete={() => setShowCompletion(false)}
+            />
         </div>
     );
 };

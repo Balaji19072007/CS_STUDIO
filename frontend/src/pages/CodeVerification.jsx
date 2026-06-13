@@ -6,7 +6,8 @@ import { buildApiUrl } from '../config/api.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useTheme } from '../hooks/useTheme.jsx';
 import { runTestCases, submitSolution } from '../api/problemApi.js';
-import Loader from '../components/common/Loader.jsx';
+import { SkeletonLesson } from '../components/common/SkeletonLoader';
+import { ErrorPage } from '../components/common/ErrorPages';
 
 const CodeVerification = () => {
   const { isLoggedIn } = useAuth();
@@ -210,30 +211,19 @@ const CodeVerification = () => {
 
   if (isLoadingProblem) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex items-center justify-center">
-        <Loader message="Loading problem..." size="lg" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <SkeletonLesson />
       </div>
     );
   }
 
   if (problemError || !problem) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
-            Problem Not Found
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {problemError || 'The requested problem could not be loaded.'}
-          </p>
-          <button
-            onClick={() => navigate('/problems')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-          >
-            Back to Problems
-          </button>
-        </div>
-      </div>
+      <ErrorPage
+        title="Problem Not Found"
+        description={problemError || 'The requested problem could not be loaded.'}
+        onRetry={() => window.location.reload()}
+      />
     );
   }
 

@@ -20,7 +20,7 @@ import {
 import { updateProfile } from '../api/authApi.js';
 import { useSimpleImageCropper } from '../hooks/useSimpleImageCropper.js';
 import { ProfileSkeleton } from '../components/common/SkeletonLoader';
-
+import SuccessState from '../components/common/SuccessState';
 
 const Settings = () => {
     const { user, updateUser: updateUserProfile, isLoggedIn, logout } = useAuth();
@@ -387,14 +387,25 @@ const Settings = () => {
                         <div className="p-6 lg:p-8">
                             {/* Alert Message */}
                             {alertMessage && (
-                                <div className={`p-4 mb-8 rounded-2xl border ${alertMessage.type === 'error'
-                                    ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-400'
-                                    : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/50 text-emerald-700 dark:text-emerald-400'
+                                <div className={`flex items-center gap-3 p-4 rounded-xl border animate-in fade-in slide-in-from-top duration-300 ${alertMessage.type === 'error'
+                                    ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-300'
+                                    : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
                                     }`}>
-                                    <div className="flex items-center">
-                                        {alertMessage.type === 'error' ? <AlertTriangle className="w-5 h-5 mr-3 shrink-0" /> : <CheckCircle className="w-5 h-5 mr-3 shrink-0" />}
-                                        <p className="text-sm font-bold">{alertMessage.message}</p>
-                                    </div>
+                                    {alertMessage.type === 'error' ? (
+                                        <AlertTriangle className="w-5 h-5 shrink-0" />
+                                    ) : (
+                                        <CheckCircle className="w-5 h-5 shrink-0" />
+                                    )}
+                                    <p className="text-sm font-medium">{alertMessage.message}</p>
+                                    <button
+                                        onClick={() => setAlertMessage(null)}
+                                        className={`ml-auto p-1 rounded-lg transition-colors ${alertMessage.type === 'error'
+                                            ? 'hover:bg-red-100 dark:hover:bg-red-500/20'
+                                            : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                                            }`}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             )}
 

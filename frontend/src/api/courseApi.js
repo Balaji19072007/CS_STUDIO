@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { buildApiUrl } from '../config/api.js';
+import { api } from '../utils/apiFetchWrapper.js';
 
 const getCModule = (() => {
   let mod = null;
@@ -19,21 +19,6 @@ const getJavaModule = (() => {
 
 const isCProgrammingCourse = (courseId) => courseId === 'c-programming' || courseId === 'c-lang' || courseId === 'C';
 const isJavaProgrammingCourse = (courseId) => courseId === 'java-programming' || courseId === 'Java';
-
-const getAuthHeaders = (includeJson = false) => {
-  const headers = {};
-  const token = localStorage.getItem('token');
-
-  if (includeJson) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-};
 
 const getJavaCourseFallback = (courseId) => ({
   id: courseId,
@@ -98,12 +83,7 @@ export const getAllCourses = async () => {
 
 export const fetchLastActiveCourse = async () => {
   try {
-    const res = await fetch(buildApiUrl('/api/courses/last-active'), {
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-    if (!res.ok) throw new Error('Failed to fetch last active course');
-    const data = await res.json();
+    const data = await api.get('/api/courses/last-active');
     return data.success ? data.course : null;
   } catch (error) {
     console.error('Error fetching last active course:', error);
@@ -113,12 +93,7 @@ export const fetchLastActiveCourse = async () => {
 
 export const getEnrolledCourses = async () => {
   try {
-    const res = await fetch(buildApiUrl('/api/courses/enrolled'), {
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-    if (!res.ok) throw new Error('Failed to fetch enrolled courses');
-    const data = await res.json();
+    const data = await api.get('/api/courses/enrolled');
     return data.success ? data.courses : [];
   } catch (error) {
     console.error('Error fetching enrolled courses:', error);
@@ -330,18 +305,10 @@ export const getTopicLearningMeta = async (topicId) => {
 
 export const getCourseChallenge = async (topicId) => {
   try {
-    const res = await fetch(buildApiUrl(`/api/course-challenges/topic/${topicId}`), {
-      headers: {
-        ...getAuthHeaders(),
-        'Cache-Control': 'no-cache',
-        Pragma: 'no-cache',
-      },
-      credentials: 'include',
+    const data = await api.get(`/api/course-challenges/topic/${topicId}`, {}, {
+      headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
       cache: 'no-store',
     });
-
-    if (!res.ok) throw new Error('Failed to fetch challenge');
-    const data = await res.json();
     return data.success !== undefined ? data.challenge : data;
   } catch (error) {
     console.error('Error fetching course challenge:', error);
@@ -351,13 +318,7 @@ export const getCourseChallenge = async (topicId) => {
 
 export const getCourseChallengeById = async (challengeId) => {
   try {
-    const res = await fetch(buildApiUrl(`/api/course-challenges/${challengeId}`), {
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-
-    if (!res.ok) throw new Error('Failed to fetch challenge');
-    const data = await res.json();
+    const data = await api.get(`/api/course-challenges/${challengeId}`);
     return data.success !== undefined ? data.challenge : data;
   } catch (error) {
     console.error('Error fetching course challenge by ID:', error);
@@ -366,30 +327,12 @@ export const getCourseChallengeById = async (challengeId) => {
 };
 
 export const runCourseChallenge = async (challengeId, code, language = 'C', custom_input = '') => {
-  const res = await fetch(buildApiUrl(`/api/course-challenges/${challengeId}/run`), {
-    method: 'POST',
-    headers: getAuthHeaders(true),
-      credentials: 'include',
-    body: JSON.stringify({ code, language, custom_input }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.msg || data.message || 'Failed to run challenge');
-  }
-
-  return data;
+  return api.post(`/api/course-challenges/${challengeId}/run`, { code, language, custom_input });
 };
 
 export const getPracticeProblemById = async (problemId) => {
   try {
-    const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}`), {
-      headers: getAuthHeaders(true),
-      credentials: 'include',
-    });
-
-    if (!res.ok) throw new Error('Failed to fetch practice problem');
-    return await res.json();
+    return await api.get(`/api/practice-problems/${problemId}`);
   } catch (error) {
     console.error('Error fetching practice problem by ID:', error);
     throw error;
@@ -397,35 +340,11 @@ export const getPracticeProblemById = async (problemId) => {
 };
 
 export const runPracticeProblem = async (problemId, code, language = 'C') => {
-  const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}/run`), {
-    method: 'POST',
-    headers: getAuthHeaders(true),
-      credentials: 'include',
-    body: JSON.stringify({ code, language }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.msg || data.message || 'Failed to run practice problem');
-  }
-
-  return data;
+  return api.post(`/api/practice-problems/${problemId}/run`, { code, language });
 };
 
 export const submitPracticeProblem = async (problemId, code, language = 'C') => {
-  const res = await fetch(buildApiUrl(`/api/practice-problems/${problemId}/submit`), {
-    method: 'POST',
-    headers: getAuthHeaders(true),
-      credentials: 'include',
-    body: JSON.stringify({ code, language }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.msg || data.message || 'Failed to submit practice problem');
-  }
-
-  return data;
+  return api.post(`/api/practice-problems/${problemId}/submit`, { code, language });
 };
 
 export const getCourseModules = async (courseId) => {

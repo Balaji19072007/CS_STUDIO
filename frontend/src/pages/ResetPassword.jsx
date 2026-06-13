@@ -11,15 +11,18 @@ const ResetPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState({ type: null, text: '' });
     const [loading, setLoading] = useState(false);
+    const [sessionChecking, setSessionChecking] = useState(true);
+    const [hasValidSession, setHasValidSession] = useState(false);
 
     useEffect(() => {
         feather.replace();
-        // Check if session exists (user must be logged in via the magic link)
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
-                // If no session, the link might be invalid or expired
+            if (session) {
+                setHasValidSession(true);
+            } else {
                 setMessage({ type: 'error', text: 'Invalid or expired link. Please request a new password reset.' });
             }
+            setSessionChecking(false);
         });
     }, []);
 
@@ -60,6 +63,34 @@ const ResetPassword = () => {
             setLoading(false);
         }
     };
+
+    if (sessionChecking) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+                    <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
+                    <p className="text-gray-600">Checking your reset link...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!hasValidSession && message.text) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                    <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+                        <div className="rounded-md bg-red-50 p-4 mb-4">
+                            <p className="text-sm font-medium text-red-800">{message.text}</p>
+                        </div>
+                        <a href="/forgot-password" className="text-blue-600 hover:text-blue-500 font-medium">
+                            Request a new reset link
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -147,7 +178,7 @@ const ResetPassword = () => {
                         <div>
                             <button
                                 type="submit"
-                                disabled={loading || !password}
+                                disabled={loading || !password || !confirmPassword}
                                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
                             >
                                 {loading ? 'Updating...' : 'Update Password'}

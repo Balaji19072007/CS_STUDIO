@@ -428,10 +428,18 @@ const CourseChallengePage = ({ challengeId: challengeIdOverride = null }) => {
 
     if (error) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#0F172A] text-red-500 dark:text-red-400">
-                <div className="text-center">
-                    <div className="mb-4 text-5xl">!</div>
-                    <p>{error}</p>
+            <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#0F172A]">
+                <div className="text-center space-y-4">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-red-500/10 flex items-center justify-center">
+                        <span className="text-3xl text-red-500">!</span>
+                    </div>
+                    <p className="text-red-500 dark:text-red-400 font-medium">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200"
+                    >
+                        Try Again
+                    </button>
                 </div>
             </div>
         );

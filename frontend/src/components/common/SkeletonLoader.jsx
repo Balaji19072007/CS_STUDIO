@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 // Basic Building Block
 export const Skeleton = ({ className }) => (
@@ -419,4 +420,156 @@ export const ProblemsSkeleton = () => {
     )
 }
 
-export default { TopicSkeleton, DashboardSkeleton, ChallengeSkeleton, ProfileSkeleton, LearningSkeleton, QuizSkeleton, ProblemsSkeleton, Skeleton };
+// ─── SkeletonCard ──────────────────────────────────────────────────
+export const SkeletonCard = ({ className = '', compact = false }) => (
+  <div className={cn(
+    'rounded-2xl border border-gray-200 dark:border-gray-700/50 overflow-hidden bg-white dark:bg-gray-800/50',
+    className
+  )}>
+    {!compact && (
+      <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 dark:via-white/5 to-transparent -translate-x-full animate-shimmer" />
+      </div>
+    )}
+    <div className={compact ? 'p-4 space-y-3' : 'p-5 sm:p-6 space-y-4'}>
+      <Skeleton className={cn('bg-gray-200 dark:bg-gray-700', compact ? 'h-4 w-3/4' : 'h-5 w-2/3')} />
+      <Skeleton className={cn('bg-gray-100 dark:bg-gray-700/50', compact ? 'h-3 w-full' : 'h-4 w-full')} />
+      <Skeleton className={cn('bg-gray-100 dark:bg-gray-700/50', compact ? 'h-3 w-4/5' : 'h-4 w-4/5')} />
+      {!compact && (
+        <div className="pt-3 flex items-center justify-between">
+          <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-8 w-24 rounded-lg bg-gray-200 dark:bg-gray-700" />
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// ─── SkeletonLesson ───────────────────────────────────────────────
+export const SkeletonLesson = () => (
+  <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-pulse">
+    <div className="space-y-4">
+      <Skeleton className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded-full" />
+      <Skeleton className="h-8 sm:h-10 w-3/4 bg-gray-200 dark:bg-gray-700" />
+      <Skeleton className="h-5 w-1/2 bg-gray-200 dark:bg-gray-700/60" />
+      <div className="flex gap-2 pt-2">
+        <Skeleton className="h-6 w-20 rounded-full bg-gray-100 dark:bg-gray-700/30" />
+        <Skeleton className="h-6 w-24 rounded-full bg-gray-100 dark:bg-gray-700/30" />
+      </div>
+    </div>
+
+    <div className="border-t border-gray-200 dark:border-gray-700/50 pt-8 space-y-6">
+      <Skeleton className="h-40 w-full rounded-xl bg-gray-100 dark:bg-gray-800/50" />
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-4 w-[95%] bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-4 w-[88%] bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-4 w-[92%] bg-gray-200 dark:bg-gray-700/50" />
+      </div>
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-4 w-[85%] bg-gray-200 dark:bg-gray-700/50" />
+        <Skeleton className="h-4 w-[78%] bg-gray-200 dark:bg-gray-700/50" />
+      </div>
+    </div>
+
+    <div className="border-t border-gray-200 dark:border-gray-700/50 pt-8 space-y-4">
+      <Skeleton className="h-48 w-full rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/30" />
+      <Skeleton className="h-48 w-full rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/30" />
+    </div>
+
+    <div className="flex items-center justify-between pt-4">
+      <Skeleton className="h-10 w-28 rounded-xl bg-gray-200 dark:bg-gray-700" />
+      <Skeleton className="h-10 w-28 rounded-xl bg-blue-200 dark:bg-blue-500/20" />
+    </div>
+  </div>
+);
+
+// ─── SkeletonQuiz ─────────────────────────────────────────────────
+export const SkeletonQuiz = () => (
+  <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 animate-pulse">
+    <div className="flex items-center justify-between">
+      <Skeleton className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded-full" />
+      <Skeleton className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
+    </div>
+
+    <Skeleton className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700" />
+
+    <div className="bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700/50 p-6 sm:p-8 space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-16 bg-gray-100 dark:bg-gray-700/50" />
+        <Skeleton className="h-6 sm:h-7 w-3/4 bg-gray-200 dark:bg-gray-700" />
+      </div>
+
+      <div className="space-y-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700/50">
+            <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 shrink-0" />
+            <Skeleton className="h-4 flex-1 bg-gray-100 dark:bg-gray-700/30" />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700/50">
+        <Skeleton className="h-10 w-28 rounded-xl bg-gray-200 dark:bg-gray-700" />
+        <Skeleton className="h-10 w-32 rounded-xl bg-emerald-200 dark:bg-emerald-500/20" />
+      </div>
+    </div>
+
+    <div className="flex items-center justify-center gap-2">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <Skeleton key={i} className="w-2.5 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700" />
+      ))}
+    </div>
+  </div>
+);
+
+// ─── SkeletonDashboard (improved) ─────────────────────────────────
+export const SkeletonDashboard = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="space-y-2">
+        <Skeleton className="h-8 sm:h-9 w-56 bg-gray-200 dark:bg-gray-700" />
+        <Skeleton className="h-4 w-40 bg-gray-200 dark:bg-gray-700/60" />
+      </div>
+      <Skeleton className="h-9 w-28 rounded-xl bg-gray-200 dark:bg-gray-700" />
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="rounded-2xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/30 p-5 space-y-3">
+          <Skeleton className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-7 w-16 bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-4 w-24 bg-gray-100 dark:bg-gray-700/50" />
+        </div>
+      ))}
+    </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/30 p-5 sm:p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-5 w-28 bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-4 w-20 bg-gray-100 dark:bg-gray-700/50" />
+        </div>
+        <div className="flex items-end justify-between gap-2 h-32 pt-4">
+          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className={`flex-1 rounded-t-lg bg-gray-200 dark:bg-gray-700 ${i % 3 === 0 ? 'h-24' : i % 3 === 1 ? 'h-16' : 'h-20'}`} />
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/30 p-5 sm:p-6 space-y-4">
+        <Skeleton className="h-5 w-24 bg-gray-200 dark:bg-gray-700" />
+        <div className="flex flex-col items-center gap-3 py-4">
+          <Skeleton className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-5 w-24 bg-gray-200 dark:bg-gray-700" />
+          <Skeleton className="h-4 w-32 bg-gray-100 dark:bg-gray-700/50" />
+        </div>
+      </div>
+    </div>
+
+    <Skeleton className="h-48 w-full rounded-2xl bg-white dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700/50" />
+  </div>
+);
+
+export default { TopicSkeleton, DashboardSkeleton, ChallengeSkeleton, ProfileSkeleton, LearningSkeleton, QuizSkeleton, ProblemsSkeleton, Skeleton, SkeletonCard, SkeletonLesson, SkeletonQuiz, SkeletonDashboard };
