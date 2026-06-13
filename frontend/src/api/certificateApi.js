@@ -7,6 +7,7 @@ export const getMyCertificates = async () => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) return [];
       const text = await response.text().catch(() => '');
       throw new Error(text ? JSON.parse(text).error : `HTTP ${response.status}`);
     }

@@ -521,8 +521,8 @@ const Community = () => {
                                                 className="flex items-center gap-2 hover:text-red-400 transition-colors"
                                                 onClick={(e) => handleLike(e, discussion.id)}
                                             >
-                                                <i data-feather="heart" className={`w-4 h-4 ${discussion.likes.includes(user?.id) ? 'fill-red-500 text-red-500' : ''}`}></i>
-                                                {discussion.likes.length}
+                                                <i data-feather="heart" className={`w-4 h-4 ${(discussion.likes || []).includes(user?.id) ? 'fill-red-500 text-red-500' : ''}`}></i>
+                                                {(discussion.likes || []).length}
                                             </button>
                                             <div className="flex items-center gap-2">
                                                 <i data-feather="message-square" className="w-4 h-4"></i>
@@ -653,10 +653,10 @@ const Community = () => {
                             <div className="flex items-center gap-6 py-4 border-y border-gray-800 mb-8">
                                 <button
                                     onClick={(e) => handleLike(e, selectedDiscussion.id)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors ${selectedDiscussion.likes.includes(user?.id) ? 'text-red-500' : 'text-gray-400'}`}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors ${(selectedDiscussion.likes || []).includes(user?.id) ? 'text-red-500' : 'text-gray-400'}`}
                                 >
-                                    <i data-feather="heart" className={`w-5 h-5 ${selectedDiscussion.likes.includes(user?.id) ? 'fill-current' : ''}`}></i>
-                                    {selectedDiscussion.likes.length} Likes
+                                    <i data-feather="heart" className={`w-5 h-5 ${(selectedDiscussion.likes || []).includes(user?.id) ? 'fill-current' : ''}`}></i>
+                                    {(selectedDiscussion.likes || []).length} Likes
                                 </button>
                                 <div className="flex items-center gap-2 text-gray-400 px-4 py-2">
                                     <i data-feather="message-circle" className="w-5 h-5"></i>
