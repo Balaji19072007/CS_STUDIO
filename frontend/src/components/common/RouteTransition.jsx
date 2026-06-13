@@ -58,9 +58,9 @@ const variants = {
 };
 
 export default function RouteTransition({ children, variant: explicitVariant }) {
+  const location = useLocation();
   const autoVariant = useRouteTransition(location.pathname);
   const variant = explicitVariant || autoVariant;
-  const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
   const { startNavigation, endNavigation } = useNavigationProgress();
   const prevPathRef = useRef(location.pathname);
