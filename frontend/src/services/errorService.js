@@ -73,7 +73,7 @@ export const classifyError = (error) => {
   if (!error) return ErrorType.UNKNOWN;
 
   // Network error (no response from server)
-  if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || error.name === 'AbortError' || !error.response) {
+  if (error.code === 'ERR_NETWORK' || error.name === 'AbortError' || !error.response) {
     return ErrorType.NETWORK;
   }
 

@@ -98,13 +98,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        clearAuthData();
         handleApiError(refreshError, { source: 'apiService/refresh-token', url });
-        
-        if (!window.location.pathname.includes('/signin')) {
-          window.location.href = '/signin';
-        }
-        
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

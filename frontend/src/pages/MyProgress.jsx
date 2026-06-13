@@ -17,7 +17,7 @@ const MyProgress = () => {
   const [heatmapData, setHeatmapData] = useState({});
 
   const fetchData = async () => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn) { setLoading(false); return; }
     setFetchError(null);
     setLoading(true);
     try {

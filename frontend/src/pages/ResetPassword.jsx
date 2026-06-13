@@ -23,6 +23,9 @@ const ResetPassword = () => {
                 setMessage({ type: 'error', text: 'Invalid or expired link. Please request a new password reset.' });
             }
             setSessionChecking(false);
+        }).catch(() => {
+            setSessionChecking(false);
+            setMessage({ type: 'error', text: 'Failed to verify session. Please request a new password reset.' });
         });
     }, []);
 

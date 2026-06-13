@@ -14,7 +14,7 @@ const MyProblemStats = () => {
     const [filter, setFilter] = useState('all'); // all, solved, attempted
 
     const fetchHistory = async () => {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) { setLoading(false); return; }
         setError(null);
         setLoading(true);
         try {
