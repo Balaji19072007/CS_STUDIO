@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext.jsx';
@@ -96,13 +96,17 @@ function AppContent() {
 
   // Keep the loader visible until it signals completion (progress hits 100% + fade-out)
   const [showLoader, setShowLoader] = useState(true);
-  const handleLoaderComplete = useCallback(() => setShowLoader(false), []);
+  const initialLoadRef = useRef(false);
+  const handleLoaderComplete = useCallback(() => {
+    initialLoadRef.current = true;
+    setShowLoader(false);
+  }, []);
 
-  // Show the loader while auth is pending OR until the loader's own animation finishes
-  if (showLoader) {
+  // Show the loader while auth is pending OR while re-authenticating after OAuth callback
+  if (showLoader || loading) {
     return (
       <FullPageLoader
-        message="Initializing CS Studio..."
+        message={initialLoadRef.current ? "Verifying session..." : "Initializing CS Studio..."}
         isReady={!loading}
         onComplete={handleLoaderComplete}
       />
