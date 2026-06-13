@@ -346,7 +346,7 @@ const Community = () => {
     const openDiscussion = async (id) => {
         try {
             const response = await communityAPI.getDiscussionById(id);
-            setSelectedDiscussion(response.data);
+            setSelectedDiscussion(response);
         } catch (err) {
             console.error(err);
         }
@@ -362,7 +362,7 @@ const Community = () => {
             setCommenting(true);
             await communityAPI.addComment(selectedDiscussion.id, commentContent);
             const updatedDiscussion = await communityAPI.getDiscussionById(selectedDiscussion.id);
-            setSelectedDiscussion(updatedDiscussion.data);
+            setSelectedDiscussion(updatedDiscussion);
             setCommentContent('');
         } catch {
             alert('Failed to post comment.');
@@ -380,7 +380,7 @@ const Community = () => {
             await communityAPI.toggleLike(id);
             if (selectedDiscussion && selectedDiscussion.id === id) {
                 const updated = await communityAPI.getDiscussionById(id);
-                setSelectedDiscussion(updated.data);
+                setSelectedDiscussion(updated);
             }
             fetchDiscussions();
         } catch (err) {

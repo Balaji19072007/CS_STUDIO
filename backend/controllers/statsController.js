@@ -60,12 +60,20 @@ exports.checkRatingStatus = async (req, res) => {
       return res.json({ success: false, msg: 'User not found' });
     }
 
-    // Check if already rated
-    const { data: existingRating } = await supabase
-      .from('ratings')
-      .select('id')
-      .eq('user_id', userId)
-      .single();
+    // Run independent queries in parallel
+    const [ratingResult, courseProgressResult] = await Promise.all([
+      supabase
+        .from('ratings')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle(),
+      supabase
+        .from('user_course_progress')
+        .select('completed_topics')
+        .eq('user_id', userId)
+    ]);
+
+    const existingRating = ratingResult.data;
 
     if (existingRating) {
       return res.json({
@@ -93,12 +101,7 @@ exports.checkRatingStatus = async (req, res) => {
     let showRating = false;
     let reason = 'tracking';
 
-    // Get completed course topics count to power the dual trigger
-    const { data: courseProgress } = await supabase
-      .from('user_course_progress')
-      .select('completed_topics')
-      .eq('user_id', userId);
-      
+    const courseProgress = courseProgressResult.data;
     const totalCompletedCourseTopics = courseProgress 
       ? courseProgress.reduce((sum, cp) => sum + (cp.completed_topics || 0), 0) 
       : 0;

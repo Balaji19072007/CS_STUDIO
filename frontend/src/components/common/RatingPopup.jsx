@@ -14,6 +14,7 @@ const RatingPopup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const failureCountRef = React.useRef(0);
+  const intervalRef = React.useRef(null);
 
   // Derived theme for CSS
   const currentTheme = isDark ? 'dark' : 'light';
@@ -63,6 +64,11 @@ const RatingPopup = () => {
       if (response.data.success && response.data.showRating && !showPopup) {
         showRatingPopup();
       }
+
+      if (response.data.reason === 'already_rated' && intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     } catch (error) {
       failureCountRef.current++;
       if (failureCountRef.current > 3) {
@@ -102,7 +108,8 @@ const RatingPopup = () => {
 
     initializeRatingSystem();
 
-    const interval = setInterval(checkRatingStatus, 30000);
+    const interval = setInterval(checkRatingStatus, 300000);
+    intervalRef.current = interval;
 
     const handleBeforeUnload = () => {
       stopUsageTracking();
@@ -111,7 +118,8 @@ const RatingPopup = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      clearInterval(interval);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
       stopUsageTracking();
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
