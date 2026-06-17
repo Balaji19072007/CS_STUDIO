@@ -18,7 +18,6 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
         const step = () => {
             const current = progressRef.current;
             const remaining = target - current;
-            // Ease out the fake progress
             const increment = Math.max(0.5, remaining * 0.1); 
             
             progressRef.current += increment;
@@ -51,8 +50,8 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
                     setFinishing(true);
                     stepTimerRef.current = setTimeout(() => {
                         if (onComplete) onComplete();
-                    }, 600); // Match CSS fade out duration
-                }, 300); // Hold briefly at 100%
+                    }, 800); // Smooth transition duration
+                }, 200); // Brief pause at 100%
             }
         };
         rushToHundred();
@@ -60,16 +59,14 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
         return () => clearTimeout(stepTimerRef.current);
     }, [isReady, onComplete]);
 
-    // Premium minimal styling
-    const bg = isDark
-        ? '#09090b' // Very dark, almost black (zinc-950)
-        : '#ffffff'; // Pure white
-        
-    const textColor = isDark ? '#f4f4f5' : '#18181b'; // zinc-100 / zinc-900
-    const subTextColor = isDark ? '#a1a1aa' : '#71717a'; // zinc-400 / zinc-500
+    // Elegant Styling
+    const bg = isDark ? '#030712' : '#f8fafc'; // Very deep blue-black / slate-50
+    const glassBg = isDark ? 'rgba(17, 24, 39, 0.45)' : 'rgba(255, 255, 255, 0.65)';
+    const glassBorder = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)';
+    const glassShadow = isDark ? '0 10px 40px -10px rgba(0, 0, 0, 0.5)' : '0 10px 40px -10px rgba(31, 38, 135, 0.08)';
     
-    // Primary brand color
-    const primaryColor = isDark ? '#3b82f6' : '#2563eb'; // blue-500 / blue-600
+    const textColor = isDark ? '#f8fafc' : '#0f172a';
+    const primaryColor = isDark ? '#3b82f6' : '#2563eb';
     const trackColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
 
     return (
@@ -83,67 +80,128 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
                 justifyContent: 'center',
                 background: bg,
                 opacity: finishing ? 0 : (fadeIn ? 1 : 0),
-                transition: 'opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+                transform: finishing ? 'scale(1.05)' : 'scale(1)',
+                transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                 pointerEvents: finishing ? 'none' : 'all',
+                overflow: 'hidden'
             }}
         >
             <style>{`
-                @keyframes logoPulse {
-                    0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0); }
-                    50% { transform: scale(1); box-shadow: 0 4px 20px 0 rgba(59, 130, 246, 0.15); }
-                    100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0); }
+                @keyframes floatOrb1 {
+                    0% { transform: translate(0, 0) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0, 0) scale(1); }
                 }
-                @keyframes sweep {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(200%); }
+                @keyframes floatOrb2 {
+                    0% { transform: translate(0, 0) scale(1); }
+                    33% { transform: translate(-30px, 40px) scale(1.1); }
+                    66% { transform: translate(20px, -20px) scale(0.9); }
+                    100% { transform: translate(0, 0) scale(1); }
+                }
+                @keyframes shimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
                 }
                 @keyframes fadeSlideUp {
-                    from { opacity: 0; transform: translateY(16px); }
-                    to { opacity: 1; transform: translateY(0); }
+                    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
                 }
             `}</style>
 
+            {/* Ambient Background Orbs */}
             <div style={{
+                position: 'absolute',
+                width: '45vw',
+                height: '45vw',
+                minWidth: '400px',
+                minHeight: '400px',
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(0,0,0,0) 70%)',
+                top: '5%',
+                left: '10%',
+                borderRadius: '50%',
+                filter: 'blur(80px)',
+                animation: 'floatOrb1 15s ease-in-out infinite',
+                pointerEvents: 'none',
+            }} />
+            <div style={{
+                position: 'absolute',
+                width: '50vw',
+                height: '50vw',
+                minWidth: '400px',
+                minHeight: '400px',
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(0,0,0,0) 70%)',
+                bottom: '5%',
+                right: '10%',
+                borderRadius: '50%',
+                filter: 'blur(80px)',
+                animation: 'floatOrb2 18s ease-in-out infinite',
+                pointerEvents: 'none',
+            }} />
+
+            {/* Glassmorphic Minimal Card */}
+            <div style={{
+                position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                width: '100%',
-                maxWidth: '320px',
-                padding: '0 1.5rem',
-                animation: 'fadeSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                width: 'calc(100% - 2rem)',
+                maxWidth: '360px',
+                padding: 'clamp(1.5rem, 6vw, 2.5rem)',
+                borderRadius: '24px',
+                background: glassBg,
+                border: `1px solid ${glassBorder}`,
+                boxShadow: glassShadow,
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                animation: 'fadeSlideUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                zIndex: 10,
             }}>
                 
-                {/* Logo / Brand Element */}
+                {/* Clean Logo Box */}
                 <div style={{
-                    width: '56px',
-                    height: '56px',
+                    width: '64px',
+                    height: '64px',
                     borderRadius: '16px',
-                    background: isDark ? '#18181b' : '#ffffff',
-                    border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
-                    boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.05)',
+                    background: isDark ? '#111827' : '#ffffff',
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: isDark ? '0 8px 20px -4px rgba(0,0,0,0.4)' : '0 8px 20px -4px rgba(0,0,0,0.05)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: '2.5rem',
-                    color: primaryColor,
-                    fontSize: '20px',
-                    fontWeight: '800',
-                    fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
-                    letterSpacing: '-0.5px',
-                    animation: 'logoPulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    marginBottom: '2rem',
+                    position: 'relative',
+                    overflow: 'hidden'
                 }}>
-                    CS
+                    <span style={{
+                        background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontSize: '24px',
+                        fontWeight: '800',
+                        fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
+                        letterSpacing: '-0.5px',
+                    }}>
+                        CS
+                    </span>
+                    {/* Inner subtle shimmer on the box */}
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%)',
+                        pointerEvents: 'none'
+                    }} />
                 </div>
 
                 {/* Progress Section */}
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'baseline',
+                        alignItems: 'flex-end',
                     }}>
                         <span style={{
-                            fontSize: '0.875rem',
+                            fontSize: '0.9rem',
                             fontWeight: '500',
                             color: textColor,
                             fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
@@ -152,9 +210,9 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
                             {message}
                         </span>
                         <span style={{
-                            fontSize: '0.75rem',
+                            fontSize: '0.8rem',
                             fontWeight: '600',
-                            color: subTextColor,
+                            color: primaryColor,
                             fontFamily: '"Inter", "JetBrains Mono", monospace',
                             fontVariantNumeric: 'tabular-nums',
                         }}>
@@ -162,7 +220,7 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
                         </span>
                     </div>
 
-                    {/* Progress Bar Track */}
+                    {/* Clean Progress Track */}
                     <div style={{
                         width: '100%',
                         height: '4px',
@@ -171,25 +229,26 @@ const FullPageLoader = ({ message = 'Initializing CS Studio...', isReady = false
                         overflow: 'hidden',
                         position: 'relative',
                     }}>
-                        {/* Progress Bar Fill */}
+                        {/* Smooth Gradient Fill */}
                         <div style={{
                             height: '100%',
                             width: `${progress}%`,
-                            backgroundColor: primaryColor,
+                            background: 'linear-gradient(90deg, #3b82f6 0%, #a855f7 100%)',
                             borderRadius: '9999px',
-                            transition: 'width 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                            transition: 'width 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
                             position: 'relative',
                             overflow: 'hidden',
                         }}>
-                            {/* Animated Shine Effect */}
+                            {/* Inner Continuous Shimmer */}
                             <div style={{
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
+                                right: 0,
                                 bottom: 0,
-                                width: '40%',
-                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                                animation: 'sweep 1.5s infinite linear',
+                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
+                                backgroundSize: '200% 100%',
+                                animation: 'shimmer 2s infinite linear',
                             }} />
                         </div>
                     </div>

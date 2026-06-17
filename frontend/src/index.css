@@ -104,7 +104,7 @@ body:not(.dark-theme):not(.light-theme) {
 }
 
 /* Ensure light theme is properly applied when no theme class is present */
-html:not(.dark-theme):not(.light-theme) body {
+html:not(.dark) body:not(.dark-theme) {
   background-color: #ffffff !important;
   color: #1f2937 !important;
 }
