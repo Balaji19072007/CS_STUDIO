@@ -1,8 +1,10 @@
 const CodeExecutionService = require('./codeExecutionService');
+const TestEvaluationService = require('./testEvaluationService');
 
 class CodeVerificationService {
   constructor() {
     this.executionService = new CodeExecutionService();
+    this.evaluationService = new TestEvaluationService();
     // Dangerous keywords/patterns to reject
     this.dangerousPatterns = [
       /\b(import|require)\s*\(\s*['"`]fs['"`]\s*\)/gi, // File system access
@@ -93,9 +95,10 @@ class CodeVerificationService {
         };
       }
 
-      // Perform exact string comparison
+      // Perform comparison using TestEvaluationService
       const actualOutput = executionResult.output;
-      const correct = actualOutput === expectedOutput;
+      const evaluationResult = this.evaluationService.compareOutputs(actualOutput, expectedOutput, language);
+      const correct = evaluationResult.passed;
 
       return {
         correct,
@@ -103,7 +106,7 @@ class CodeVerificationService {
         expectedOutput,
         executionTime: executionResult.executionTime,
         message: correct ? 'Code is correct' : 'Output mismatch',
-        difference: correct ? null : this.generateDifference(actualOutput, expectedOutput)
+        difference: correct ? null : evaluationResult.difference || this.generateDifference(actualOutput, expectedOutput)
       };
 
     } catch (error) {

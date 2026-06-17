@@ -114,7 +114,7 @@ const ProblemCard = ({ problem }) => {
                         </span>
 
                         {/* Mobile: Pen Icon */}
-                        <span className="sm:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white">
+                        <span className="sm:hidden flex items-center justify-center w-8 h-8 rounded-full bg-black/5 text-gray-600 dark:bg-white/10 dark:text-white">
                             {status === 'solved' ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                         </span>
                     </Link>

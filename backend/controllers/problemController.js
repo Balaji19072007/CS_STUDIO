@@ -169,7 +169,7 @@ exports.runTestCases = async (req, res) => {
 
                 const result = await runCodeTest(language, code, cleanedInput);
                 const cleanedOutput = evaluationService.cleanOutput(result.stdout);
-                const expected = test.expected ?? test.expected_output ?? test.expectedOutput;
+                const expected = test.expected ?? test.expected_output ?? test.expectedOutput ?? test.output;
                 const comparison = evaluationService.compareOutputs(cleanedOutput, expected, language);
 
                 if (comparison.passed) passedCount++;

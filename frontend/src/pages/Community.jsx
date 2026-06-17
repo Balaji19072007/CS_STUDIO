@@ -438,7 +438,7 @@ const Community = () => {
 
                     <button
                         onClick={() => isLoggedIn ? setShowCreateModal(true) : alert('Please login to start a discussion')}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 hover:bg-gray-100 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-white/10"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-white/10 dark:shadow-gray-900/50"
                     >
                         <i data-feather="plus-circle" className="w-5 h-5 text-gray-900"></i>
                         Start Discussion

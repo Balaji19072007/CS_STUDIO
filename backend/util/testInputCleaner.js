@@ -25,8 +25,8 @@ class TestInputCleaner {
         const cleanedLines = [];
 
         for (const line of lines) {
-            // Check if line contains a colon (typical prompt format)
-            if (line.includes(':')) {
+            // Only attempt to strip colons if it clearly looks like a prompt
+            if (line.includes(':') && TestInputCleaner.isFormattedInput(line)) {
                 // Extract everything after the last colon
                 const parts = line.split(':');
                 const value = parts[parts.length - 1].trim();
@@ -36,7 +36,7 @@ class TestInputCleaner {
                     cleanedLines.push(value);
                 }
             } else {
-                // No colon, assume it's already clean input
+                // No prompt, treat as clean input
                 const trimmed = line.trim();
                 if (trimmed) {
                     cleanedLines.push(trimmed);

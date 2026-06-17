@@ -172,7 +172,7 @@ const MyCourses = () => {
                             You haven't enrolled in any courses yet. Explore our structured curriculum, complete challenges, and start building your foundational knowledge step by step.
                         </p>
                         
-                        <Link to="/courses" className="inline-flex bg-white text-indigo-700 px-8 py-4 rounded-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 items-center gap-3 text-lg">
+                        <Link to="/courses" className="inline-flex bg-white text-indigo-700 dark:bg-gray-800 dark:text-indigo-400 px-8 py-4 rounded-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 items-center gap-3 text-lg">
                             Browse Course Catalog
                             <ArrowRight className="w-5 h-5" />
                         </Link>

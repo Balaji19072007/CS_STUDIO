@@ -46,7 +46,6 @@ class TestEvaluationService {
       this.compareCaseInsensitive(cleanedActual, cleanedExpected),
       this.compareWhitespaceInsensitive(cleanedActual, cleanedExpected),
       this.compareNumeric(cleanedActual, cleanedExpected),
-      this.compareNumeric(cleanedActual, cleanedExpected),
       this.compareFloatingPoint(cleanedActual, cleanedExpected, 1e-6),
       this.compareContains(cleanedActual, cleanedExpected) // Relaxed check: allows extraneous prompts
     ];
@@ -232,11 +231,8 @@ class TestEvaluationService {
       .replace(/\\n/g, '\n')       // Unescape literal \n to actual newline
       .replace(/\r\n/g, '\n')      // Normalize Windows line endings
       .replace(/\r/g, '\n')        // Normalize Mac line endings
-      .replace(/\t/g, ' ')         // Replace tabs with spaces
-      .replace(/ +\n/g, '\n')      // Remove trailing spaces before newlines
-      .replace(/\n +/g, '\n')      // Remove leading spaces after newlines
-      .replace(/^ +/, '')          // Remove leading spaces
-      .replace(/ +$/, '');         // Remove trailing spaces (but keep \n)
+      .replace(/[\t ]+\n/g, '\n')  // Remove trailing spaces before newlines
+      .trim();                     // Remove leading/trailing spaces from the whole string
   }
 
   /**

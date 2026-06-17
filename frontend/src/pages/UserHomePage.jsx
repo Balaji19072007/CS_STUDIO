@@ -489,7 +489,7 @@ const UserHomePage = () => {
                                         </div>
 
                                         <Link to="/problems" className="flex-shrink-0">
-                                            <div className="bg-white text-orange-600 px-5 py-3 sm:px-6 sm:py-4 rounded-xl md:rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-105 transition-transform font-bold whitespace-nowrap">
+                                            <div className="bg-white text-orange-600 dark:bg-gray-800 dark:text-orange-400 px-5 py-3 sm:px-6 sm:py-4 rounded-xl md:rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-105 transition-transform font-bold whitespace-nowrap">
                                                 Solve Now
                                                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 fill-current" />
                                             </div>

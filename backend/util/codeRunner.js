@@ -195,8 +195,17 @@ async function runCodeTest(language, code, input, testArgs = []) {
 
     // Send input if provided
     if (input) {
-      childProcess.stdin.write(input);
-      childProcess.stdin.end();
+      childProcess.stdin.on('error', (err) => {
+        if (err.code !== 'EPIPE' && err.code !== 'EOF') {
+          console.error('Error writing to stdin:', err.message);
+        }
+      });
+      try {
+        childProcess.stdin.write(input);
+        childProcess.stdin.end();
+      } catch (err) {
+        // Ignore synchronous write errors if stream is already closed
+      }
     }
 
     childProcess.stdout.on('data', (data) => {
@@ -210,16 +219,15 @@ async function runCodeTest(language, code, input, testArgs = []) {
     const result = await new Promise((resolve) => {
       childProcess.on('close', (code) => {
         if (code !== 0 || stderr) {
-          let debugInfo = '';
           try {
             const files = execCwd && fs.existsSync(execCwd) ? fs.readdirSync(execCwd).join(', ') : 'N/A';
             const command = runCommand || 'N/A';
             const args = runArgs ? runArgs.join(' ') : 'N/A';
-            debugInfo = `\n[DEBUG Info]\nRunDir: ${execCwd || 'N/A'}\nFiles: ${files}\nCommand: ${command} ${args}\n`;
+            console.error(`[DEBUG Info] RunDir: ${execCwd || 'N/A'} Files: ${files} Command: ${command} ${args}`);
           } catch (e) {
-            debugInfo = `\n[DEBUG Info]\nError: ${e.message}\n`;
+            console.error(`[DEBUG Info] Error: ${e.message}`);
           }
-          resolve({ stdout, stderr: (stderr || '') + debugInfo, exitCode: code });
+          resolve({ stdout, stderr: stderr || '', exitCode: code });
         } else {
           resolve({ stdout, stderr, exitCode: code });
         }
@@ -245,16 +253,15 @@ async function runCodeTest(language, code, input, testArgs = []) {
 
   } catch (error) {
     console.error(`Error during single test run for ${language}:`, error.message);
-    let debugInfo = '';
     try {
       const files = execCwd && fs.existsSync(execCwd) ? fs.readdirSync(execCwd).join(', ') : 'N/A';
       const command = runCommand || 'N/A';
       const args = runArgs ? runArgs.join(' ') : 'N/A';
-      debugInfo = `\n[DEBUG Info]\nRunDir: ${execCwd || 'N/A'}\nFiles: ${files}\nCommand: ${command} ${args}\n`;
+      console.error(`[DEBUG Info] RunDir: ${execCwd || 'N/A'} Files: ${files} Command: ${command} ${args}`);
     } catch (e) {
-      debugInfo = `\n[DEBUG Info]\nError: ${e.message}\n`;
+      console.error(`[DEBUG Info] Error: ${e.message}`);
     }
-    return { stdout: '', stderr: error.message + debugInfo, exitCode: 1 };
+    return { stdout: '', stderr: error.message, exitCode: 1 };
   } finally {
     cleanupFiles(tempFiles);
   }
