@@ -4,9 +4,6 @@ import api, { setAuthToken } from '../config/api';
 
 export const AuthContext = createContext();
 
-export const useAuth = () => {
-  return React.useContext(AuthContext);
-};
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

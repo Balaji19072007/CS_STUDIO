@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCourse, getPhases, getTopics } from '../api/courseApi';
 import { getQuizzes } from '../api/quizApi';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { getAllUserProgressForCourse } from '../api/progressApi';
 import { getMyCertificates, issueCourseCertificate } from '../api/certificateApi.js';
 import { downloadCertificate } from '../utils/certificateUtils.js';
