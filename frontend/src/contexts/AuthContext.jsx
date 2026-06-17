@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
         setUser(null);
         setIsAuthenticated(false);
@@ -54,7 +54,11 @@ export const AuthProvider = ({ children }) => {
           const refreshRes = await api.post('/api/auth/session/refresh');
           if (refreshRes.status === 200) {
             if (refreshRes.data.token) {
-               localStorage.setItem('token', refreshRes.data.token);
+               if (localStorage.getItem('token')) {
+                 localStorage.setItem('token', refreshRes.data.token);
+               } else {
+                 sessionStorage.setItem('token', refreshRes.data.token);
+               }
             }
             // If refresh worked, fetch session again
             const retryRes = await api.get('/api/auth/me');

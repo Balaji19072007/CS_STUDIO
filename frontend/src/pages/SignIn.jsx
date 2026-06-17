@@ -18,7 +18,8 @@ const SignIn = () => {
     email: '',
     password: '',
     captchaToken: '',
-    mfaCode: ''
+    mfaCode: '',
+    rememberMe: false
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -63,7 +64,8 @@ const SignIn = () => {
       const response = await api.post('/api/auth/session/login', { 
         email, 
         password, 
-        captchaToken 
+        captchaToken,
+        rememberMe: formData.rememberMe
       });
       
       const data = response.data;
@@ -79,7 +81,11 @@ const SignIn = () => {
       }
 
       if (data.token) {
-          localStorage.setItem('token', data.token);
+          if (formData.rememberMe) {
+              localStorage.setItem('token', data.token);
+          } else {
+              sessionStorage.setItem('token', data.token);
+          }
       }
 
       showMessage('success', 'Signed in successfully!');
@@ -112,14 +118,19 @@ const SignIn = () => {
       // Verify
       const verifyRes = await api.post('/api/auth/session/verify-mfa', {
         factorId, 
-        code: formData.mfaCode 
+        code: formData.mfaCode,
+        rememberMe: formData.rememberMe
       });
       const verifyData = verifyRes.data;
       
       if (!verifyData.success) throw new Error(verifyData.msg || 'Invalid verification code');
 
       if (verifyData.token) {
-          localStorage.setItem('token', verifyData.token);
+          if (formData.rememberMe) {
+              localStorage.setItem('token', verifyData.token);
+          } else {
+              sessionStorage.setItem('token', verifyData.token);
+          }
       }
       showMessage('success', 'Signed in successfully!');
       setTimeout(() => {
@@ -349,7 +360,14 @@ const SignIn = () => {
                 </div>
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center">
-                    <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                    <input 
+                      id="remember-me" 
+                      name="rememberMe" 
+                      type="checkbox" 
+                      checked={formData.rememberMe}
+                      onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                    />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-400">
                       Remember me
                     </label>

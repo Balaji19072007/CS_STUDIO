@@ -25,7 +25,7 @@ const api = axios.create({
 // Request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       config.headers['x-auth-token'] = token;
     }
@@ -170,20 +170,25 @@ export const testAPI = {
 };
 
 // Utility functions
-export const setAuthToken = (token) => {
+export const setAuthToken = (token, rememberMe = true) => {
   if (token) {
-    localStorage.setItem('token', token);
+    if (rememberMe) {
+      localStorage.setItem('token', token);
+    } else {
+      sessionStorage.setItem('token', token);
+    }
   } else {
     localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
   }
 };
 
 export const getAuthToken = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem('token') || sessionStorage.getItem('token');
 };
 
 export const isAuthenticated = () => {
-  return !!localStorage.getItem('token');
+  return !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
 };
 
 // Legacy functions for backward compatibility
@@ -193,7 +198,7 @@ export const getHeaders = (includeAuth = false) => {
   };
 
   if (includeAuth) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       // CRITICAL: Use ONLY x-auth-token for backend authentication
       headers['x-auth-token'] = token;

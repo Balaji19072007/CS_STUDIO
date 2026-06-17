@@ -50,7 +50,7 @@ exports.login = async (req, res) => {
     return res.status(401).json({ success: false, msg: 'Invalid credentials' });
   }
 
-    const { email, password, captchaToken } = req.body;
+    const { email, password, captchaToken, rememberMe } = req.body;
     let authEmail = email;
 
     try {
@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
 
     if (data.session) {
       // 3. Set HttpOnly cookies
-      setCookies(res, data.session);
+      setCookies(res, data.session, rememberMe);
       
       // Check AAL using user-scoped client
       const userClient = createUserClient(data.session.access_token);
@@ -318,7 +318,7 @@ exports.setCookie = (req, res) => {
 };
 
 exports.verifyMFA = async (req, res) => {
-    const { factorId, challengeId, code } = req.body;
+    const { factorId, challengeId, code, rememberMe } = req.body;
     // We would need the access token of the user in AAL1 state.
     // If we just logged in, the token isn't in a cookie yet if AAL2 is required.
     // So the frontend needs to pass the temporary access_token from login,
@@ -345,7 +345,7 @@ exports.verifyMFA = async (req, res) => {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
         if (!sessionError && sessionData.session) {
-             setCookies(res, sessionData.session);
+             setCookies(res, sessionData.session, rememberMe);
              return res.json({ success: true, session: sessionData.session, token: sessionData.session.access_token });
         }
         
@@ -357,22 +357,24 @@ exports.verifyMFA = async (req, res) => {
 };
 
 // Helper function
-function setCookies(res, session) {
+function setCookies(res, session, rememberMe = true) {
   const isProd = process.env.NODE_ENV === 'production';
-  res.cookie('access_token', session.access_token, {
+  const accessOpts = {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    maxAge: session.expires_in * 1000 // usually 3600s
-  });
+    sameSite: isProd ? 'none' : 'lax'
+  };
+  const refreshOpts = { ...accessOpts };
+
+  if (rememberMe) {
+    accessOpts.maxAge = session.expires_in * 1000; // usually 3600s
+    refreshOpts.maxAge = 7 * 24 * 3600000; // 7 days
+  }
+
+  res.cookie('access_token', session.access_token, accessOpts);
 
   if (session.refresh_token) {
-    res.cookie('refresh_token', session.refresh_token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      maxAge: 7 * 24 * 3600000 // 7 days
-    });
+    res.cookie('refresh_token', session.refresh_token, refreshOpts);
   }
 }
 
