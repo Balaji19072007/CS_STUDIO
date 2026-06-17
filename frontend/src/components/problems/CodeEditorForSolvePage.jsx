@@ -60,7 +60,7 @@ const CodeEditorForSolvePage = forwardRef(({
   // --- Socket.IO Initialization and Listeners (FIXED) ---
   useEffect(() => {
     // Initialize socket service if not already connected
-    const token = localStorage.getItem('token') || 'anonymous';
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token') || 'anonymous';
     if (!socketService.isConnected) {
       console.log('🔌 Initializing socket service for compiler...');
       socketService.connect(token);

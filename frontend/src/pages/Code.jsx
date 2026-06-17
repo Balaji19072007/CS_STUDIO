@@ -62,7 +62,7 @@ const Code = () => {
 
     // Initialize socket service when component mounts
     useEffect(() => {
-        const token = localStorage.getItem('token') || 'anonymous';
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token') || 'anonymous';
         if (!socketService.isConnected) {
             console.log('🔌 Initializing socket service for freeform playground...');
             socketService.connect(token);
@@ -90,7 +90,7 @@ const Code = () => {
     };
 
     const handleRetryConnection = () => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
             socketService.manualReconnect();
         }
