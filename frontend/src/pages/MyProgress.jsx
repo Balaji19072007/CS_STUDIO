@@ -134,6 +134,29 @@ const MyProgress = () => {
   }
 
   const { userStats, difficultyBreakdown } = stats;
+  
+  // Calculate effective streak
+  const hasSolvedToday = history?.some(h => {
+    if (h.status !== 'solved' || !h.solvedAt) return false;
+    const solvedDate = new Date(h.solvedAt);
+    const today = new Date();
+    return solvedDate.getDate() === today.getDate() &&
+           solvedDate.getMonth() === today.getMonth() &&
+           solvedDate.getFullYear() === today.getFullYear();
+  }) || false;
+
+  const hasSolvedYesterday = history?.some(h => {
+    if (h.status !== 'solved' || !h.solvedAt) return false;
+    const solvedDate = new Date(h.solvedAt);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return solvedDate.getDate() === yesterday.getDate() &&
+           solvedDate.getMonth() === yesterday.getMonth() &&
+           solvedDate.getFullYear() === yesterday.getFullYear();
+  }) || false;
+
+  const effectiveStreak = (!hasSolvedToday && !hasSolvedYesterday) ? 0 : (userStats?.currentStreak || 0);
+
   const yearDays = generateYearDays();
   return (
     <div className="min-h-screen bg-gray-50 dark:dark-gradient-secondary pt-6 pb-12 px-4 sm:px-6 lg:px-8">
@@ -162,7 +185,7 @@ const MyProgress = () => {
           {/* Streak Badge */}
           <div className="bg-white dark:bg-gray-800/40 backdrop-blur-md p-5 rounded-3xl border border-gray-200 dark:border-gray-700/50 flex flex-col items-center justify-center shadow-xl group hover:border-orange-500/30 transition-all duration-300">
             <div className="flex items-center gap-1.5 leading-none">
-              <span className="text-4xl font-black text-gray-900 dark:text-white group-hover:scale-110 transition-transform duration-300">{userStats.currentStreak || 0}</span>
+              <span className="text-4xl font-black text-gray-900 dark:text-white group-hover:scale-110 transition-transform duration-300">{effectiveStreak}</span>
               <span className="text-3xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">🔥</span>
             </div>
             <div className="text-[10px] text-gray-500 dark:text-gray-400 font-black uppercase tracking-[0.2em] mt-2 text-center">Day Streak</div>
