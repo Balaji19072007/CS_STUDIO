@@ -323,6 +323,20 @@ const UserHomePage = () => {
                solvedDate.getFullYear() === today.getFullYear();
     }) || false;
 
+    const hasSolvedYesterday = userHistory?.some(h => {
+        if (h.status !== 'solved' || !h.solvedAt) return false;
+        const solvedDate = new Date(h.solvedAt);
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        return solvedDate.getDate() === yesterday.getDate() &&
+               solvedDate.getMonth() === yesterday.getMonth() &&
+               solvedDate.getFullYear() === yesterday.getFullYear();
+    }) || false;
+
+    const dbStreak = userStats?.currentStreak || 0;
+    const isStreakExpired = !hasSolvedToday && !hasSolvedYesterday && dbStreak > 0;
+    const effectiveStreak = (!hasSolvedToday && !hasSolvedYesterday) ? 0 : dbStreak;
+
     // --- MASTERY LEVEL CALCULATION ---
     const MASTERY_LEVELS = [
         { name: 'Beginner', target: { Easy: 20, Medium: 10, Hard: 5 }, icon: '🌱' },
@@ -401,13 +415,13 @@ const UserHomePage = () => {
                                             {/* Desktop Streak Badge */}
                                             <div className="hidden md:flex items-center gap-1.5 bg-orange-500/20 px-3 py-1 rounded-full border border-orange-500/30">
                                                 <Flame className="w-3.5 h-3.5 text-orange-200 fill-orange-200" />
-                                                <span className="text-orange-100 font-bold text-xs">{userStats?.currentStreak || 0} Day Streak</span>
+                                                <span className="text-orange-100 font-bold text-xs">{effectiveStreak} Day Streak</span>
                                             </div>
                                         </div>
 
                                         {/* Mobile Streak Badge (Top Right) */}
                                         <div className="md:hidden absolute top-5 right-5 flex items-center justify-end">
-                                            <span className="text-orange-100 font-extrabold text-2xl tracking-tighter mr-0.5">{userStats?.currentStreak || 0}</span>
+                                            <span className="text-orange-100 font-extrabold text-2xl tracking-tighter mr-0.5">{effectiveStreak}</span>
                                             <Flame className="w-5 h-5 text-orange-200 fill-orange-200" />
                                         </div>
 
@@ -448,11 +462,13 @@ const UserHomePage = () => {
                                         {/* Desktop Streak Badge */}
                                         <div className="hidden md:flex items-center gap-1.5 bg-orange-500/20 px-3 py-1 rounded-full border border-orange-500/30 whitespace-nowrap">
                                             <Flame className="w-3.5 h-3.5 text-orange-100 fill-orange-100" />
-                                            <span className="text-orange-50 font-bold text-xs">{userStats?.currentStreak || 0} Day Streak at Risk!</span>
+                                            <span className="text-orange-50 font-bold text-xs">
+                                                {isStreakExpired ? "Streak Expired!" : effectiveStreak === 0 ? "Start a Streak!" : `${effectiveStreak} Day Streak at Risk!`}
+                                            </span>
                                         </div>
                                         {/* Mobile Streak Badge */}
                                         <div className="flex md:hidden items-center whitespace-nowrap ml-auto" title="Current Streak">
-                                            <span className="text-orange-50 font-extrabold text-sm shadow-sm">{userStats?.currentStreak || 0}</span>
+                                            <span className="text-orange-50 font-extrabold text-sm shadow-sm">{effectiveStreak}</span>
                                             <Flame className="w-4 h-4 text-orange-200 fill-orange-200 drop-shadow-sm" />
                                         </div>
                                     </div>
@@ -461,10 +477,14 @@ const UserHomePage = () => {
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex-1">
                                             <h2 className="text-lg sm:text-xl md:text-3xl font-bold text-white leading-tight">
-                                                Maintain Your Streak
+                                                {isStreakExpired ? "Start a New Streak" : effectiveStreak === 0 ? "Ignite Your Streak" : "Maintain Your Streak"}
                                             </h2>
                                             <p className="hidden md:block text-orange-50/90 text-sm max-w-2xl mt-2 line-clamp-2">
-                                                Today you have not solved any problem. Solve a new problem of your choice to keep your streak alive!
+                                                {isStreakExpired 
+                                                    ? "Your previous streak has expired. Solve a problem today to ignite a new one!" 
+                                                    : effectiveStreak === 0 
+                                                        ? "You don't have an active streak. Solve a problem today to start one!"
+                                                        : "Today you have not solved any problem. Solve a new problem of your choice to keep your streak alive!"}
                                             </p>
                                         </div>
 
