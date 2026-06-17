@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../config/api';
+import api, { setAuthToken } from '../config/api';
 
 export const AuthContext = createContext();
 
@@ -54,11 +54,7 @@ export const AuthProvider = ({ children }) => {
           const refreshRes = await api.post('/api/auth/session/refresh');
           if (refreshRes.status === 200) {
             if (refreshRes.data.token) {
-               if (localStorage.getItem('token')) {
-                 localStorage.setItem('token', refreshRes.data.token);
-               } else {
-                 sessionStorage.setItem('token', refreshRes.data.token);
-               }
+               setAuthToken(refreshRes.data.token, !!localStorage.getItem('token'));
             }
             // If refresh worked, fetch session again
             const retryRes = await api.get('/api/auth/me');
@@ -105,11 +101,13 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await api.post('/api/auth/session/logout');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      setAuthToken(null);
       setUser(null);
       setIsAuthenticated(false);
       navigate('/');
-    } catch (error) {
-      console.error('Error during logout:', error);
     }
   };
 

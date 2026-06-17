@@ -22,7 +22,7 @@ export const fetchProblemById = async (id) => {
 };
 
 export const fetchProblemProgress = async (id) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) return null;
     return api.get(`${API_BASE_URL}/${id}/progress`);
 };

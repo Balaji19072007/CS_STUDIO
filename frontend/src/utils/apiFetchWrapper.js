@@ -3,7 +3,7 @@ import { handleApiError } from '../services/errorService.js';
 
 const getAuthHeaders = (isFormData = false) => {
   const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   if (token) headers['x-auth-token'] = token;
   return headers;
 };

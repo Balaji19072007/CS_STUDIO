@@ -182,7 +182,7 @@ const UserHomePage = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const headers = token ? { 'x-auth-token': token } : {};
                 const cacheKey = `dashboard_data_v5_${user.uid || user.id}`;
 
@@ -213,8 +213,8 @@ const UserHomePage = () => {
                         setUserStats(data.userStats);
                         setDifficultyStats(data.difficultyStats);
                         // setDailyProblem(data.dailyProblem);
-                        setRecommendedProblems(data.recommendedProblems);
-                        setUserHistory(data.userHistory);
+                        setRecommendedProblems(data.recommendedProblems || []);
+                        setUserHistory(data.userHistory || []);
                         setOngoingCourses(data.ongoingCourses || []);
                         setLoading(false);
                         return;

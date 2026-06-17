@@ -5,7 +5,7 @@ import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
 import { Navbar as SiteNavbar } from '../components/site/Navbar';
 import { Turnstile } from '@marsidev/react-turnstile';
-import api from '../config/api';
+import api, { setAuthToken } from '../config/api';
 
 const SignIn = () => {
   const { isLoggedIn } = useAuth();
@@ -81,11 +81,7 @@ const SignIn = () => {
       }
 
       if (data.token) {
-          if (formData.rememberMe) {
-              localStorage.setItem('token', data.token);
-          } else {
-              sessionStorage.setItem('token', data.token);
-          }
+          setAuthToken(data.token, formData.rememberMe);
       }
 
       showMessage('success', 'Signed in successfully!');
@@ -126,11 +122,7 @@ const SignIn = () => {
       if (!verifyData.success) throw new Error(verifyData.msg || 'Invalid verification code');
 
       if (verifyData.token) {
-          if (formData.rememberMe) {
-              localStorage.setItem('token', verifyData.token);
-          } else {
-              sessionStorage.setItem('token', verifyData.token);
-          }
+          setAuthToken(verifyData.token, formData.rememberMe);
       }
       showMessage('success', 'Signed in successfully!');
       setTimeout(() => {
