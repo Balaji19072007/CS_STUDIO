@@ -21,9 +21,11 @@ async function runCodeTest(language, code, input, testArgs = []) {
     fs.mkdirSync(tempDir, { recursive: true });
   }
 
-  console.log('Using CodeRunner V3 with tempDir:', tempDir);
-
-  const sessionId = `test_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  // Create a deterministic hash for the code to cache compilation across test cases!
+  const crypto = require('crypto');
+  const codeHash = crypto.createHash('md5').update(code).digest('hex');
+  const sessionId = `test_${codeHash}`;
+  
   let sourceFile, executable, runCommand, runArgs, tempFiles = [];
   let execCwd = tempDir; // Default execution directory
 
@@ -38,7 +40,8 @@ async function runCodeTest(language, code, input, testArgs = []) {
 
     switch (language.toLowerCase()) {
       case 'python':
-        sourceFile = path.join(tempDir, `${sessionId}.py`);
+        // Python doesn't need compilation caching since it's interpreted, but we use the hash anyway
+        sourceFile = path.join(tempDir, `py_${Date.now()}_${Math.random().toString(36).substring(2,7)}.py`);
         fs.writeFileSync(sourceFile, cleanedCode);
         runCommand = 'python';
         runArgs = [sourceFile];
@@ -53,102 +56,94 @@ async function runCodeTest(language, code, input, testArgs = []) {
         sourceFile = path.join(tempDir, `${sessionId}${ext}`);
         executable = path.join(tempDir, `${sessionId}${process.platform === 'win32' ? '.exe' : ''}`);
 
-        fs.writeFileSync(sourceFile, cleanedCode);
+        // ONLY COMPILE IF THE EXECUTABLE DOES NOT ALREADY EXIST
+        if (!fs.existsSync(executable)) {
+          fs.writeFileSync(sourceFile, cleanedCode);
 
-        // Compilation
-        const compileProcess = spawn(compiler, [sourceFile, '-o', executable], { timeout: 15000, cwd: tempDir });
-        let compileError = '';
+          // Compilation
+          const compileProcess = spawn(compiler, [sourceFile, '-o', executable], { timeout: 15000, cwd: tempDir });
+          let compileError = '';
 
-        compileProcess.stderr.on('data', (data) => {
-          compileError += data.toString();
-        });
-
-        await new Promise((resolve, reject) => {
-          compileProcess.on('error', (err) => reject(new Error(`${compiler} not found. ${err.message}`)));
-          compileProcess.on('close', (code) => {
-            if (code !== 0) {
-              reject(new Error(compileError || `Compilation failed with exit code ${code}`));
-            } else {
-              resolve();
-            }
+          compileProcess.stderr.on('data', (data) => {
+            compileError += data.toString();
           });
-        });
+
+          await new Promise((resolve, reject) => {
+            compileProcess.on('error', (err) => reject(new Error(`${compiler} not found. ${err.message}`)));
+            compileProcess.on('close', (code) => {
+              if (code !== 0) {
+                reject(new Error(compileError || `Compilation failed with exit code ${code}`));
+              } else {
+                resolve();
+              }
+            });
+          });
+          
+          // Only add source file to tempFiles if we just created it (to delete later, actually we shouldn't delete cached ones yet!)
+          // Wait, if we delete the executable at the end of the run, the cache is destroyed!
+          // We will ONLY delete python scripts and let a cron job or startup script clean the tempDir of executables.
+        } else {
+            // Executable already exists from a previous test case in this same run! Skip compilation!
+        }
 
         runCommand = executable;
         runArgs = [];
-        tempFiles.push(sourceFile, executable);
+        // DO NOT add to tempFiles so they aren't deleted after the first test case
         break;
       }
 
       case 'java': {
-        console.log('[JAVA DEBUG] Starting Java execution...');
-        // Create a unique directory for Java execution to support any class name and avoid collisions
         const runDir = path.join(tempDir, sessionId);
-        console.log('[JAVA DEBUG] Run directory:', runDir);
         if (!fs.existsSync(runDir)) {
           fs.mkdirSync(runDir, { recursive: true });
-          console.log('[JAVA DEBUG] Created run directory');
         }
 
         // Detect class name
         const classMatch = cleanedCode.match(/(?:public\s+)?class\s+(\w+)/);
         let className = classMatch ? classMatch[1] : 'Main';
-        console.log('[JAVA DEBUG] Detected class name:', className);
 
         sourceFile = path.join(runDir, `${className}.java`);
         const classFile = path.join(runDir, `${className}.class`);
-        console.log('[JAVA DEBUG] Source file:', sourceFile);
-        console.log('[JAVA DEBUG] Class file:', classFile);
 
-        fs.writeFileSync(sourceFile, cleanedCode);
-        console.log('[JAVA DEBUG] Wrote source file, length:', cleanedCode.length);
+        // ONLY COMPILE IF THE CLASS FILE DOES NOT ALREADY EXIST
+        if (!fs.existsSync(classFile)) {
+            fs.writeFileSync(sourceFile, cleanedCode);
 
-        // Compilation
-        console.log('[JAVA DEBUG] Starting compilation with javac...');
-        const compileProcess = spawn('javac', [sourceFile], { timeout: 10000, cwd: runDir });
-        let compileError = '';
+            // Compilation
+            const compileProcess = spawn('javac', [sourceFile], { timeout: 10000, cwd: runDir });
+            let compileError = '';
 
-        compileProcess.stderr.on('data', (data) => {
-          compileError += data.toString();
-          console.log('[JAVA DEBUG] Compile stderr:', data.toString());
-        });
+            compileProcess.stderr.on('data', (data) => {
+              compileError += data.toString();
+            });
 
-        compileProcess.stdout.on('data', (data) => {
-          console.log('[JAVA DEBUG] Compile stdout:', data.toString());
-        });
-
-        await new Promise((resolve, reject) => {
-          compileProcess.on('error', (err) => {
-            console.error('[JAVA DEBUG] Compile process error:', err);
-            reject(new Error(`javac not found. ${err.message}`));
-          });
-          compileProcess.on('close', (code) => {
-            console.log('[JAVA DEBUG] Compile process closed with code:', code);
-            console.log('[JAVA DEBUG] Files in runDir:', fs.readdirSync(runDir));
-
-            if (code !== 0) {
-              console.error('[JAVA DEBUG] Compilation failed:', compileError);
-              reject(new Error(compileError || `Compilation failed with exit code ${code}`));
-            } else if (!fs.existsSync(classFile)) {
-              console.log('[JAVA DEBUG] Expected class file not found, searching for any .class file...');
-              // Try to find ANY .class file if the specific one is missing
-              // This happens if the user defines 'class Solution' but the file was named 'Main.java' (and it wasn't public)
-              const generatedClass = fs.readdirSync(runDir).find(f => f.endsWith('.class'));
-              if (generatedClass) {
-                // Update className to the file that was actually generated
-                className = path.basename(generatedClass, '.class');
-                console.log('[JAVA DEBUG] Found alternative class file:', generatedClass, 'Using className:', className);
-                resolve();
-              } else {
-                console.error('[JAVA DEBUG] No .class file found after compilation');
-                reject(new Error('Compilation failed: Class file was not created. Ensure your class name matches the filename or use public class Main.'));
-              }
-            } else {
-              console.log('[JAVA DEBUG] Compilation successful, class file exists');
-              resolve();
-            }
-          });
-        });
+            await new Promise((resolve, reject) => {
+              compileProcess.on('error', (err) => {
+                reject(new Error(`javac not found. ${err.message}`));
+              });
+              compileProcess.on('close', (code) => {
+                if (code !== 0) {
+                  reject(new Error(compileError || `Compilation failed with exit code ${code}`));
+                } else if (!fs.existsSync(classFile)) {
+                  const generatedClass = fs.readdirSync(runDir).find(f => f.endsWith('.class'));
+                  if (generatedClass) {
+                    className = path.basename(generatedClass, '.class');
+                    resolve();
+                  } else {
+                    reject(new Error('Compilation failed: Class file was not created. Ensure your class name matches the filename or use public class Main.'));
+                  }
+                } else {
+                  resolve();
+                }
+              });
+            });
+        } else {
+             // If class file already exists but maybe a different class name was compiled, detect it
+             const generatedClass = fs.readdirSync(runDir).find(f => f.endsWith('.class'));
+             if (generatedClass) {
+                 className = path.basename(generatedClass, '.class');
+             }
+        }
 
         runCommand = 'java';
         // Pass classpath via -cp argument with absolute path
