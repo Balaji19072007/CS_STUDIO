@@ -3,10 +3,14 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Crown, Award } from 'lucide-react';
 
 // Top User Stats Component
-const TopUserStats = ({ rankData }) => {
+const TopUserStats = ({ rankData, userStats }) => {
     if (!rankData || !rankData.user) return null;
     const { user, rank } = rankData;
-    const hasParticipated = (user.problemsSolved || 0) > 0;
+    const hasParticipated = (user.problemsSolved || 0) > 0 || (userStats?.problemsSolved || 0) > 0;
+
+    const solved = userStats?.problemsSolved ?? user.problemsSolved ?? 0;
+    const points = userStats?.totalPoints ?? user.totalPoints ?? 0;
+    const accuracy = userStats?.accuracy ?? user.accuracy ?? Math.round(user.averageAccuracy || 0);
 
     return (
         <div className="mb-8">
@@ -38,16 +42,16 @@ const TopUserStats = ({ rankData }) => {
                         <div className="flex-1 w-full bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-200 dark:border-white/5">
                             <div className="grid grid-cols-3 gap-2 h-full items-center">
                                 <div className="flex flex-col items-center justify-center">
-                                    <div className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">{user.problemsSolved || 0}</div>
+                                    <div className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">{solved}</div>
                                     <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold text-center">Solved</div>
                                 </div>
                                 <div className="flex flex-col items-center justify-center border-x border-gray-200 dark:border-white/10 relative">
-                                    <div className="text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{user.totalPoints || 0}</div>
+                                    <div className="text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{points}</div>
                                     <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold text-center">Points</div>
                                 </div>
                                 <div className="flex flex-col items-center justify-center">
                                     <div className="text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mb-1">
-                                        {user.accuracy !== undefined ? user.accuracy : Math.round(user.averageAccuracy || 0)}%
+                                        {accuracy}%
                                     </div>
                                     <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold text-center">Accuracy</div>
                                 </div>

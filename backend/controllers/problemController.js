@@ -322,6 +322,7 @@ exports.submitProblem = async (req, res) => {
         }
 
         // --- STREAK UPDATE LOGIC (atomic via RPC) ---
+        let newStreak = null; // track new streak value
         if (isSolved) {
             const { data: streakUser, error: streakFetchError } = await supabase
                 .from('users')
@@ -352,10 +353,8 @@ exports.submitProblem = async (req, res) => {
                 const yesterdayStr = getDateInTimezone(yesterday, userTimezone);
 
                 if (lastStr !== todayStr) {
-                    let newStreak = 1;
-                    if (lastStr === yesterdayStr) {
-                        newStreak = (streakUser.current_streak || 0) + 1;
-                    }
+                    // Start fresh at 1, or increment if solved yesterday
+                    newStreak = (lastStr === yesterdayStr) ? (streakUser.current_streak || 0) + 1 : 1;
 
                     const { error: streakUpdateError } = await supabase
                         .rpc('update_user_streak', {
@@ -365,6 +364,9 @@ exports.submitProblem = async (req, res) => {
                         });
 
                     if (streakUpdateError) console.error('Streak Update RPC Error:', streakUpdateError);
+                } else {
+                    // Already updated today — streak unchanged
+                    newStreak = streakUser.current_streak;
                 }
             }
         }
@@ -375,6 +377,7 @@ exports.submitProblem = async (req, res) => {
             accuracy: Math.floor(accuracy),
             passedCount,
             totalTests,
+            newStreak,
             message: isSolved ? 'Solution accepted!' : 'Keep trying!',
             failureDetails: firstFailure
         });

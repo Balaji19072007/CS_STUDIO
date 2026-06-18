@@ -179,7 +179,7 @@ const showToast = (type, message, action) => {
 
 // ─── Main Error Handler ──────────────────────────────────────────
 let errorCounts = new Map();
-const RATE_LIMIT_THRESHOLD = 3;
+const RATE_LIMIT_THRESHOLD = 0; // Allow 1 toast per window (count > 0 means rate limited)
 const RATE_LIMIT_WINDOW = 10000;
 
 const isRateLimited = (key) => {
@@ -206,6 +206,10 @@ setInterval(() => {
 
 export const handleApiError = (error, context = {}) => {
   const type = classifyError(error);
+  
+  // If silent flag is passed (e.g. for background polling), suppress the toast
+  if (context?.silent) return;
+
   const message = getErrorMessage(error, type);
   const errorKey = `${type}:${message}`;
 

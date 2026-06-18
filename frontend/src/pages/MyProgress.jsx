@@ -155,7 +155,10 @@ const MyProgress = () => {
            solvedDate.getFullYear() === yesterday.getFullYear();
   }) || false;
 
-  const effectiveStreak = (!hasSolvedToday && !hasSolvedYesterday) ? 0 : (userStats?.currentStreak || 0);
+  const dbStreak = userStats?.currentStreak || 0;
+  const isStreakExpired = !hasSolvedToday && !hasSolvedYesterday && dbStreak > 0;
+  // Effective streak: 0 if expired or not active. Otherwise use the DB value.
+  const effectiveStreak = isStreakExpired ? 0 : (!hasSolvedToday && !hasSolvedYesterday) ? 0 : dbStreak;
 
   const yearDays = generateYearDays();
   return (

@@ -107,7 +107,8 @@ api.interceptors.response.use(
 
     // Handle non-401 errors globally (skip auth endpoints - components handle those)
     if (!isAuthEndpoint) {
-      handleApiError(error, { source: 'services/apiService.js', url });
+      const isSilent = url?.includes('/api/notifications/unread-count') || url?.includes('/api/auth/me');
+      handleApiError(error, { source: 'services/apiService.js', url, silent: isSilent });
     }
 
     return Promise.reject(error);

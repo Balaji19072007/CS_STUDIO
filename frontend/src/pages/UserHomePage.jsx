@@ -19,12 +19,9 @@ const ActivityGraph = ({ history }) => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today);
         d.setDate(today.getDate() - (6 - i));
-
-        // Use Local Time for date string to match data processing logic
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
-
         return {
             date: `${year}-${month}-${day}`,
             dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
@@ -34,28 +31,23 @@ const ActivityGraph = ({ history }) => {
 
     if (history) {
         history.forEach(item => {
-            // Use solvedAt as primary source for activity graph
             const dateVal = item.solvedAt || item.lastSubmission;
             if (dateVal) {
                 const dateObj = new Date(dateVal);
                 if (!isNaN(dateObj.getTime())) {
-                    // Normalize to Local Date (YYYY-MM-DD)
                     const year = dateObj.getFullYear();
                     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
                     const day = String(dateObj.getDate()).padStart(2, '0');
                     const dateKey = `${year}-${month}-${day}`;
-
                     const dayStat = last7Days.find(d => d.date === dateKey);
-                    if (dayStat) {
-                        dayStat.count++;
-                    }
+                    if (dayStat) dayStat.count++;
                 }
             }
         });
     }
 
-    // 2. Responsive SVG calculation
-    const [width, setWidth] = useState(300); // Default fallback width
+    // 2. Responsive SVG
+    const [width, setWidth] = useState(300);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -64,24 +56,43 @@ const ActivityGraph = ({ history }) => {
                 setWidth(entries[0].contentRect.width);
             }
         });
-        if (containerRef.current) {
-            observer.observe(containerRef.current);
-        }
+        if (containerRef.current) observer.observe(containerRef.current);
         return () => observer.disconnect();
     }, []);
 
-    const maxCount = Math.max(...last7Days.map(d => d.count), 5); // Minimum max of 5 for scale
-    const height = 180; // Increased height to prevent clipping
-    const paddingX = 30;
-    const paddingY = 40; // More top/bottom padding
-    const chartWidth = width - paddingX * 2;
-    const chartHeight = height - paddingY * 2;
+    // 3. Fully dynamic scale — grows with actual data, never fixed
+    const rawMax = Math.max(...last7Days.map(d => d.count), 1);
+    // Round up to a clean "nice" ceiling
+    const niceMax = (() => {
+        if (rawMax <= 5) return 5;
+        if (rawMax <= 10) return 10;
+        if (rawMax <= 20) return 20;
+        if (rawMax <= 50) return Math.ceil(rawMax / 10) * 10;
+        return Math.ceil(rawMax / 20) * 20;
+    })();
+
+    // 4 evenly-spaced ticks distributed across the chart height
+    const yTicks = [0, Math.round(niceMax * 0.33), Math.round(niceMax * 0.66), niceMax]
+        .filter((v, i, a) => a.indexOf(v) === i);
+
+    // Dimensions — keep original h-44 (176px), small left margin for labels
+    const height = 176;
+    const paddingTop = 12;
+    const paddingBottom = 36;
+    const paddingLeft = 28;
+    const paddingRight = 8;
+    const chartWidth = width - paddingLeft - paddingRight;
+    const chartHeight = height - paddingTop - paddingBottom;
+
+    const toY = (count) => paddingTop + chartHeight - (count / niceMax) * chartHeight;
 
     const points = last7Days.map((d, i) => {
-        const x = paddingX + (i / (last7Days.length - 1)) * chartWidth;
-        const y = height - paddingY - (d.count / maxCount) * chartHeight;
+        const x = paddingLeft + (i / (last7Days.length - 1)) * chartWidth;
+        const y = toY(d.count);
         return `${x},${y}`;
     }).join(' ');
+
+    const areaPath = `M${paddingLeft},${toY(0)} ${points} L${paddingLeft + chartWidth},${toY(0)} Z`;
 
     return (
         <div className="bg-white dark:dark-glass backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 p-6 shadow-xl dark:shadow-2xl relative overflow-hidden group">
@@ -96,8 +107,8 @@ const ActivityGraph = ({ history }) => {
                 <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider bg-gray-100 dark:bg-gray-700/50 px-3 py-1 rounded-full">Last 7 Days</span>
             </div>
 
+            {/* h-44 — same size as original, no layout change */}
             <div className="relative h-44 w-full z-10" ref={containerRef}>
-                {/* Empty State Overlay */}
                 {(!history || history.length === 0) && (
                     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
                         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3">No activity this week</p>
@@ -106,52 +117,90 @@ const ActivityGraph = ({ history }) => {
                         </Link>
                     </div>
                 )}
-                {/* SVG Graph */}
                 <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
-                    {/* Grid Lines */}
-                    <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} className="stroke-gray-300 dark:stroke-gray-700" strokeWidth="1" strokeDasharray="4 4" />
-
-                    {/* Area Gradient Definition */}
                     <defs>
-                        <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.5" />
+                        <linearGradient id="activityGradient" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
                             <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
                         </linearGradient>
                     </defs>
 
-                    {/* Filled Area */}
-                    <path
-                        d={`M${paddingX},${height - paddingY} ${points} L${width - paddingX},${height - paddingY} Z`}
-                        fill="url(#gradient)"
-                    />
+                    {/* Y-axis grid lines — very faint dotted, evenly spaced */}
+                    {yTicks.map(tick => {
+                        const y = toY(tick);
+                        return (
+                            <g key={tick}>
+                                <line
+                                    x1={paddingLeft}
+                                    y1={y}
+                                    x2={paddingLeft + chartWidth}
+                                    y2={y}
+                                    stroke="#93c5fd"
+                                    strokeOpacity="0.15"
+                                    strokeWidth="1"
+                                    strokeDasharray="3 6"
+                                />
+                                {/* Y label — small and subtle */}
+                                <text
+                                    x={paddingLeft - 4}
+                                    y={y + 3}
+                                    textAnchor="end"
+                                    fontSize="9"
+                                    fontWeight="500"
+                                    fill="#9ca3af"
+                                    opacity="0.8"
+                                >
+                                    {tick}
+                                </text>
+                            </g>
+                        );
+                    })}
 
-                    {/* Line Path */}
+                    {/* Filled Area */}
+                    <path d={areaPath} fill="url(#activityGradient)" />
+
+                    {/* Line */}
                     <polyline
                         fill="none"
                         stroke="#3B82F6"
-                        strokeWidth="3"
+                        strokeWidth="2.5"
                         points={points}
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="drop-shadow-lg"
                     />
 
-                    {/* Data Points */}
+                    {/* Data Points + Hover Tooltip + X Labels */}
                     {last7Days.map((d, i) => {
-                        const x = paddingX + (i / (last7Days.length - 1)) * chartWidth;
-                        const y = height - paddingY - (d.count / maxCount) * chartHeight;
+                        const x = paddingLeft + (i / (last7Days.length - 1)) * chartWidth;
+                        const y = toY(d.count);
                         return (
                             <g key={i} className="group/point">
-                                <circle cx={x} cy={y} r="4" className="fill-white dark:fill-gray-900 stroke-blue-500 stroke-2 group-hover/point:r-6 transition-all duration-300 cursor-pointer" />
-                                {/* Tooltip */}
-                                <g className="opacity-0 group-hover/point:opacity-100 transition-opacity duration-300">
-                                    <rect x={x - 15} y={y - 35} width="30" height="20" rx="4" className="fill-gray-800 dark:fill-gray-800 stroke-none" />
-                                    <text x={x} y={y - 21} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">
+                                {/* Larger invisible hit area for easy hover */}
+                                <circle cx={x} cy={y} r="14" fill="transparent" />
+                                {/* Visible dot */}
+                                <circle
+                                    cx={x} cy={y} r="4"
+                                    fill="white"
+                                    stroke="#3B82F6"
+                                    strokeWidth="2"
+                                    className="cursor-pointer"
+                                />
+                                {/* Hover tooltip with count */}
+                                <g className="opacity-0 group-hover/point:opacity-100 transition-opacity duration-150 pointer-events-none">
+                                    <rect x={x - 18} y={y - 36} width="36" height="22" rx="6" fill="#1e293b" />
+                                    <text x={x} y={y - 21} textAnchor="middle" fill="white" fontSize="11" fontWeight="700">
                                         {d.count}
                                     </text>
                                 </g>
-                                {/* X-Axis Labels */}
-                                <text x={x} y={height - paddingY + 24} textAnchor="middle" fontSize="12" fontWeight="500" className="fill-gray-500 dark:fill-gray-400">
+                                {/* X-axis day label */}
+                                <text
+                                    x={x}
+                                    y={height - 4}
+                                    textAnchor="middle"
+                                    fontSize="11"
+                                    fontWeight="500"
+                                    fill="#6b7280"
+                                >
                                     {d.dayName}
                                 </text>
                             </g>
@@ -335,7 +384,10 @@ const UserHomePage = () => {
 
     const dbStreak = userStats?.currentStreak || 0;
     const isStreakExpired = !hasSolvedToday && !hasSolvedYesterday && dbStreak > 0;
-    const effectiveStreak = (!hasSolvedToday && !hasSolvedYesterday) ? 0 : dbStreak;
+    // When streak just started today (no solve yesterday), cap to max(dbStreak, 1)
+    // When maintaining streak (solved today AND yesterday), use dbStreak from DB
+    // When expired (no solve today or yesterday), show 0
+    const effectiveStreak = isStreakExpired ? 0 : (!hasSolvedToday && !hasSolvedYesterday) ? 0 : dbStreak;
 
     // --- MASTERY LEVEL CALCULATION ---
     const MASTERY_LEVELS = [
@@ -601,7 +653,7 @@ const UserHomePage = () => {
 
                         {/* 1. Rank Card */}
                         {rankData ? (
-                            <TopUserStats rankData={rankData} />
+                            <TopUserStats rankData={rankData} userStats={userStats} />
                         ) : (
                                 <div className="bg-white dark:dark-glass rounded-2xl sm:rounded-3xl p-6 border border-gray-200 dark:border-white/10 text-center shadow-sm dark:shadow-none">
                                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
