@@ -19,9 +19,9 @@ for (const script of scripts) {
     console.log('----------------------------------------');
 
     try {
-        execSync(`node scripts/${script.file}`, {
+        execSync(`node scripts/course_and_topic_creation/${script.file}`, {
             stdio: 'inherit',
-            cwd: __dirname + '/..'
+            cwd: __dirname + '/../..'
         });
         totalSuccess++;
     } catch (error) {

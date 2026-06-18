@@ -17,9 +17,9 @@ async function run() {
     console.log('Connected to PostgreSQL');
 
     const filesToRun = [
-      'scripts/schema_complete_with_quizzes.sql',
-      'scripts/generate_quizzes.sql',
-      'scripts/generate_quiz_questions_fast.sql'
+      '../sql_migrations/schema_complete_with_quizzes.sql',
+      '../sql_migrations/generate_quizzes.sql',
+      '../sql_migrations/generate_quiz_questions_fast.sql'
     ];
 
     for (const file of filesToRun) {

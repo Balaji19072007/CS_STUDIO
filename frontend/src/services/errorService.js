@@ -72,6 +72,11 @@ export const ErrorType = {
 export const classifyError = (error) => {
   if (!error) return ErrorType.UNKNOWN;
 
+  // Manually thrown auth errors (e.g., from apiService refresh token failure)
+  if (error.message && error.message.toLowerCase().includes('refresh token')) {
+    return ErrorType.AUTH;
+  }
+
   // Network error (no response from server)
   if (error.code === 'ERR_NETWORK' || error.name === 'AbortError' || !error.response) {
     return ErrorType.NETWORK;

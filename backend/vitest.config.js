@@ -17,7 +17,7 @@ export default defineConfig({
         'config/**',
         'src/**',
       ],
-      exclude: ['src/scripts/**', 'src/test/**', '**/temp*/**', '**/node_modules/**'],
+      exclude: ['scripts/**', 'src/test/**', '**/temp*/**', '**/node_modules/**'],
       thresholds: {
         branches: 0,
         functions: 1,
