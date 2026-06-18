@@ -3,9 +3,9 @@ import { api } from '../utils/apiFetchWrapper.js';
 const API_BASE_URL = '/api/community';
 
 export const communityAPI = {
-    getAllDiscussions: () => api.get(API_BASE_URL),
+    getAllDiscussions: () => api.get(API_BASE_URL, undefined, { cache: 'no-store' }),
 
-    getDiscussionById: (id) => api.get(`${API_BASE_URL}/${id}`),
+    getDiscussionById: (id) => api.get(`${API_BASE_URL}/${id}`, undefined, { cache: 'no-store' }),
 
     createDiscussion: (data) => api.post(API_BASE_URL, data),
 

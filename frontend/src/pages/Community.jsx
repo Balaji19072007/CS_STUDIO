@@ -480,7 +480,7 @@ const Community = () => {
                                                 {discussion.author?.username && (
                                                     <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">@{discussion.author.username}</span>
                                                 )}
-                                                <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(discussion.createdAt).toLocaleDateString()}</span>
+                                                <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(discussion.created_at).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -617,7 +617,7 @@ const Community = () => {
                                         {selectedDiscussion.author?.username && (
                                             <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">@{selectedDiscussion.author.username}</span>
                                         )}
-                                        <span className="text-sm text-gray-400">{new Date(selectedDiscussion.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-sm text-gray-400">{new Date(selectedDiscussion.created_at).toLocaleDateString()}</span>
                                     </div>
                                 </div>
                                 <h2 className="text-xl md:text-3xl font-bold text-white mb-2 text-left">{selectedDiscussion.title}</h2>
@@ -681,7 +681,7 @@ const Community = () => {
                                                     {comment.author?.username && (
                                                         <span className="ml-1.5 text-xs text-primary-600 dark:text-primary-400">@{comment.author.username}</span>
                                                     )}
-                                                    <span className="ml-1.5 text-xs text-gray-500">• {new Date(comment.createdAt).toLocaleDateString()}</span>
+                                                    <span className="ml-1.5 text-xs text-gray-500">• {new Date(comment.created_at).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
                                         </div>
