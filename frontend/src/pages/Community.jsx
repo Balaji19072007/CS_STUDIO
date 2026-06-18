@@ -462,7 +462,7 @@ const Community = () => {
                                 iconType="default"
                                 title="No posts yet"
                                 description="Be the first to share something with the community!"
-                                action={<button className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium">Create Post</button>}
+                                action={<button onClick={() => isLoggedIn ? setShowCreateModal(true) : alert('Please login to start a discussion')} className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium">Create Post</button>}
                             />
                         ) : (
                             discussions.map(discussion => (
