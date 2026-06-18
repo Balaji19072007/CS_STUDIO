@@ -11,6 +11,7 @@ import { getEnrolledCourses } from '../api/courseApi.js';
 import { buildApiUrl } from '../config/api.js';
 import TopUserStats from '../components/TopUserStats.jsx';
 import { DashboardSkeleton } from '../components/common/SkeletonLoader.jsx';
+import SetUsernameModal from '../components/auth/SetUsernameModal.jsx';
 
 // Inline SVG Activity Graph Component
 const ActivityGraph = ({ history }) => {
@@ -431,6 +432,7 @@ const UserHomePage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:dark-gradient-secondary pt-6 sm:pt-8 pb-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+            <SetUsernameModal />
             <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
 
                 {/* --- HEADER --- */}

@@ -15,20 +15,26 @@ exports.getCurrentUser = async (req, res) => {
       .from('users')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Fetch user error:', error.message);
-      // If user is in Auth but not in public table (race condition?), try to return basic info
-      if (req.user) {
-        return res.json({
-          id: req.user.id,
-          email: req.user.email,
-          role: 'user', // Default
-          username: req.user.email.split('@')[0]
-        });
-      }
-      return res.status(404).json({ msg: 'User profile not found' });
+      return res.status(500).json({ msg: 'Server error' });
+    }
+
+    if (!user) {
+      // User is in Auth but not in public table (Google OAuth first login)
+      return res.json({
+        id: req.user.id,
+        email: req.user.email,
+        role: 'user',
+        needsUsername: true
+      });
+    }
+
+    // If user exists but lacks a username
+    if (!user.username) {
+        user.needsUsername = true;
     }
 
     res.json(user);
@@ -46,7 +52,7 @@ const xss = require('xss');
  * @access  Private
  */
 exports.updateProfile = async (req, res) => {
-  const { firstName, lastName, bio, removeProfilePicture } = req.body;
+  const { firstName, lastName, bio, removeProfilePicture, username } = req.body;
   const file = req.file;
   const userId = req.user.id;
 
@@ -56,14 +62,27 @@ exports.updateProfile = async (req, res) => {
     if (lastName !== undefined) updates.last_name = xss(lastName);
     if (bio !== undefined) updates.bio = xss(bio);
 
+    if (username) {
+        const cleanUsername = xss(username);
+        // Check if username is already taken by someone else
+        const { data: existingUsers } = await supabase
+            .from('users')
+            .select('id')
+            .ilike('username', cleanUsername)
+            .neq('id', userId)
+            .limit(1);
+            
+        if (existingUsers && existingUsers.length > 0) {
+            return res.status(400).json({ msg: 'Username is already taken' });
+        }
+        updates.username = cleanUsername;
+    }
+
     if (removeProfilePicture === 'true') {
       updates.photo_url = '';
-      // TODO: Handle cloudinary deletion if needed
     }
 
     if (file) {
-      // Cloudinary upload logic remains similar OR use Supabase Storage
-      // For minimal changes, we keep Cloudinary if configured in server.js
       const cloudinary = req.app.get('cloudinary');
       if (cloudinary) {
         const upload = () => new Promise((resolve, reject) => {
@@ -83,14 +102,31 @@ exports.updateProfile = async (req, res) => {
 
     updates.updated_at = new Date();
 
+    // Try to update first
     const { data, error } = await supabase
       .from('users')
       .update(updates)
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+
+    // If no row was updated, it means the user doesn't exist in public.users yet (Google OAuth)
+    if (!data) {
+        updates.id = userId;
+        updates.email = req.user.email;
+        updates.role = 'user';
+        
+        const { data: insertedData, error: insertError } = await supabase
+            .from('users')
+            .insert([updates])
+            .select()
+            .single();
+            
+        if (insertError) throw insertError;
+        return res.json(insertedData);
+    }
 
     res.json(data);
 
