@@ -184,8 +184,8 @@ const showToast = (type, message, action) => {
 
 // ─── Main Error Handler ──────────────────────────────────────────
 let errorCounts = new Map();
-const RATE_LIMIT_THRESHOLD = 0; // Allow 1 toast per window (count > 0 means rate limited)
-const RATE_LIMIT_WINDOW = 10000;
+const RATE_LIMIT_THRESHOLD = 2; // Allow 3 toasts per window (count > 2 means rate limited)
+const RATE_LIMIT_WINDOW = 5000;
 
 const isRateLimited = (key) => {
   const now = Date.now();
