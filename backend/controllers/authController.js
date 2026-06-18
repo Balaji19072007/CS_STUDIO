@@ -33,13 +33,12 @@ exports.getCurrentUser = async (req, res) => {
     }
 
     // If user exists but lacks a username OR has a default generated username
-    const isGeneratedUsername = user.username === user.email?.split('@')[0] || !user.username;
-    
-    // Check if the user signed up via Google and has a default/generated username
-    const isGoogleProvider = req.user?.app_metadata?.provider === 'google';
-
-    if (!user.username || (isGoogleProvider && isGeneratedUsername)) {
+    const emailPrefix = user.email ? user.email.split('@')[0].toLowerCase().trim() : '';
+    const currentUsername = user.username ? user.username.toLowerCase().trim() : '';
+    const isGeneratedUsername = !currentUsername || currentUsername === emailPrefix;
+    if (isGeneratedUsername) {
         user.needsUsername = true;
+        user.username = ''; // Clear it so frontend doesn't show the auto-generated one
     }
 
     res.json(user);
