@@ -47,25 +47,33 @@ exports.updateProgress = async (req, res) => {
 
         if (error) throw error;
 
-        // Trigger atomic user stats update
-        if (isSolved) {
-            await supabase.rpc('increment_user_stats', {
-                p_user_id: userId,
-                p_solved_inc: 1,
-                p_points_inc: accuracy >= 100 ? 100 : Math.round((accuracy || 0) * 10),
-            });
-        }
-
-        // Always recalculate average accuracy
+        // Calculate all stats from absolute truth (progress table)
         try {
-            const { data: allUserProgress } = await supabase.from('progress').select('best_accuracy').eq('user_id', userId).lt('problem_id', 1001);
+            const { data: allUserProgress } = await supabase.from('progress')
+                .select('best_accuracy, status')
+                .eq('user_id', userId)
+                .lt('problem_id', 1001);
+                
             if (allUserProgress && allUserProgress.length > 0) {
-                const sumAcc = allUserProgress.reduce((sum, p) => sum + (p.best_accuracy || 0), 0);
+                let solvedCount = 0;
+                let totalPts = 0;
+                const sumAcc = allUserProgress.reduce((sum, p) => {
+                    if (p.status === 'solved') {
+                        solvedCount++;
+                        totalPts += (p.best_accuracy >= 100) ? 100 : Math.round((p.best_accuracy || 0) * 10);
+                    }
+                    return sum + (p.best_accuracy || 0);
+                }, 0);
                 const avgAcc = sumAcc / allUserProgress.length;
-                await supabase.from('users').update({ average_accuracy: avgAcc }).eq('id', userId);
+                
+                await supabase.from('users').update({ 
+                    average_accuracy: avgAcc,
+                    problems_solved: solvedCount,
+                    total_points: totalPts
+                }).eq('id', userId);
             }
         } catch (accErr) {
-            console.error('Failed to update average accuracy:', accErr);
+            console.error('Failed to update user stats:', accErr);
         }
 
         res.json({
