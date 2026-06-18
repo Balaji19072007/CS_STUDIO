@@ -84,7 +84,9 @@ exports.getUserRank = async (req, res) => {
             });
         }
 
-        if (!rank) rank = 1001;
+        if (!rank) {
+            rank = currentUser.role === 'admin' ? 'Admin' : 1001;
+        }
 
         res.json({
             success: true,
@@ -95,6 +97,7 @@ exports.getUserRank = async (req, res) => {
                 firstName: currentUser.first_name,
                 lastName: currentUser.last_name,
                 username: currentUser.username,
+                role: currentUser.role,
                 problemsSolved: currentUser.problems_solved,
                 totalPoints: currentUser.total_points,
                 currentStreak: currentUser.current_streak,
