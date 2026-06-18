@@ -232,7 +232,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             return res.status(401).json({ msg: 'User not authorized' });
         }
 
-        await supabase.from('discussions').delete().eq('id', req.params.id);
+        const { error: deleteError } = await supabase.from('discussions').delete().eq('id', req.params.id);
+
+        if (deleteError) {
+            console.error('Delete Error:', deleteError);
+            return res.status(500).json({ msg: 'Failed to delete discussion' });
+        }
 
         res.json({ msg: 'Discussion removed' });
     } catch (err) {

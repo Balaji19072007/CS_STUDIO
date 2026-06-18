@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { SkeletonDashboard } from '../components/common/SkeletonLoader';
 import EmptyState from '../components/common/EmptyState';
 import { ErrorPage } from '../components/common/ErrorPages';
+import { toast } from 'sonner';
 
 
 // ─────────────────────────────────────────────
@@ -407,9 +408,10 @@ const Community = () => {
             }
             setShowDeleteModal(false);
             setDiscussionToDelete(null);
+            toast.success("Message deleted successfully");
         } catch (err) {
             console.error(err);
-            alert("Failed to delete discussion.");
+            toast.error("Failed to delete discussion.");
         }
     };
 
