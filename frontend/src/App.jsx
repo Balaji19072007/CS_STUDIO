@@ -68,6 +68,9 @@ import RouteTransition from './components/common/RouteTransition.jsx';
 import NavigationProgress from './components/common/NavigationProgress.jsx';
 import { NavigationProgressProvider } from './hooks/useNavigationProgress.jsx';
 
+// Auth Components
+import SetUsernameModal from './components/auth/SetUsernameModal.jsx';
+
 function App() {
   return (
     <ErrorBoundary>
@@ -140,6 +143,9 @@ function AppContent() {
 
       {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve page */}
       {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
+
+      {/* Global Modals */}
+      <SetUsernameModal />
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
       {!(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
