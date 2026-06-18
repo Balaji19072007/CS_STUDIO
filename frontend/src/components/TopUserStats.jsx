@@ -10,7 +10,8 @@ const TopUserStats = ({ rankData, userStats }) => {
 
     const solved = userStats?.problemsSolved ?? user.problemsSolved ?? 0;
     const points = userStats?.totalPoints ?? user.totalPoints ?? 0;
-    const accuracy = userStats?.averageAccuracy ?? user.averageAccuracy ?? Math.round(userStats?.accuracy || user.accuracy || 0);
+    const rawAccuracy = userStats?.averageAccuracy ?? user.averageAccuracy ?? Math.round(userStats?.accuracy || user.accuracy || 0);
+    const accuracy = Number(rawAccuracy).toFixed(1);
 
     return (
         <div className="mb-8">

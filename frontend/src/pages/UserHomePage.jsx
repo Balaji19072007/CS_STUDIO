@@ -31,16 +31,18 @@ const ActivityGraph = ({ history }) => {
 
     if (history) {
         history.forEach(item => {
-            const dateVal = item.solvedAt || item.lastSubmission;
-            if (dateVal) {
-                const dateObj = new Date(dateVal);
-                if (!isNaN(dateObj.getTime())) {
-                    const year = dateObj.getFullYear();
-                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const day = String(dateObj.getDate()).padStart(2, '0');
-                    const dateKey = `${year}-${month}-${day}`;
-                    const dayStat = last7Days.find(d => d.date === dateKey);
-                    if (dayStat) dayStat.count++;
+            if (item.status === 'solved') {
+                const dateVal = item.solvedAt || item.lastSubmission;
+                if (dateVal) {
+                    const dateObj = new Date(dateVal);
+                    if (!isNaN(dateObj.getTime())) {
+                        const year = dateObj.getFullYear();
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const dateKey = `${year}-${month}-${day}`;
+                        const dayStat = last7Days.find(d => d.date === dateKey);
+                        if (dayStat) dayStat.count++;
+                    }
                 }
             }
         });
