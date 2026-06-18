@@ -480,6 +480,24 @@ const Settings = () => {
                                                 <p className="ml-1 text-[10px] uppercase font-bold tracking-wider text-gray-400 dark:text-gray-500">Registered Email (Cannot be changed)</p>
                                             </div>
 
+                                            {/* Username */}
+                                            <div className="space-y-2">
+                                                <label htmlFor="username" className="block text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Username</label>
+                                                <div className="relative">
+                                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                        <User className="w-5 h-5" />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        id="username"
+                                                        value={user.username || ''}
+                                                        className="w-full pl-12 pr-4 py-3.5 bg-gray-100/50 dark:bg-gray-800/50 border-2 border-transparent rounded-2xl text-gray-500 dark:text-gray-500 font-medium cursor-not-allowed"
+                                                        disabled
+                                                    />
+                                                </div>
+                                                <p className="ml-1 text-[10px] uppercase font-bold tracking-wider text-gray-400 dark:text-gray-500">Unique Username (Cannot be changed)</p>
+                                            </div>
+
                                             {/* Bio */}
                                             <div className="space-y-2">
                                                 <label htmlFor="bio" className="block text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Bio</label>
