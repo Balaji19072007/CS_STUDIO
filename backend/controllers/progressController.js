@@ -56,6 +56,18 @@ exports.updateProgress = async (req, res) => {
             });
         }
 
+        // Always recalculate average accuracy
+        try {
+            const { data: allUserProgress } = await supabase.from('progress').select('best_accuracy').eq('user_id', userId).lt('problem_id', 1001);
+            if (allUserProgress && allUserProgress.length > 0) {
+                const sumAcc = allUserProgress.reduce((sum, p) => sum + (p.best_accuracy || 0), 0);
+                const avgAcc = sumAcc / allUserProgress.length;
+                await supabase.from('users').update({ average_accuracy: avgAcc }).eq('id', userId);
+            }
+        } catch (accErr) {
+            console.error('Failed to update average accuracy:', accErr);
+        }
+
         res.json({
             success: true,
             progress: {
