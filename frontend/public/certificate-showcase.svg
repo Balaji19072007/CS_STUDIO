@@ -1,45 +1,4 @@
-import { jsPDF } from 'jspdf';
-
-const escapeXml = (value = '') =>
-  String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-
-export const formatCertificateDate = (value) => {
-  const d = value ? new Date(value) : new Date();
-  if (isNaN(d.getTime())) return new Date().toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}/${mm}/${dd}`;
-};
-
-export const buildCertificateFileName = (certificate) => {
-  const slug = (certificate?.courseTitle || 'course').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  return `${slug || 'course'}-certificate`;
-};
-
-function getStampBumps(cx, cy, R, r, N, color) {
-  let s = '';
-  for (let i = 0; i < N; i++) {
-    const a = (i / N) * 2 * Math.PI;
-    const x = (cx + R * Math.cos(a)).toFixed(1);
-    const y = (cy + R * Math.sin(a)).toFixed(1);
-    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" filter="url(#distress)"/>`;
-  }
-  return s;
-}
-
-export const buildCertificateSvg = (certificate) => {
-  const learner   = escapeXml(certificate?.userName    || 'CS Studio Learner');
-  const course    = escapeXml(certificate?.courseTitle || 'Course Completion');
-  const issuedOn  = escapeXml(formatCertificateDate(certificate?.issuedAt));
-  const certId    = escapeXml(certificate?.certificateId || certificate?.id || 'N/A');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="100%" height="100%" viewBox="0 0 3300 2550"
      style="background-color: #F8F9FA;"
@@ -99,13 +58,13 @@ export const buildCertificateSvg = (certificate) => {
 
   <!-- Name -->
   <g transform="translate(350, 1150)">
-    <text class="name" x="0" y="0">${learner}</text>
+    <text class="name" x="0" y="0">System Admin</text>
   </g>
 
   <!-- Description -->
   <g transform="translate(350, 1300)">
     <text class="desc" x="0" y="0">This certificate is proudly presented to acknowledge the successful</text>
-    <text class="desc" x="0" y="70">completion of the course <tspan font-weight="bold" fill="#333333">${course}</tspan>.</text>
+    <text class="desc" x="0" y="70">completion of the course <tspan font-weight="bold" fill="#333333">Introduction to C Programming</tspan>.</text>
     <text class="desc" x="0" y="140">Your dedication and hard work have yielded excellent results.</text>
   </g>
 
@@ -113,9 +72,9 @@ export const buildCertificateSvg = (certificate) => {
   <!-- DATE & ID -->
   <g transform="translate(350, 1850)">
     <text class="label" x="0" y="0">DATE</text>
-    <text class="value" x="0" y="70">${issuedOn}</text>
+    <text class="value" x="0" y="70">2026/06/19</text>
     <text class="label" x="0" y="180">ID</text>
-    <text class="value" x="0" y="250">${certId}</text>
+    <text class="value" x="0" y="250">CST-20260619-ADMIN01</text>
   </g>
 
   <!-- SIGNATURE -->
@@ -126,7 +85,7 @@ export const buildCertificateSvg = (certificate) => {
     <line x1="-50" y1="210" x2="450" y2="210" stroke="#333" stroke-width="3"/>
     
     <g transform="translate(420, 150) rotate(-10)" opacity="0.92">
-      ${getStampBumps(0, 0, 200, 10, 40, '#110CA6')}
+      <circle cx="200.0" cy="0.0" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="197.5" cy="31.3" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="190.2" cy="61.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="178.2" cy="90.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="161.8" cy="117.6" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="141.4" cy="141.4" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="117.6" cy="161.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="90.8" cy="178.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="61.8" cy="190.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="31.3" cy="197.5" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="0.0" cy="200.0" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-31.3" cy="197.5" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-61.8" cy="190.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-90.8" cy="178.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-117.6" cy="161.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-141.4" cy="141.4" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-161.8" cy="117.6" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-178.2" cy="90.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-190.2" cy="61.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-197.5" cy="31.3" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-200.0" cy="0.0" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-197.5" cy="-31.3" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-190.2" cy="-61.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-178.2" cy="-90.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-161.8" cy="-117.6" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-141.4" cy="-141.4" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-117.6" cy="-161.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-90.8" cy="-178.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-61.8" cy="-190.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-31.3" cy="-197.5" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="-0.0" cy="-200.0" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="31.3" cy="-197.5" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="61.8" cy="-190.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="90.8" cy="-178.2" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="117.6" cy="-161.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="141.4" cy="-141.4" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="161.8" cy="-117.6" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="178.2" cy="-90.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="190.2" cy="-61.8" r="10" fill="#110CA6" filter="url(#distress)"/><circle cx="197.5" cy="-31.3" r="10" fill="#110CA6" filter="url(#distress)"/>
       <circle cx="0" cy="0" r="180" fill="none" stroke="#110CA6" stroke-width="8" filter="url(#distress)"/>
       <circle cx="0" cy="0" r="160" fill="none" stroke="#110CA6" stroke-width="3" filter="url(#distress)"/>
       
@@ -152,92 +111,4 @@ export const buildCertificateSvg = (certificate) => {
       <path d="M120,0 L140,0 M130,-10 L130,10" stroke="#110CA6" stroke-width="3" filter="url(#distress)"/>
     </g>
   </g>
-</svg>`;
-};
-
-// Simple approach using standard browser PDF generation via iframe print (preserves vector quality and fonts perfectly)
-export const downloadCertificateAsPdf = (certificate) => {
-  const svg = buildCertificateSvg(certificate);
-  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  
-  // We use the browser's native print-to-PDF which handles custom fonts and vector SVGs beautifully
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  
-  iframe.onload = () => {
-    try {
-      iframe.contentWindow.print();
-    } catch (e) {
-      console.error('Error printing certificate', e);
-    }
-    // Cleanup
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-      URL.revokeObjectURL(url);
-    }, 2000);
-  };
-  
-  // Create a minimal HTML document to wrap the SVG so it scales to fit the printed page exactly
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <style>
-          @page { size: landscape; margin: 0; }
-          body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #F8F9FA; }
-          svg { width: 100%; height: 100%; object-fit: contain; }
-        </style>
-      </head>
-      <body>${svg}</body>
-    </html>
-  `;
-  
-  iframe.srcdoc = htmlContent;
-  document.body.appendChild(iframe);
-};
-
-// Rasterized jsPDF approach (Fallback if native print is not preferred)
-export const downloadCertificateAsJspdf = async (certificate) => {
-  const svgString = buildCertificateSvg(certificate);
-  const width = 3300;
-  const height = 2550;
-  
-  const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  
-  const img = new Image();
-  img.crossOrigin = "Anonymous";
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#F8F9FA'; 
-    ctx.fillRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
-    URL.revokeObjectURL(url);
-    
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'pt',
-      format: [width, height]
-    });
-    
-    pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
-    pdf.save(buildCertificateFileName(certificate) + '.pdf');
-  };
-  img.src = url;
-};
-
-// We will use the jspdf approach as primary, but if fonts fail, they can rely on SVG download.
-export const downloadCertificate = (certificate) => {
-  downloadCertificateAsJspdf(certificate);
-};
+</svg>
