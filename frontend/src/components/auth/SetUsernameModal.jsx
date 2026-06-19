@@ -61,7 +61,11 @@ const SetUsernameModal = () => {
         }
     };
 
-    if (!user || !user.needsUsername) return null;
+    const emailPrefix = user?.email ? user.email.split('@')[0].toLowerCase() : '';
+    const isGeneratedUsername = !user?.username || user?.username.toLowerCase() === emailPrefix;
+    const shouldShow = user && (user.needsUsername || isGeneratedUsername);
+
+    if (!shouldShow) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">

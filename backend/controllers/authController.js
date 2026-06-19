@@ -35,7 +35,10 @@ exports.getCurrentUser = async (req, res) => {
     // If user exists but lacks a username OR has a default generated username
     const emailPrefix = user.email ? user.email.split('@')[0].toLowerCase().trim() : '';
     const currentUsername = user.username ? user.username.toLowerCase().trim() : '';
-    const isGeneratedUsername = !currentUsername || currentUsername === emailPrefix;
+    const isGeneratedUsername = !currentUsername || 
+                                currentUsername === emailPrefix || 
+                                currentUsername === (user.email ? user.email.toLowerCase().trim() : '');
+    
     if (isGeneratedUsername) {
         user.needsUsername = true;
         user.username = ''; // Clear it so frontend doesn't show the auto-generated one

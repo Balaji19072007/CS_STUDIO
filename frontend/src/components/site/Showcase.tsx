@@ -78,17 +78,20 @@ export function Showcase() {
                   ))}
                 </div>
               </div>
-              <div className="relative">
-                <div className="rounded-2xl border border-white/5 bg-[#0B1527] p-6 h-72 grid place-items-center text-center shadow-lg">
-                  <div>
-                    {tab === "ide" ? (
-                      <div className="mx-auto text-4xl text-[#8B5CF6] mb-4 font-mono">{">_"}</div>
-                    ) : (
-                      <active.icon className="mx-auto h-12 w-12 text-[#8B5CF6] mb-4" />
-                    )}
-                    <p className="text-sm text-[#8F9BB3]">Interactive {active.label.toLowerCase()} preview</p>
+              <div className="relative h-72">
+                {["ide", "ch", "co"].includes(tab) ? (
+                  <div className="w-full h-full rounded-2xl border border-white/5 bg-[#0B1527] shadow-lg overflow-hidden">
+                    <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'ch' ? 'challenges' : 'community'}-light.png`} alt={`${active.label} Light`} className="w-full h-full object-cover object-left-top dark:hidden block" />
+                    <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'ch' ? 'challenges' : 'community'}-dark.png`} alt={`${active.label} Dark`} className="w-full h-full object-cover object-left-top hidden dark:block" />
                   </div>
-                </div>
+                ) : (
+                  <div className="w-full h-full rounded-2xl border border-white/5 bg-[#0B1527] p-6 grid place-items-center text-center shadow-lg">
+                    <div>
+                      <active.icon className="mx-auto h-12 w-12 text-[#8B5CF6] mb-4" />
+                      <p className="text-sm text-[#8F9BB3]">Interactive {active.label.toLowerCase()} preview</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
