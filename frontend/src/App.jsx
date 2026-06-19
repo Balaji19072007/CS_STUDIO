@@ -24,6 +24,7 @@ import MobileBottomNav from './components/common/MobileBottomNav.jsx';
 // Lazy-loaded page components for code splitting
 const Home = lazy(() => import('./pages/Home.jsx'));
 const UserHomePage = lazy(() => import('./pages/UserHomePage.jsx'));
+const Workspace = lazy(() => import('./pages/Workspace/Workspace.jsx'));
 
 const SignIn = lazy(() => import('./pages/SignIn.jsx'));
 const SignUp = lazy(() => import('./pages/SignUp.jsx'));
@@ -141,20 +142,20 @@ function AppContent() {
         Skip to main content
       </a>
 
-      {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve page */}
-      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
+      {/* Mobile Top Bar - Only visible on mobile when logged in - Hidden on Solve/Workspace pages */}
+      {isLoggedIn && !location.pathname.startsWith('/workspace') && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileTopBar />}
 
       {/* Global Modals */}
       <SetUsernameModal />
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
-      {!(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
+      {!location.pathname.startsWith('/workspace') && !(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
 
       <main
         id="main-content"
         tabIndex={-1}
-        className={`flex-grow flex flex-col ${location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0' : 'pt-14 lg:pt-16')} pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden`}
-        style={{ minHeight: '60vh' }}
+        className={`flex-grow flex flex-col \${location.pathname.startsWith('/workspace') ? 'p-0 h-screen overflow-hidden' : (location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden' : 'pt-14 lg:pt-16 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden'))}`}
+        style={location.pathname.startsWith('/workspace') ? {} : { minHeight: '60vh' }}
       >
 
         <AnimatePresence mode="wait">
@@ -404,6 +405,17 @@ function AppContent() {
             </ProtectedRoute>
             </DashboardErrorBoundary>
           } />
+          <Route path="/workspace" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Workspace />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
+            </DashboardErrorBoundary>
+          } />
           <Route path="/code-verification" element={
             <DashboardErrorBoundary>
             <ProtectedRoute>
@@ -517,6 +529,7 @@ function AppContent() {
         location.pathname !== '/signin' &&
         location.pathname !== '/signup' &&
         location.pathname !== '/code' &&
+        !location.pathname.startsWith('/workspace') &&
         location.pathname !== '/settings' &&
         location.pathname !== '/problems' &&
         location.pathname !== '/my-progress' &&
@@ -524,10 +537,10 @@ function AppContent() {
         !(location.pathname === '/' && !isLoggedIn) &&
         <CodeEditorFloatingIcon />}
 
-      {location.pathname !== '/' && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/courses') && <Footer />}
+      {location.pathname !== '/' && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && !location.pathname.startsWith('/workspace') && !location.pathname.startsWith('/courses') && <Footer />}
 
       {/* Mobile Bottom Navigation - Only visible on mobile when logged in */}
-      {isLoggedIn && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
+      {isLoggedIn && !location.pathname.startsWith('/workspace') && !location.pathname.startsWith('/solve') && !location.pathname.startsWith('/challenge') && !location.pathname.startsWith('/course-challenge') && !location.pathname.startsWith('/course-project') && <MobileBottomNav />}
     </div>
     </NavigationProgressProvider>
     </>
