@@ -742,8 +742,10 @@ const UserHomePage = () => {
                                     </Link>
                                 </div>
                                 <div className="space-y-2 sm:space-y-3">
-                                    {recommendedProblems.map((problem, index) => (
-                                        <Link key={problem.problemId || index} to={`/solve?problemId=${problem.problemId}`} state={{ from: '/' }} className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-xl sm:rounded-2xl transition-all group">
+                                    {recommendedProblems.map((problem, index) => {
+                                        const actualProblemId = problem.id || problem.problemId;
+                                        return (
+                                        <Link key={actualProblemId || index} to={`/solve?problemId=${actualProblemId}`} state={{ from: '/' }} className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-xl sm:rounded-2xl transition-all group">
                                             <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
                                                 <div className={`w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm shadow-inner ${problem.difficulty === 'Easy' ? 'bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500' :
                                                     problem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500' :
@@ -752,7 +754,7 @@ const UserHomePage = () => {
                                                     {problem.difficulty ? problem.difficulty[0] : '?'}
                                                 </div>
                                                 <div className="overflow-hidden min-w-0">
-                                                    <h3 className="text-gray-900 dark:text-white font-bold text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{problem.title}</h3>
+                                                    <h3 className="text-gray-900 dark:text-white font-bold text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">#{actualProblemId} {problem.title}</h3>
                                                     <p className="text-xs text-gray-500 dark:text-gray-500 truncate">{problem.category || 'General'}</p>
                                                 </div>
                                             </div>
@@ -760,7 +762,8 @@ const UserHomePage = () => {
                                                 <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 dark:text-gray-500 group-hover:text-white" />
                                             </div>
                                         </Link>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}

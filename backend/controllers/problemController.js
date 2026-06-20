@@ -527,22 +527,81 @@ exports.getDailyProblem = async (req, res) => {
 };
 
 exports.getRecommendedProblems = async (req, res) => {
-    // Basic implementation: Random 3 unsolved
     try {
         const userId = req.user.id;
-        const { data: solved } = await supabase.from('progress').select('problem_id').eq('user_id', userId).eq('status', 'solved');
+        
+        // 1. Fetch solved problem IDs
+        const { data: solved } = await supabase
+            .from('progress')
+            .select('problem_id')
+            .eq('user_id', userId)
+            .eq('status', 'solved');
+        
         const solvedIds = solved ? solved.map(s => s.problem_id) : [];
 
-        // Not 'in' solvedIds
-        let query = supabase.from('problems').select('*').limit(3);
-        if (solvedIds.length > 0) {
-            query = query.not('id', 'in', `(${solvedIds.join(',')})`);
+        // 2. Fetch problems (only basic info needed to decide)
+        const { data: allProblems, error: probErr } = await supabase
+            .from('problems')
+            .select('id, title, difficulty, category')
+            .eq('is_course_problem', false);
+
+        if (probErr || !allProblems) return res.status(500).json([]);
+
+        const solvedProblems = allProblems.filter(p => solvedIds.includes(p.id));
+        const unsolvedProblems = allProblems.filter(p => !solvedIds.includes(p.id));
+
+        const diffMap = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+        let recommended = [];
+
+        // Determine highest difficulty solved
+        let maxSolvedDiff = 0;
+        for (const sp of solvedProblems) {
+            const level = diffMap[sp.difficulty] || 1;
+            if (level > maxSolvedDiff) {
+                maxSolvedDiff = level;
+            }
         }
 
-        const { data: recommended } = await query;
-        res.json(recommended || []);
+        if (maxSolvedDiff === 0) {
+            // New user: pick 3 Easy problems randomly
+            const easyUnsolved = unsolvedProblems.filter(p => p.difficulty === 'Easy');
+            easyUnsolved.sort(() => 0.5 - Math.random());
+            recommended = easyUnsolved.slice(0, 3);
+        } else {
+            // User has solved something. Look for simpler unsolved problems first.
+            const simplerUnsolved = unsolvedProblems.filter(p => (diffMap[p.difficulty] || 1) < maxSolvedDiff);
+            const sameUnsolved = unsolvedProblems.filter(p => (diffMap[p.difficulty] || 1) === maxSolvedDiff);
+            const harderUnsolved = unsolvedProblems.filter(p => (diffMap[p.difficulty] || 1) > maxSolvedDiff);
+            
+            simplerUnsolved.sort(() => 0.5 - Math.random());
+            sameUnsolved.sort(() => 0.5 - Math.random());
+            harderUnsolved.sort(() => 0.5 - Math.random());
+
+            // Add simpler problems first
+            recommended.push(...simplerUnsolved.slice(0, 3));
+            
+            // If we need more, add same difficulty
+            if (recommended.length < 3) {
+                recommended.push(...sameUnsolved.slice(0, 3 - recommended.length));
+            }
+
+            // If we STILL need more, add harder
+            if (recommended.length < 3) {
+                recommended.push(...harderUnsolved.slice(0, 3 - recommended.length));
+            }
+        }
+
+        // Fallback: If we still don't have 3, pick from any remaining unsolved
+        if (recommended.length < 3) {
+            const others = unsolvedProblems.filter(p => !recommended.some(r => r.id === p.id));
+            others.sort(() => 0.5 - Math.random());
+            recommended.push(...others.slice(0, 3 - recommended.length));
+        }
+
+        res.json(recommended);
 
     } catch (err) {
+        console.error('getRecommendedProblems error:', err.message);
         res.status(500).json([]);
     }
 };

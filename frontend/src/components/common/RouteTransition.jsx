@@ -98,6 +98,7 @@ export default function RouteTransition({ children, variant: explicitVariant }) 
       animate="animate"
       exit="exit"
       variants={variants[variant]}
+      className="w-full flex-grow"
     >
       {children}
     </motion.div>

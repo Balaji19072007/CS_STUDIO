@@ -117,7 +117,9 @@ const Problems = () => {
             const matchesLanguage = currentFilters.language === 'All' || problem.language === currentFilters.language;
 
             const searchLower = currentFilters.search.toLowerCase();
+            const searchClean = searchLower.replace(/^#/, '').trim();
             const matchesSearch = !searchLower ||
+                String(problem.problemId || problem.id) === searchClean ||
                 problem.title.toLowerCase().includes(searchLower) ||
                 (problem.tags && problem.tags.some(tag => tag.toLowerCase().includes(searchLower))) ||
                 (problem.difficulty && problem.difficulty.toLowerCase().includes(searchLower));
@@ -182,7 +184,7 @@ const Problems = () => {
     if (isLoading) return <ProblemsSkeleton />;
 
     return (
-        <div className="min-h-screen dark-gradient-secondary">
+        <div className="w-full min-h-screen dark-gradient-secondary block">
             {/* Hero Section - Minimal */}
             <div className="pt-24 pb-12 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

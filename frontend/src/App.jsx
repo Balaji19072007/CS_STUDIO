@@ -154,7 +154,7 @@ function AppContent() {
       <main
         id="main-content"
         tabIndex={-1}
-        className={`flex-grow flex flex-col \${location.pathname.startsWith('/workspace') ? 'p-0 h-screen overflow-hidden' : (location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden' : 'pt-14 lg:pt-16 pb-24 sm:pb-0 max-w-[100vw] overflow-x-hidden'))}`}
+        className={`flex-grow ${location.pathname.startsWith('/workspace') ? 'flex flex-col p-0 h-screen overflow-hidden' : (location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16 pb-24 sm:pb-0' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0 pb-24 sm:pb-0' : 'pt-14 lg:pt-16 pb-24 sm:pb-0'))}`}
         style={location.pathname.startsWith('/workspace') ? {} : { minHeight: '60vh' }}
       >
 
