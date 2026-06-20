@@ -335,6 +335,77 @@ const TopicContent = ({
         return null;
     };
 
+    const renderFormattedText = (rawText) => {
+        if (!rawText) return null;
+        
+        const lines = rawText.split(/\r\n|\r|\n/).map(l => l.trim()).filter(Boolean);
+        
+        const sectionKeywords = [
+            'definition', 'features', 'applications', 
+            'advantages', 'disadvantages', 'syntax', 
+            'example', 'steps', 'what is needed'
+        ];
+
+        return (
+            <div className="flex flex-col" style={{ gap: '24px' }}>
+                {lines.map((line, lineIndex) => {
+                    const parts = line.split('•').map(p => p.trim());
+                    
+                    if (parts.length > 1) {
+                        const firstPart = parts[0];
+                        const listItems = parts.slice(1).filter(Boolean);
+                        
+                        const plainText = firstPart.replace(/<[^>]+>/g, '').trim().toLowerCase();
+                        const isHeading = plainText && sectionKeywords.some(keyword => plainText.startsWith(keyword));
+                        
+                        return (
+                            <div key={lineIndex} className="flex flex-col">
+                                {firstPart && (
+                                    isHeading ? (
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white" style={{ marginBottom: '12px' }}>
+                                            <span dangerouslySetInnerHTML={{ __html: firstPart.replace(/:\s*$/, '') }} />
+                                        </h3>
+                                    ) : (
+                                        <p className="text-lg tracking-wide text-gray-800 dark:text-gray-200" style={{ lineHeight: '1.7', marginBottom: '12px' }}>
+                                            <span dangerouslySetInnerHTML={{ __html: firstPart }} />
+                                        </p>
+                                    )
+                                )}
+                                {listItems.length > 0 && (
+                                    <ul className="list-none m-0 p-0 flex flex-col gap-2">
+                                        {listItems.map((item, idx) => (
+                                            <li key={idx} className="flex items-start gap-3">
+                                                <span className="mt-1 flex-shrink-0 text-blue-500 font-bold text-lg">•</span>
+                                                <span className="text-lg tracking-wide text-gray-800 dark:text-gray-200" style={{ lineHeight: '1.8' }} dangerouslySetInnerHTML={{ __html: item }} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        );
+                    } else {
+                        const plainText = line.replace(/<[^>]+>/g, '').trim().toLowerCase();
+                        const isHeading = plainText.length < 100 && sectionKeywords.some(keyword => plainText.startsWith(keyword));
+                        
+                        if (isHeading) {
+                            return (
+                                <h3 key={lineIndex} className="text-2xl font-bold text-gray-900 dark:text-white" style={{ marginBottom: '12px' }}>
+                                    <span dangerouslySetInnerHTML={{ __html: line.replace(/:\s*$/, '') }} />
+                                </h3>
+                            );
+                        }
+                        
+                        return (
+                            <p key={lineIndex} className="text-lg tracking-wide text-gray-800 dark:text-gray-200" style={{ lineHeight: '1.7' }}>
+                                <span dangerouslySetInnerHTML={{ __html: line }} />
+                            </p>
+                        );
+                    }
+                })}
+            </div>
+        );
+    };
+
     const renderContentBlock = (block) => {
         const codeText = extractCodeText(block.content_text);
 
@@ -343,17 +414,15 @@ const TopicContent = ({
                 return (
                     <div key={block.id} className="mb-8">
                         <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">Definition</h3>
-                        <p className="text-lg font-light leading-relaxed text-gray-800 dark:text-gray-200 sm:text-xl">{block.content_text}</p>
+                        {renderFormattedText(block.content_text)}
                     </div>
                 );
 
             case 'explanation':
                 return (
-                    <div 
-                        key={block.id} 
-                        className="mb-8 text-lg font-light leading-loose tracking-wide text-gray-800 dark:text-gray-200"
-                        dangerouslySetInnerHTML={{ __html: block.content_text }}
-                    />
+                    <div key={block.id} className="mb-8">
+                        {renderFormattedText(block.content_text)}
+                    </div>
                 );
 
             case 'syntax': {
@@ -490,8 +559,8 @@ const TopicContent = ({
 
             default:
                 return (
-                    <div key={block.id} className="text-slate-800 font-medium dark:text-gray-300 transition-colors">
-                        <p>{block.content_text}</p>
+                    <div key={block.id} className="mb-8 transition-colors">
+                        {renderFormattedText(block.content_text)}
                     </div>
                 );
         }
