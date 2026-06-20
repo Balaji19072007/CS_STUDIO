@@ -203,18 +203,18 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
     <div className="flex-1 flex overflow-hidden min-h-0">
 
       {/* ── LEFT: Editor ── */}
-      <div className="w-1/2 flex flex-col min-w-0" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', background: '#0d1117' }}>
+      <div className="w-1/2 flex flex-col min-w-0" style={{ borderRight: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0', background: isDark ? '#0d1117' : '#ffffff' }}>
 
         {/* Tab bar */}
-        <div className="flex items-center overflow-x-auto flex-shrink-0" style={{ minHeight: 40, background: '#111827', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center overflow-x-auto flex-shrink-0" style={{ minHeight: 40, background: isDark ? '#111827' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' }}>
           {files.map(f => (
             <button
               key={f.name}
               onClick={() => setActiveFile(f.name)}
               className="group relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-all border-b-2"
               style={activeFile === f.name
-                ? { background: '#0d1117', color: '#60a5fa', borderBottomColor: '#3B82F6' }
-                : { borderBottomColor: 'transparent', color: 'rgba(255,255,255,0.4)' }
+                ? { background: isDark ? '#0d1117' : '#ffffff', color: isDark ? '#60a5fa' : '#2563eb', borderBottomColor: isDark ? '#3B82F6' : '#3B82F6' }
+                : { borderBottomColor: 'transparent', color: isDark ? 'rgba(255,255,255,0.4)' : '#94a3b8' }
               }
             >
               {getIcon(f.type)}
@@ -264,7 +264,7 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
               }}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-3" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <div className="flex flex-col items-center justify-center h-full gap-3" style={{ color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.3)' }}>
               <FilePlus className="w-10 h-10" />
               <p className="text-sm">No file open. Create one to start.</p>
               <button
@@ -278,18 +278,18 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
       </div>
 
       {/* ── RIGHT: Preview + Console ── */}
-      <div className="w-1/2 flex flex-col min-w-0" style={{ background: '#0a0f1a' }}>
+      <div className="w-1/2 flex flex-col min-w-0" style={{ background: isDark ? '#0a0f1a' : '#f1f5f9' }}>
 
         {/* Preview toolbar */}
-        <div className="flex items-center justify-between px-3 py-2 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#111827' }}>
-          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>Live Preview</span>
+        <div className="flex items-center justify-between px-3 py-2 flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #cbd5e1', background: isDark ? '#111827' : '#e2e8f0' }}>
+          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(15,23,42,0.5)' }}>Live Preview</span>
 
           <div className="flex items-center gap-1.5">
-            <button onClick={refresh} className="p-1.5 rounded-md transition-colors" style={{ color: 'rgba(255,255,255,0.4)' }} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.4)'} title="Refresh">
+            <button onClick={refresh} className="p-1.5 rounded-md transition-colors" style={{ color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(15,23,42,0.5)' }} onMouseEnter={e=>e.currentTarget.style.color=isDark?'white':'#1e293b'} onMouseLeave={e=>e.currentTarget.style.color=isDark?'rgba(255,255,255,0.4)':'rgba(15,23,42,0.5)'} title="Refresh">
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
 
-            <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #cbd5e1' }}>
               {[['desktop', Monitor], ['tablet', Tablet], ['mobile', Smartphone]].map(([id, Icon]) => (
                 <button
                   key={id}
@@ -297,8 +297,8 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
                   title={id}
                   className="p-1.5 transition-colors"
                   style={previewSize === id
-                    ? { background: 'rgba(59,130,246,0.3)', color: '#60a5fa' }
-                    : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)' }
+                    ? { background: isDark ? 'rgba(59,130,246,0.3)' : '#ffffff', color: isDark ? '#60a5fa' : '#2563eb' }
+                    : { background: isDark ? 'rgba(255,255,255,0.04)' : 'transparent', color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }
                   }
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -306,13 +306,13 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
               ))}
             </div>
 
-            <button onClick={openNewTab} className="p-1.5 rounded-md transition-colors" style={{ color: 'rgba(255,255,255,0.4)' }} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.4)'} title="Open in new tab">
+            <button onClick={openNewTab} className="p-1.5 rounded-md transition-colors" style={{ color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(15,23,42,0.5)' }} onMouseEnter={e=>e.currentTarget.style.color=isDark?'white':'#1e293b'} onMouseLeave={e=>e.currentTarget.style.color=isDark?'rgba(255,255,255,0.4)':'rgba(15,23,42,0.5)'} title="Open in new tab">
               <ExternalLink className="w-3.5 h-3.5" />
             </button>
 
-            <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            <div className="w-px h-4" style={{ background: isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1' }} />
 
-            <button onClick={download} className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }} onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.07)';e.currentTarget.style.color='white'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color='rgba(255,255,255,0.55)'}}>
+            <button onClick={download} className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold rounded-md transition-colors" style={{ color: isDark ? 'rgba(255,255,255,0.55)' : '#475569' }} onMouseEnter={e=>{e.currentTarget.style.background=isDark?'rgba(255,255,255,0.07)':'#e2e8f0';e.currentTarget.style.color=isDark?'white':'#1e293b'}} onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color=isDark?'rgba(255,255,255,0.55)':'#475569'}}>
               <Download className="w-3.5 h-3.5" />
               Download
             </button>
@@ -350,23 +350,23 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
         </div>
 
         {/* Console */}
-        <div className="h-40 flex flex-col flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: '#0d1117' }}>
-          <div className="flex items-center justify-between px-3 py-1.5 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#111827' }}>
+        <div className="h-40 flex flex-col flex-shrink-0" style={{ borderTop: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0', background: isDark ? '#0d1117' : '#f8fafc' }}>
+          <div className="flex items-center justify-between px-3 py-1.5 flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0', background: isDark ? '#111827' : '#e2e8f0' }}>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>Console</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(15,23,42,0.4)' }}>Console</span>
               {logs.length > 0 && (
                 <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-500 text-white rounded-full">{logs.length}</span>
               )}
             </div>
             <button
               onClick={() => setLogs([])}
-              className="text-[10px] uppercase font-bold tracking-wider rounded px-2 py-0.5 transition-colors"
-              style={{ color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}
-              onMouseEnter={e=>e.currentTarget.style.color='white'}
-              onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.3)'}
+              className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded transition-colors"
+              style={{ color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(15,23,42,0.4)' }}
+              onMouseEnter={e=>{e.currentTarget.style.color=isDark?'white':'#0f172a';e.currentTarget.style.background=isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)'}}
+              onMouseLeave={e=>{e.currentTarget.style.color=isDark?'rgba(255,255,255,0.3)':'rgba(15,23,42,0.4)';e.currentTarget.style.background='transparent'}}
             >Clear</button>
           </div>
-          <div className="flex-1 overflow-y-auto p-2 font-mono text-xs space-y-0.5">
+          <div className="flex-1 overflow-auto p-2 space-y-1 font-mono text-[11px]" style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#334155' }}>
             {logs.length === 0
               ? <span className="text-slate-400 dark:text-slate-600 text-[11px]">Console output will appear here…</span>
               : logs.map((log, i) => (

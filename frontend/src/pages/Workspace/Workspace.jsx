@@ -7,6 +7,7 @@ import CodeEditorTab   from './tabs/CodeEditorTab.jsx';
 import WebStudioTab    from './tabs/WebStudioTab.jsx';
 import AIStudioTab     from './tabs/AIStudioTab.jsx';
 import { loadSettings, DEFAULT_SETTINGS, saveSettings } from './panels/SettingsPanel.jsx';
+import { useTheme } from '../../hooks/useTheme.jsx';
 
 // ─── Starter project files ────────────────────────────────────────────────────
 const STARTER_FILES = [
@@ -90,6 +91,7 @@ function saveProjects(projects) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 const Workspace = () => {
+  const { isDark } = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || localStorage.getItem('cs_studio_workspace_tab') || 'web');
   const [projects, setProjects]   = useState(loadProjects);
@@ -189,8 +191,8 @@ const Workspace = () => {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col text-slate-900 dark:text-white z-50 overflow-hidden"
-      style={{ background: '#0d1117' }}
+      className="fixed inset-0 flex flex-col z-50 overflow-hidden"
+      style={{ color: isDark ? 'white' : '#0f172a', background: isDark ? '#0d1117' : '#f8fafc' }}
     >
       {/* Header */}
       <WorkspaceHeader
@@ -218,7 +220,7 @@ const Workspace = () => {
         />
 
         {/* Main area */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0" style={{ background: '#0d1117' }}>
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0" style={{ background: isDark ? '#0d1117' : '#f8fafc' }}>
           {activeTab === 'code' && <CodeEditorTab />}
           {activeTab === 'web' && (
             <WebStudioTab
@@ -237,10 +239,10 @@ const Workspace = () => {
           <>
             <div className="absolute inset-0 bg-black/40 z-40" onClick={() => setShowProjects(false)} />
             <div className="absolute top-0 right-0 bottom-0 w-80 z-50 flex flex-col"
-              style={{ background: '#111827', borderLeft: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ background: isDark ? '#111827' : '#ffffff', borderLeft: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                <h2 className="text-sm font-bold text-white tracking-wide">My Projects</h2>
+              <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0' }}>
+                <h2 className="text-sm font-bold tracking-wide" style={{ color: isDark ? 'white' : '#1e293b' }}>My Projects</h2>
                 <button onClick={() => setShowProjects(false)}
                   className="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
                   ✕
@@ -250,13 +252,13 @@ const Workspace = () => {
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {projects.map(p => (
                   <button key={p.id} onClick={() => handleOpenProject(p.id)}
-                    className={`group w-full text-left px-4 py-3 rounded-xl border transition-all ${p.id === activeProjectId ? 'border-blue-500/50 bg-blue-600/10' : 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/15'}`}
+                    className={`group w-full text-left px-4 py-3 rounded-xl border transition-all ${p.id === activeProjectId ? (isDark ? 'border-blue-500/50 bg-blue-600/10' : 'border-blue-500 bg-blue-50') : (isDark ? 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/15' : 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300')}`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           {p.id === activeProjectId && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />}
-                          <span className="text-sm font-semibold text-white truncate">{p.name}</span>
+                          <span className="text-sm font-semibold truncate" style={{ color: isDark ? 'white' : '#1e293b' }}>{p.name}</span>
                         </div>
                         <p className="text-xs text-slate-500">
                           {p.files.length} file{p.files.length !== 1 ? 's' : ''} · {new Date(p.updatedAt).toLocaleDateString()}
@@ -271,7 +273,7 @@ const Workspace = () => {
                 ))}
               </div>
 
-              <div className="p-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+              <div className="p-3 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0' }}>
                 <button
                   onClick={handleNewProject}
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white hover:opacity-90 transition-opacity"

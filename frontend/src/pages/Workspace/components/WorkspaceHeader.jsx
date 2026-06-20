@@ -1,17 +1,19 @@
 import React from 'react';
 import { ArrowLeft, Code2, Globe, Sparkles, FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme.jsx';
 
 const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects }) => {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
 
   return (
     <div
       className="flex items-center justify-between px-4 py-2.5 z-10 relative flex-shrink-0"
       style={{
-        background: 'linear-gradient(90deg, #0a1628 0%, #0d1b36 100%)',
-        borderBottom: '1px solid rgba(56,139,253,0.15)',
-        boxShadow: '0 2px 20px rgba(0,0,0,0.4)',
+        background: isDark ? 'linear-gradient(90deg, #0a1628 0%, #0d1b36 100%)' : 'linear-gradient(90deg, #f8fafc 0%, #eff6ff 100%)',
+        borderBottom: isDark ? '1px solid rgba(56,139,253,0.15)' : '1px solid rgba(59,130,246,0.15)',
+        boxShadow: isDark ? '0 2px 20px rgba(0,0,0,0.4)' : '0 2px 15px rgba(59,130,246,0.05)',
       }}
     >
       {/* ── Left: Back button + breadcrumb ── */}
@@ -20,19 +22,19 @@ const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects })
           onClick={() => navigate(-1)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.65)',
+            background: isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+            border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0',
+            color: isDark ? 'rgba(255,255,255,0.65)' : '#475569',
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.background = 'rgba(59,130,246,0.15)';
-            e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)';
-            e.currentTarget.style.color = '#60a5fa';
+            e.currentTarget.style.background = isDark ? 'rgba(59,130,246,0.15)' : '#eff6ff';
+            e.currentTarget.style.borderColor = isDark ? 'rgba(59,130,246,0.4)' : '#bfdbfe';
+            e.currentTarget.style.color = isDark ? '#60a5fa' : '#2563eb';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.65)';
+            e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : '#ffffff';
+            e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0';
+            e.currentTarget.style.color = isDark ? 'rgba(255,255,255,0.65)' : '#475569';
           }}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -41,10 +43,10 @@ const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects })
 
         {projectName && (
           <div className="hidden md:flex items-center gap-2 min-w-0">
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>
+            <span style={{ color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.2)' }}>/</span>
             <span
               className="text-xs font-semibold truncate max-w-[110px]"
-              style={{ color: '#58a6ff' }}
+              style={{ color: isDark ? '#58a6ff' : '#2563eb' }}
               title={projectName}
             >
               {projectName}
@@ -57,8 +59,8 @@ const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects })
       <div
         className="flex items-center p-1 rounded-xl"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff',
+          border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0',
         }}
       >
         {[
@@ -74,23 +76,27 @@ const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects })
               className="relative flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               style={active
                 ? {
-                    background: 'linear-gradient(135deg, rgba(59,130,246,0.25), rgba(99,102,241,0.25))',
-                    color: '#60a5fa',
-                    boxShadow: '0 0 0 1px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    background: isDark ? 'linear-gradient(135deg, rgba(59,130,246,0.25), rgba(99,102,241,0.25))' : 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1))',
+                    color: isDark ? '#60a5fa' : '#1d4ed8',
+                    boxShadow: isDark ? '0 0 0 1px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.05)' : '0 0 0 1px rgba(59,130,246,0.2), inset 0 1px 0 rgba(255,255,255,0.5)',
                   }
                 : {
-                    color: 'rgba(255,255,255,0.45)',
+                    color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.5)',
                   }
               }
-              onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.color = isDark ? 'rgba(255,255,255,0.75)' : 'rgba(15,23,42,0.8)'; }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.color = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.5)'; }}
             >
               <Icon className="w-4 h-4" />
               {label}
               {badge && (
                 <span
                   className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase"
-                  style={{ background: 'rgba(99,102,241,0.3)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.4)' }}
+                  style={{
+                    background: isDark ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.1)',
+                    color: isDark ? '#a5b4fc' : '#4f46e5',
+                    border: isDark ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(99,102,241,0.2)'
+                  }}
                 >
                   {badge}
                 </span>
@@ -112,19 +118,19 @@ const WorkspaceHeader = ({ activeTab, setActiveTab, projectName, onMyProjects })
           onClick={onMyProjects}
           className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.6)',
+            background: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff',
+            border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0',
+            color: isDark ? 'rgba(255,255,255,0.6)' : '#475569',
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.background = 'rgba(59,130,246,0.15)';
-            e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)';
-            e.currentTarget.style.color = '#60a5fa';
+            e.currentTarget.style.background = isDark ? 'rgba(59,130,246,0.15)' : '#eff6ff';
+            e.currentTarget.style.borderColor = isDark ? 'rgba(59,130,246,0.4)' : '#bfdbfe';
+            e.currentTarget.style.color = isDark ? '#60a5fa' : '#2563eb';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+            e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
+            e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0';
+            e.currentTarget.style.color = isDark ? 'rgba(255,255,255,0.6)' : '#475569';
           }}
         >
           <FolderOpen className="w-4 h-4" />
