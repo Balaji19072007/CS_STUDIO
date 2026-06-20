@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../../hooks/useTheme.jsx';
 
 const SETTINGS_KEY = 'cs_studio_settings';
 
@@ -37,13 +38,13 @@ export function saveSettings(s) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-const Toggle = ({ value, onChange }) => (
+const Toggle = ({ value, onChange, isDark }) => (
   <button
     onClick={() => onChange(!value)}
     className="relative flex-shrink-0 transition-colors rounded-full"
     style={{
       width: 36, height: 20,
-      background: value ? '#3b82f6' : 'rgba(255,255,255,0.12)',
+      background: value ? '#3b82f6' : (isDark ? 'rgba(255,255,255,0.12)' : '#cbd5e1'),
     }}
   >
     <span
@@ -58,39 +59,40 @@ const Toggle = ({ value, onChange }) => (
   </button>
 );
 
-const Select = ({ value, onChange, options, style }) => (
+const Select = ({ value, onChange, options, style, isDark }) => (
   <select
     value={value}
     onChange={e => onChange(e.target.value)}
     className="rounded-lg outline-none text-xs px-2 py-1.5"
-    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', ...style }}
+    style={{ background: isDark ? 'rgba(255,255,255,0.07)' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', color: isDark ? '#e2e8f0' : '#1e293b', ...style }}
   >
     {options.map(o => (
-      <option key={o.value || o} value={o.value || o} style={{ background: '#1e293b' }}>
+      <option key={o.value || o} value={o.value || o} style={{ background: isDark ? '#1e293b' : '#fff' }}>
         {o.label || o}
       </option>
     ))}
   </select>
 );
 
-const Row = ({ label, hint, children }) => (
-  <div className="flex items-center justify-between py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+const Row = ({ label, hint, children, isDark }) => (
+  <div className="flex items-center justify-between py-2.5" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid #f1f5f9' }}>
     <div className="flex-1 min-w-0 pr-3">
-      <p className="text-xs font-medium text-white">{label}</p>
-      {hint && <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{hint}</p>}
+      <p className={`text-xs font-medium ${isDark ? 'text-white' : 'text-slate-800'}`}>{label}</p>
+      {hint && <p className="text-[10px] mt-0.5" style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }}>{hint}</p>}
     </div>
     {children}
   </div>
 );
 
-const SectionTitle = ({ children }) => (
-  <p className="text-[10px] font-bold uppercase tracking-widest pt-4 pb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+const SectionTitle = ({ children, isDark }) => (
+  <p className="text-[10px] font-bold uppercase tracking-widest pt-4 pb-2" style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }}>
     {children}
   </p>
 );
 
 // ─── Main component ────────────────────────────────────────────────────────────
 const SettingsPanel = ({ settings, onSettingsChange }) => {
+  const { isDark } = useTheme();
   const update = (section, key, value) => {
     const next = { ...settings, [section]: { ...settings[section], [key]: value } };
     onSettingsChange(next);
@@ -112,18 +114,20 @@ const SettingsPanel = ({ settings, onSettingsChange }) => {
     <div className="flex-1 overflow-y-auto px-3 py-1">
 
       {/* ── Editor ── */}
-      <SectionTitle>Editor</SectionTitle>
+      <SectionTitle isDark={isDark}>Editor</SectionTitle>
 
-      <Row label="Font Size">
+      <Row label="Font Size" isDark={isDark}>
         <Select
+          isDark={isDark}
           value={String(settings.editor.fontSize)}
           onChange={v => update('editor', 'fontSize', Number(v))}
           options={FONT_SIZES}
         />
       </Row>
 
-      <Row label="Font Family">
+      <Row label="Font Family" isDark={isDark}>
         <Select
+          isDark={isDark}
           value={settings.editor.fontFamily}
           onChange={v => update('editor', 'fontFamily', v)}
           options={FONT_FAMILIES}
@@ -131,39 +135,41 @@ const SettingsPanel = ({ settings, onSettingsChange }) => {
         />
       </Row>
 
-      <Row label="Tab Size">
+      <Row label="Tab Size" isDark={isDark}>
         <Select
+          isDark={isDark}
           value={String(settings.editor.tabSize)}
           onChange={v => update('editor', 'tabSize', Number(v))}
           options={TAB_SIZES}
         />
       </Row>
 
-      <Row label="Word Wrap" hint="Wrap long lines in editor">
-        <Toggle value={settings.editor.wordWrap === 'on'} onChange={v => update('editor', 'wordWrap', v ? 'on' : 'off')} />
+      <Row label="Word Wrap" hint="Wrap long lines in editor" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.editor.wordWrap === 'on'} onChange={v => update('editor', 'wordWrap', v ? 'on' : 'off')} />
       </Row>
 
-      <Row label="Line Numbers">
-        <Toggle value={settings.editor.lineNumbers === 'on'} onChange={v => update('editor', 'lineNumbers', v ? 'on' : 'off')} />
+      <Row label="Line Numbers" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.editor.lineNumbers === 'on'} onChange={v => update('editor', 'lineNumbers', v ? 'on' : 'off')} />
       </Row>
 
-      <Row label="Minimap" hint="Show code minimap on the right">
-        <Toggle value={settings.editor.minimap} onChange={v => update('editor', 'minimap', v)} />
+      <Row label="Minimap" hint="Show code minimap on the right" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.editor.minimap} onChange={v => update('editor', 'minimap', v)} />
       </Row>
 
-      <Row label="Auto Save" hint="Save changes automatically">
-        <Toggle value={settings.editor.autoSave} onChange={v => update('editor', 'autoSave', v)} />
+      <Row label="Auto Save" hint="Save changes automatically" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.editor.autoSave} onChange={v => update('editor', 'autoSave', v)} />
       </Row>
 
       {/* ── Preview ── */}
-      <SectionTitle>Preview</SectionTitle>
+      <SectionTitle isDark={isDark}>Preview</SectionTitle>
 
-      <Row label="Auto Refresh" hint="Refresh preview on code change">
-        <Toggle value={settings.preview.autoRefresh} onChange={v => update('preview', 'autoRefresh', v)} />
+      <Row label="Auto Refresh" hint="Refresh preview on code change" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.preview.autoRefresh} onChange={v => update('preview', 'autoRefresh', v)} />
       </Row>
 
-      <Row label="Default Device">
+      <Row label="Default Device" isDark={isDark}>
         <Select
+          isDark={isDark}
           value={settings.preview.previewDevice}
           onChange={v => update('preview', 'previewDevice', v)}
           options={[
@@ -174,24 +180,24 @@ const SettingsPanel = ({ settings, onSettingsChange }) => {
         />
       </Row>
 
-      <Row label="Open Links in New Tab">
-        <Toggle value={settings.preview.openLinksNewTab} onChange={v => update('preview', 'openLinksNewTab', v)} />
+      <Row label="Open Links in New Tab" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.preview.openLinksNewTab} onChange={v => update('preview', 'openLinksNewTab', v)} />
       </Row>
 
       {/* ── Workspace ── */}
-      <SectionTitle>Workspace</SectionTitle>
+      <SectionTitle isDark={isDark}>Workspace</SectionTitle>
 
-      <Row label="Default Project Name">
+      <Row label="Default Project Name" isDark={isDark}>
         <input
           value={settings.workspace.defaultProjectName}
           onChange={e => update('workspace', 'defaultProjectName', e.target.value)}
           className="rounded-lg outline-none text-xs px-2 py-1.5 w-32"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0' }}
+          style={{ background: isDark ? 'rgba(255,255,255,0.07)' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', color: isDark ? '#e2e8f0' : '#1e293b' }}
         />
       </Row>
 
-      <Row label="Restore Last Session" hint="Reopen last project on launch">
-        <Toggle value={settings.workspace.restoreLastSession} onChange={v => update('workspace', 'restoreLastSession', v)} />
+      <Row label="Restore Last Session" hint="Reopen last project on launch" isDark={isDark}>
+        <Toggle isDark={isDark} value={settings.workspace.restoreLastSession} onChange={v => update('workspace', 'restoreLastSession', v)} />
       </Row>
 
       {/* Reset */}

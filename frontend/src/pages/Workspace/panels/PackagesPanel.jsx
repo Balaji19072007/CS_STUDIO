@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Check, Package } from 'lucide-react';
+import { useTheme } from '../../../hooks/useTheme.jsx';
 
 // ─── Package registry ─────────────────────────────────────────────────────────
 const PACKAGES = [
@@ -58,6 +59,7 @@ function removeCDN(html, pkg) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 const PackagesPanel = ({ files, setFiles }) => {
+  const { isDark } = useTheme();
   const [search, setSearch]       = useState('');
   const [cat, setCat]             = useState('All');
   const [installed, setInstalled] = useState(() => {
@@ -102,28 +104,28 @@ const PackagesPanel = ({ files, setFiles }) => {
   return (
     <div className="flex flex-col h-full">
       {/* Search */}
-      <div className="px-3 pt-2 pb-2 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <Search className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+      <div className="px-3 pt-2 pb-2 flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' }}>
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0' }}>
+          <Search className="w-3 h-3 flex-shrink-0" style={{ color: isDark ? 'rgba(255,255,255,0.3)' : '#64748b' }} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search packages…"
             className="flex-1 bg-transparent outline-none text-xs"
-            style={{ color: '#e2e8f0' }}
+            style={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
           />
         </div>
       </div>
 
       {/* Category chips */}
-      <div className="px-3 py-2 flex gap-1 overflow-x-auto flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="px-3 py-2 flex gap-1 overflow-x-auto flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' }}>
         {CATS.map(c => (
           <button key={c}
             onClick={() => setCat(c)}
             className="text-[10px] font-semibold whitespace-nowrap px-2 py-1 rounded-full border transition-all"
             style={cat === c
               ? { background: '#3b82f6', color: '#fff', borderColor: '#3b82f6' }
-              : { background: 'transparent', color: 'rgba(255,255,255,0.4)', borderColor: 'rgba(255,255,255,0.1)' }
+              : { background: 'transparent', color: isDark ? 'rgba(255,255,255,0.4)' : '#64748b', borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1' }
             }
           >{c === 'All' ? 'All' : (CAT_EMOJI[c] || '') + ' ' + c.split(' ')[0]}</button>
         ))}
@@ -131,8 +133,8 @@ const PackagesPanel = ({ files, setFiles }) => {
 
       {/* Installed banner */}
       {installedPkgs.length > 0 && cat === 'All' && !search && (
-        <div className="px-3 py-2 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <div className="px-3 py-2 flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }}>
             Installed ({installedPkgs.length})
           </p>
           <div className="flex flex-wrap gap-1">
@@ -155,26 +157,26 @@ const PackagesPanel = ({ files, setFiles }) => {
             <div key={pkg.id}
               className="rounded-xl p-3"
               style={{
-                background: inst ? 'rgba(74,222,128,0.06)' : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${inst ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.07)'}`,
+                background: inst ? (isDark ? 'rgba(74,222,128,0.06)' : 'rgba(74,222,128,0.1)') : (isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'),
+                border: `1px solid ${inst ? (isDark ? 'rgba(74,222,128,0.2)' : 'rgba(74,222,128,0.4)') : (isDark ? 'rgba(255,255,255,0.07)' : '#e2e8f0')}`,
               }}
             >
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-xs font-semibold text-white">{pkg.name}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)' }}>
+                    <span className={`text-xs font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>{pkg.name}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: isDark ? 'rgba(255,255,255,0.08)' : '#f1f5f9', color: isDark ? 'rgba(255,255,255,0.4)' : '#64748b' }}>
                       v{pkg.version}
                     </span>
                   </div>
-                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{pkg.desc}</p>
+                  <p className="text-[10px]" style={{ color: isDark ? 'rgba(255,255,255,0.4)' : '#64748b' }}>{pkg.desc}</p>
                 </div>
                 <button
                   onClick={() => inst ? uninstall(pkg) : install(pkg)}
                   className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all"
                   style={inst
                     ? { background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }
-                    : { background: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.3)' }
+                    : { background: 'rgba(59,130,246,0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }
                   }
                 >
                   {inst ? <><X className="w-3 h-3" />Remove</> : <>+ Install</>}
@@ -182,7 +184,7 @@ const PackagesPanel = ({ files, setFiles }) => {
               </div>
               <div className="flex flex-wrap gap-1">
                 {pkg.tags.map(tag => (
-                  <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>
+                  <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', color: isDark ? 'rgba(255,255,255,0.3)' : '#64748b' }}>
                     {tag}
                   </span>
                 ))}

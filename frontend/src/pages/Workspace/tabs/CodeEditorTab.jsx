@@ -130,6 +130,7 @@ const CodeEditorTab = ({
           theme={monacoTheme}
           initialCode={activeFile.code}
           language={activeFile.language}
+          showLanguageSelector={false}
           onRunEnd={handleRunEnd}
           onChange={handleCodeChange}
           options={codeSettings?.editor || {}}

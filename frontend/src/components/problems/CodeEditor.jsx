@@ -38,6 +38,7 @@ const CodeEditor = forwardRef(({
   language: propLanguage = 'Python',
   theme: propTheme = 'vs-dark',
   isProblemSolver = false,
+  showLanguageSelector = true,
   onRunEnd = null,
   onChange = null,
   options = {},
@@ -371,15 +372,17 @@ const CodeEditor = forwardRef(({
         <div className={`hidden lg:flex items-center justify-between px-4 py-3 ${toolbarBg} border-b ${borderClass}`}>
           <div className="flex items-center gap-4">
             {/* Language Selector */}
-            <select
-              value={finalLanguage}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-              className={`px-3 py-2 ${ioBodyBg} border ${borderClass} ${textMain} rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500`}
-            >
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang} value={lang}> {lang} </option>
-              ))}
-            </select>
+            {showLanguageSelector && (
+              <select
+                value={finalLanguage}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                className={`px-3 py-2 ${ioBodyBg} border ${borderClass} ${textMain} rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500`}
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang} value={lang}> {lang} </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -475,15 +478,19 @@ const CodeEditor = forwardRef(({
           {mobileTab === 'editor' && (
             <div className={`flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800`}>
               {/* Language Selector */}
-              <select
-                value={finalLanguage}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-                className={`text-xs font-medium bg-transparent border-none focus:ring-0 ${textMain} p-0 cursor-pointer`}
-              >
-                {SUPPORTED_LANGUAGES.map((lang) => (
-                  <option key={lang} value={lang} className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white"> {lang} </option>
-                ))}
-              </select>
+              {showLanguageSelector ? (
+                <select
+                  value={finalLanguage}
+                  onChange={(e) => handleLanguageChange(e.target.value)}
+                  className={`text-xs font-medium bg-transparent border-none focus:ring-0 ${textMain} p-0 cursor-pointer`}
+                >
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <option key={lang} value={lang} className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white"> {lang} </option>
+                  ))}
+                </select>
+              ) : (
+                <div className={`text-xs font-medium ${textMain}`}>{finalLanguage}</div>
+              )}
 
               <div className="flex gap-4">
                 <button onClick={handleCopyCode} className={`${textSecondary} hover:${textMain}`} title="Copy">

@@ -92,13 +92,29 @@ const CodeSidebarPanel = ({
     setShowLangSelector(false);
   };
 
+  const handleLanguageSelect = (lang) => {
+    const existingFile = codeFiles.find(f => f.language === lang);
+    if (existingFile) {
+      setActiveCodeFileId(existingFile.id);
+    } else {
+      handleCreateFile(lang);
+    }
+  };
+
   const handleDeleteFile = (id, e) => {
     e.stopPropagation();
     if (codeFiles.length <= 1) return alert('Cannot delete the last file.');
     if (!confirm('Delete this file?')) return;
     const newFiles = codeFiles.filter(f => f.id !== id);
     setCodeFiles(newFiles);
-    if (activeCodeFileId === id) setActiveCodeFileId(newFiles[0].id);
+    if (activeCodeFileId === id) {
+      const sameLangFile = newFiles.find(f => f.language === activeLanguage);
+      if (sameLangFile) {
+        setActiveCodeFileId(sameLangFile.id);
+      } else {
+        setActiveCodeFileId(newFiles[0].id);
+      }
+    }
   };
 
   const handleDuplicateFile = (file, e) => {
@@ -133,30 +149,54 @@ const CodeSidebarPanel = ({
         
         {/* RECENT FILES */}
         {activeNav === 'recent' && (
-          <div className="space-y-2">
-            {codeFiles.map(file => (
-              <div 
-                key={file.id} 
-                onClick={() => setActiveCodeFileId(file.id)}
-                className={`group w-full text-left px-3 py-2 rounded border transition-all cursor-pointer flex justify-between items-center ${activeCodeFileId === file.id ? (isDark ? 'border-blue-500 bg-blue-500/10' : 'border-blue-500 bg-blue-50') : `${borderClass} ${bgClass}`}`}
+          <div className="space-y-4">
+            
+            {/* Language Selector at the top */}
+            <div className="space-y-1.5">
+              <label className={`text-[10px] font-bold uppercase tracking-wider ${textMuted}`}>Language</label>
+              <select
+                value={activeLanguage}
+                onChange={(e) => handleLanguageSelect(e.target.value)}
+                className={`w-full px-3 py-2 text-sm rounded border ${borderClass} ${bgClass} ${textClass} focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer`}
               >
-                <div>
-                  <p className={`text-sm font-medium ${textClass}`}>{file.name}</p>
-                  <p className={`text-[10px] ${textMuted}`}>{file.language}</p>
+                {['Python', 'Java', 'JavaScript', 'C', 'C++'].map(lang => (
+                  <option 
+                    key={lang} 
+                    value={lang}
+                    className={isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}
+                  >
+                    {lang}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className={`text-[10px] font-bold uppercase tracking-wider ${textMuted}`}>Recent Files ({codeFiles.filter(f => f.language === activeLanguage).length})</label>
+              {codeFiles.filter(f => f.language === activeLanguage).map(file => (
+                <div 
+                  key={file.id} 
+                  onClick={() => setActiveCodeFileId(file.id)}
+                  className={`group w-full text-left px-3 py-2 rounded border transition-all cursor-pointer flex justify-between items-center ${activeCodeFileId === file.id ? (isDark ? 'border-blue-500 bg-blue-500/10' : 'border-blue-500 bg-blue-50') : `${borderClass} ${bgClass}`}`}
+                >
+                  <div className="min-w-0">
+                    <p className={`text-sm font-medium ${textClass} truncate`}>{file.name}</p>
+                    <p className={`text-[10px] ${textMuted} truncate`}>{new Date(file.updatedAt).toLocaleTimeString()}</p>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => handleDuplicateFile(file, e)} className="text-slate-400 hover:text-blue-400" title="Duplicate"><Copy size={14}/></button>
+                    <button onClick={(e) => handleDeleteFile(file.id, e)} className="text-slate-400 hover:text-red-400" title="Delete"><Trash2 size={14}/></button>
+                  </div>
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={(e) => handleDuplicateFile(file, e)} className="text-slate-400 hover:text-blue-400" title="Duplicate"><Copy size={14}/></button>
-                  <button onClick={(e) => handleDeleteFile(file.id, e)} className="text-slate-400 hover:text-red-400" title="Delete"><Trash2 size={14}/></button>
-                </div>
-              </div>
-            ))}
-            <button 
-              onClick={() => setShowLangSelector(true)}
-              className="w-full mt-4 py-2 border-2 border-dashed rounded text-sm font-medium transition-colors"
-              style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)' }}
-            >
-              + New File
-            </button>
+              ))}
+              <button 
+                onClick={() => handleCreateFile(activeLanguage)}
+                className="w-full mt-4 py-2 border-2 border-dashed rounded text-sm font-medium transition-colors"
+                style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)' }}
+              >
+                + New File
+              </button>
+            </div>
           </div>
         )}
 
@@ -283,30 +323,7 @@ const CodeSidebarPanel = ({
         </div>
       </div>
 
-      {/* LANGUAGE SELECTOR MODAL */}
-      {showLangSelector && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className={`w-full max-w-xs p-4 rounded-xl shadow-xl ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
-            <h3 className={`font-bold mb-4 ${textClass}`}>New File</h3>
-            <div className="space-y-2">
-              {['Python', 'Java', 'JavaScript', 'C', 'C++'].map(lang => (
-                <button 
-                  key={lang} onClick={() => handleCreateFile(lang)}
-                  className={`w-full text-left px-4 py-2 rounded font-medium transition-colors ${bgClass} ${textClass}`}
-                >
-                  {lang} File
-                </button>
-              ))}
-            </div>
-            <button 
-              onClick={() => setShowLangSelector(false)}
-              className="w-full mt-4 py-2 text-sm text-slate-400 hover:text-slate-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+
     </>
   );
 };
