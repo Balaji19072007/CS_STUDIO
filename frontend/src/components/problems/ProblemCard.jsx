@@ -48,6 +48,7 @@ const ProblemCard = ({ problem }) => {
         <div
             id={`problem-${problemId}`} // ADDED ID for scrolling
             className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-xl p-3 sm:p-4 transition-colors duration-300 border border-gray-200 dark:border-gray-700 card-hover"
+            style={{ contentVisibility: 'auto', containIntrinsicSize: '120px' }}
         >
             <div className="flex flex-row justify-between items-center gap-3">
 

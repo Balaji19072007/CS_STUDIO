@@ -198,7 +198,7 @@ const Problems = () => {
                     <Link
                         to="/solve?problemId=1"
                         onClick={(e) => handleSolveClick(1, e)}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-full font-semibold transition-all duration-300 transform hover:scale-105"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-full font-semibold transition-colors duration-300 transform hover:scale-105"
                     >
                         <i data-feather="terminal" className="w-4 h-4 text-gray-900"></i>
                         Try First Problem
