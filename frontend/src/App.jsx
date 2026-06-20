@@ -6,7 +6,6 @@ import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { useAuth } from './hooks/useAuth.jsx';
-import { useTheme } from './hooks/useTheme.jsx';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
 import {
   DashboardErrorBoundary,
@@ -93,7 +92,6 @@ function App() {
 
 // Separate component to use hooks
 function AppContent() {
-  const { isDark } = useTheme();
   const location = useLocation();
   const { user, loading } = useAuth();
   const isLoggedIn = !!user;
@@ -133,7 +131,7 @@ function AppContent() {
       />
       <NavigationProgressProvider>
       <NavigationProgress />
-      <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+      <div className="min-h-screen flex flex-col transition-colors duration-300 bg-gray-50 dark:bg-gray-900">
       {/* Skip to main content - accessibility */}
       <a
         href="#main-content"
