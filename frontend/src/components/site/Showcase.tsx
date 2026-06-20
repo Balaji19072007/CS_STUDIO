@@ -79,14 +79,14 @@ export function Showcase() {
                 </div>
               </div>
               <div className="relative h-72">
-                {["ide", "ch", "co", "ce"].includes(tab) ? (
+                {["ide", "web", "ch", "co", "ce"].includes(tab) ? (
                   <div className={`w-full h-full rounded-2xl border border-white/5 bg-[#0B1527] shadow-lg overflow-hidden ${tab === 'ce' ? 'flex items-center justify-center p-4 bg-slate-100/5 dark:bg-[#0B1527]' : ''}`}>
                     {tab === "ce" ? (
                       <img src="/certificate-showcase.svg" alt="Verified Certificate" className="w-full h-full object-contain drop-shadow-xl" />
                     ) : (
                       <>
-                        <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'ch' ? 'challenges' : 'community'}-light.png`} alt={`${active.label} Light`} className="w-full h-full object-cover object-left-top dark:hidden block" />
-                        <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'ch' ? 'challenges' : 'community'}-dark.png`} alt={`${active.label} Dark`} className="w-full h-full object-cover object-left-top hidden dark:block" />
+                        <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'web' ? 'web-studio' : tab === 'ch' ? 'challenges' : 'community'}-light.png`} alt={`${active.label} Light`} className="w-full h-full object-cover object-left-top dark:hidden block" />
+                        <img src={`/${tab === 'ide' ? 'cloud-ide' : tab === 'web' ? 'web-studio' : tab === 'ch' ? 'challenges' : 'community'}-dark.png`} alt={`${active.label} Dark`} className="w-full h-full object-cover object-left-top hidden dark:block" />
                       </>
                     )}
                   </div>
