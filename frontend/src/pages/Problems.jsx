@@ -184,7 +184,7 @@ const Problems = () => {
     if (isLoading) return <ProblemsSkeleton />;
 
     return (
-        <div className="w-full min-h-screen dark-gradient-secondary block">
+        <div className="w-full min-h-screen dark-gradient-secondary block transition-colors duration-300">
             {/* Hero Section - Minimal */}
             <div className="pt-24 pb-12 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
