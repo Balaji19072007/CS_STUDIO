@@ -37,7 +37,10 @@ const CodeEditor = forwardRef(({
   initialCode = DEFAULT_CODE['Python'],
   language: propLanguage = 'Python',
   theme: propTheme = 'vs-dark',
-  isProblemSolver = false
+  isProblemSolver = false,
+  onRunEnd = null,
+  onChange = null,
+  options = {},
 }, ref) => {
 
   const [code, setCode] = useState(initialCode);
@@ -59,15 +62,25 @@ const CodeEditor = forwardRef(({
   const inputReadyTimerRef = useRef(null);
   const inputBufferRef = useRef('');
   const isInputActiveRef = useRef(false);
+  // Track execution time
+  const runStartTimeRef = useRef(null);
+  const currentErrorStateRef = useRef(false);
   // Track previous language to detect actual user-driven changes
   const prevLanguageRef = useRef(propLanguage);
 
   // Sync props to internal state
   useEffect(() => {
-    setCode(initialCode);
+    if (initialCode !== code) {
+      setCode(initialCode);
+    }
+  }, [initialCode]);
+
+  useEffect(() => {
     setTheme(propTheme);
     setLanguage(propLanguage);
-  }, [initialCode, propTheme, propLanguage]);
+  }, [propTheme, propLanguage]);
+
+
 
   // Update code when language changes (tracks actual previous value via ref
   // so switching back to the initial language also resets the code correctly)
@@ -124,10 +137,15 @@ const CodeEditor = forwardRef(({
       if (isRunningState === false) {
         setIsWaitingForInput(false);
         isInputActiveRef.current = false;
+        if (onRunEnd) {
+          const executionTime = runStartTimeRef.current ? Date.now() - runStartTimeRef.current : 0;
+          onRunEnd({ status: currentErrorStateRef.current ? 'Error' : 'Success', executionTime });
+        }
       }
 
       if (isError) {
         setError(output);
+        currentErrorStateRef.current = true;
       } else {
         setOutput(prev => {
           if (prev === 'Output will appear here.' || prev === 'Executing...\n') {
@@ -228,6 +246,8 @@ const CodeEditor = forwardRef(({
     isInputActiveRef.current = false;
     setOutput('Running...\n');
     setError('');
+    currentErrorStateRef.current = false;
+    runStartTimeRef.current = Date.now();
     inputBufferRef.current = '';
 
     // Use the correct execution language mapping
@@ -256,6 +276,29 @@ const CodeEditor = forwardRef(({
     runCode: handleRunCode,
     stopCode: handleStopExecution,
     getCode: () => editorRef.current?.getValue() || code,
+    insertSnippet: (snippet) => {
+      const editor = editorRef.current;
+      if (editor) {
+        const position = editor.getPosition();
+        editor.executeEdits('snippet', [{
+          range: { startLineNumber: position.lineNumber, startColumn: position.column, endLineNumber: position.lineNumber, endColumn: position.column },
+          text: snippet + '\n',
+          forceMoveMarkers: true
+        }]);
+        editor.focus();
+      }
+    },
+    loadTemplate: (templateCode) => {
+      setCode(templateCode);
+      if (editorRef.current) {
+        editorRef.current.setValue(templateCode);
+      }
+      setOutput('Output will appear here.');
+      setError('');
+      setIsRunning(false);
+      setIsWaitingForInput(false);
+      currentErrorStateRef.current = false;
+    }
   }));
 
   // --- UI Handlers (Only active in Freeform mode) ---
@@ -291,6 +334,7 @@ const CodeEditor = forwardRef(({
 
   const handleEditorChange = (value) => {
     setCode(value || '');
+    if (onChange) onChange(value || '');
   };
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -464,16 +508,13 @@ const CodeEditor = forwardRef(({
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           options={{
+            selectOnLineNumbers: true,
             minimap: { enabled: false },
             fontSize: 14,
-            lineNumbers: 'on',
             scrollBeyondLastLine: false,
-            automaticLayout: true,
-            tabSize: 4,
             wordWrap: 'on',
-            scrollbar: {
-              alwaysConsumeMouseWheel: false,
-            }
+            automaticLayout: true,
+            ...options
           }}
         />
       </div>

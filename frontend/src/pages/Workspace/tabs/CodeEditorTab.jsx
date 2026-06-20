@@ -1,43 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
 import CodeEditor from '../../../components/problems/CodeEditor.jsx';
 import socketService from '../../../services/socketService.js';
 import { useTheme } from '../../../hooks/useTheme.jsx';
 
-const CodeEditorTab = () => {
-  const [searchParams] = useSearchParams();
-  const location = useLocation();
+const CodeEditorTab = ({
+  codeFiles, setCodeFiles, activeCodeFileId, setActiveCodeFileId,
+  codeHistory, setCodeHistory, codeSettings
+}) => {
   const { isDark } = useTheme();
   const [connectionStatus, setConnectionStatus] = useState('connecting');
+  const editorRef = useRef(null);
 
-  // Parse query params and route state
-  const sourceParam = searchParams.get('source') || location.state?.source;
-  const langParam = searchParams.get('lang') || location.state?.lang;
+  const activeFile = codeFiles?.find(f => f.id === activeCodeFileId) || codeFiles?.[0];
 
-  // Helper to map URL lang param to Editor supported language
-  const getLanguageFromParam = (param) => {
-    if (!param) return 'Python'; // Default
-    const lower = param.toLowerCase();
-    if (lower === 'c') return 'C';
-    if (lower === 'cpp' || lower === 'c++') return 'C++';
-    if (lower === 'java') return 'Java';
-    if (lower === 'python' || lower === 'py') return 'Python';
-    if (lower === 'javascript' || lower === 'js') return 'JavaScript';
-    return 'Python'; // Fallback
-  };
-
-  const initialLanguage = getLanguageFromParam(langParam);
-
-  let initialCode;
-  if (sourceParam) {
-    try {
-      initialCode = decodeURIComponent(sourceParam);
-    } catch (error) {
-      initialCode = sourceParam;
-    }
-  }
-
-  // Initialize socket service when component mounts
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token') || 'anonymous';
     if (!socketService.isConnected) {
@@ -60,7 +35,54 @@ const CodeEditorTab = () => {
     }
   };
 
+  // Custom event listeners for Sidebar actions
+  useEffect(() => {
+    const handleInsertSnippet = (e) => {
+      if (editorRef.current && editorRef.current.insertSnippet) {
+        editorRef.current.insertSnippet(e.detail);
+      }
+    };
+    const handleLoadTemplate = (e) => {
+      if (editorRef.current && editorRef.current.loadTemplate) {
+        editorRef.current.loadTemplate(e.detail);
+      }
+    };
+
+    document.addEventListener('cs_insert_snippet', handleInsertSnippet);
+    document.addEventListener('cs_load_template', handleLoadTemplate);
+    return () => {
+      document.removeEventListener('cs_insert_snippet', handleInsertSnippet);
+      document.removeEventListener('cs_load_template', handleLoadTemplate);
+    };
+  }, []);
+
+  const handleRunEnd = ({ status, executionTime }) => {
+    if (!activeFile) return;
+    const historyEntry = {
+      filename: activeFile.name,
+      language: activeFile.language,
+      status,
+      timestamp: Date.now(),
+      executionTime,
+      codeLength: activeFile.code.length,
+    };
+    setCodeHistory(prev => [historyEntry, ...prev].slice(0, 20));
+  };
+
+  const handleCodeChange = (newCode) => {
+    if (!activeFile) return;
+    setCodeFiles(prev => prev.map(f => f.id === activeFile.id ? { ...f, code: newCode, updatedAt: Date.now() } : f));
+  };
+
   const monacoTheme = isDark ? 'vs-dark' : 'vs-light';
+
+  if (!activeFile) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-slate-500 text-sm">
+        Create or select a file to start coding.
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative" style={{ background: isDark ? '#060B14' : '#ffffff' }}>
@@ -81,7 +103,7 @@ const CodeEditorTab = () => {
                 ? (isDark ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-700')
                 : (isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700')
           }`}>
-            <div className={`w-1.5 h-1.5 rounded-full mr-1.5 \${
+            <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
               connectionStatus === 'connected' ? 'bg-green-500 animate-pulse'
                 : connectionStatus === 'connecting' ? 'bg-yellow-500 animate-pulse'
                 : 'bg-red-500'
@@ -103,10 +125,14 @@ const CodeEditorTab = () => {
       {/* Editor takes remaining height */}
       <div className="flex-1 relative overflow-hidden">
         <CodeEditor
-          key={initialLanguage}
+          key={activeFile.id}
+          ref={editorRef}
           theme={monacoTheme}
-          initialCode={initialCode}
-          language={initialLanguage}
+          initialCode={activeFile.code}
+          language={activeFile.language}
+          onRunEnd={handleRunEnd}
+          onChange={handleCodeChange}
+          options={codeSettings?.editor || {}}
         />
       </div>
     </div>

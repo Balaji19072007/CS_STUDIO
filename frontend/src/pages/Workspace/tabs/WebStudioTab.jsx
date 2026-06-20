@@ -119,6 +119,39 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
   const iframeRef = useRef(null);
   const debounceRef = useRef(null);
 
+  // Open tabs state
+  const [openTabs, setOpenTabs] = useState(() => activeFile ? [activeFile] : []);
+  const closedTabsRef = useRef(new Set());
+
+  useEffect(() => {
+    if (activeFile && !openTabs.includes(activeFile) && !closedTabsRef.current.has(activeFile)) {
+      setOpenTabs(prev => [...prev, activeFile]);
+    }
+    if (activeFile) {
+      closedTabsRef.current.delete(activeFile);
+    }
+  }, [activeFile, openTabs]);
+
+  useEffect(() => {
+    setOpenTabs(prev => prev.filter(tab => files.some(f => f.name === tab)));
+  }, [files]);
+
+  const closeTab = (name, e) => {
+    e.stopPropagation();
+    closedTabsRef.current.add(name);
+    setOpenTabs(prev => {
+      const next = prev.filter(n => n !== name);
+      if (activeFile === name) {
+        const remainingFiles = next.filter(n => {
+          const f = files.find(file => file.name === n);
+          return f && f.type !== 'folder';
+        });
+        setActiveFile(remainingFiles[remainingFiles.length - 1] || '');
+      }
+      return next;
+    });
+  };
+
   // Helper: read/write file content
   const getContent  = (name) => files.find(f => f.name === name)?.content ?? '';
   const setContent  = useCallback((name, val) =>
@@ -149,7 +182,13 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
 
   const download = async () => {
     const zip = new JSZip();
-    files.forEach(f => zip.file(f.name, f.content));
+    files.forEach(f => {
+      if (f.type === 'folder') {
+        zip.folder(f.name);
+      } else {
+        zip.file(f.name, f.content);
+      }
+    });
     const blob = await zip.generateAsync({ type: 'blob' });
     const a = Object.assign(document.createElement('a'), {
       href: URL.createObjectURL(blob),
@@ -174,10 +213,13 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
 
   const deleteFile = (name, e) => {
     e.stopPropagation();
-    if (!confirm(`Delete "${name}"?`)) return;
     setFiles(prev => {
       const next = prev.filter(f => f.name !== name);
-      if (activeFile === name) setActiveFile(next[0]?.name ?? '');
+      if (activeFile === name) {
+        // Switch to the rightmost file that is not a folder
+        const remainingFiles = next.filter(f => f.type !== 'folder');
+        setActiveFile(remainingFiles[remainingFiles.length - 1]?.name ?? '');
+      }
       return next;
     });
   };
@@ -190,7 +232,7 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
     return 'plaintext';
   };
 
-  const currentFile = files.find(f => f.name === activeFile);
+  const currentFile = files.find(f => f.name === activeFile && f.type !== 'folder');
 
   // Preview container sizing
   const previewClass = {
@@ -203,29 +245,36 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
     <div className="flex-1 flex overflow-hidden min-h-0">
 
       {/* ── LEFT: Editor ── */}
-      <div className="w-1/2 flex flex-col min-w-0" style={{ borderRight: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0', background: isDark ? '#0d1117' : '#ffffff' }}>
+      <div className="flex-1 flex flex-col min-w-0" style={{ borderRight: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0', background: isDark ? '#0d1117' : '#ffffff' }}>
 
         {/* Tab bar */}
         <div className="flex items-center overflow-x-auto flex-shrink-0" style={{ minHeight: 40, background: isDark ? '#111827' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' }}>
-          {files.map(f => (
-            <button
-              key={f.name}
-              onClick={() => setActiveFile(f.name)}
-              className="group relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-all border-b-2"
-              style={activeFile === f.name
-                ? { background: isDark ? '#0d1117' : '#ffffff', color: isDark ? '#60a5fa' : '#2563eb', borderBottomColor: isDark ? '#3B82F6' : '#3B82F6' }
-                : { borderBottomColor: 'transparent', color: isDark ? 'rgba(255,255,255,0.4)' : '#94a3b8' }
-              }
-            >
-              {getIcon(f.type)}
-              <span>{f.name}</span>
-              <span
-                onClick={(e) => deleteFile(f.name, e)}
-                className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-xs rounded opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-500 transition-all cursor-pointer"
-                title="Delete file"
-              >×</span>
-            </button>
-          ))}
+          {openTabs.map(tabName => {
+            const f = files.find(f => f.name === tabName);
+            if (!f || f.type === 'folder') return null;
+            return (
+              <button
+                key={f.name}
+                onClick={() => setActiveFile(f.name)}
+                className="group relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-all border-b-2"
+                style={activeFile === f.name
+                  ? { background: isDark ? '#0d1117' : '#ffffff', color: isDark ? '#60a5fa' : '#2563eb', borderBottomColor: isDark ? '#3B82F6' : '#3B82F6' }
+                  : { borderBottomColor: 'transparent', color: isDark ? 'rgba(255,255,255,0.4)' : '#94a3b8' }
+                }
+              >
+                {getIcon(f.type)}
+                <span title={f.name}>{f.name.split('/').pop()}</span>
+                <span
+                  onClick={(e) => closeTab(f.name, e)}
+                  className="ml-1.5 w-4 h-4 flex items-center justify-center text-xs rounded opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                  style={{ color: isDark ? 'rgba(255,255,255,0.5)' : '#94a3b8' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = isDark ? 'white' : 'black'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = isDark ? 'rgba(255,255,255,0.5)' : '#94a3b8'; }}
+                  title="Close tab"
+                >×</span>
+              </button>
+            );
+          })}
           <button
             onClick={createFile}
             className="px-2 py-2 transition-colors flex-shrink-0"
@@ -264,21 +313,18 @@ const WebStudioTab = ({ activeFile, setActiveFile, files, setFiles, settings }) 
               }}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-3" style={{ color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.3)' }}>
-              <FilePlus className="w-10 h-10" />
-              <p className="text-sm">No file open. Create one to start.</p>
-              <button
-                onClick={createFile}
-                className="px-4 py-2 text-sm font-medium rounded-lg text-white transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}
-              >+ New File</button>
+            <div className="flex flex-col items-center justify-center h-full gap-4 select-none" style={{ color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(15,23,42,0.6)' }}>
+              <svg className="w-20 h-20 mb-2 opacity-90 drop-shadow-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+              <h2 className="text-2xl font-semibold tracking-wider opacity-90">CS Studio</h2>
             </div>
           )}
         </div>
       </div>
 
       {/* ── RIGHT: Preview + Console ── */}
-      <div className="w-1/2 flex flex-col min-w-0" style={{ background: isDark ? '#0a0f1a' : '#f1f5f9' }}>
+      <div className="flex flex-col min-w-0 flex-shrink-0" style={{ width: '45vw', background: isDark ? '#0a0f1a' : '#f1f5f9' }}>
 
         {/* Preview toolbar */}
         <div className="flex items-center justify-between px-3 py-2 flex-shrink-0" style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #cbd5e1', background: isDark ? '#111827' : '#e2e8f0' }}>

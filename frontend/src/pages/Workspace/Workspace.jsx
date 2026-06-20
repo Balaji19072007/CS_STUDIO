@@ -104,6 +104,42 @@ const Workspace = () => {
   const [showProjects, setShowProjects] = useState(false);
   const [settings, setSettings]       = useState(loadSettings);
 
+  // CODE EDITOR STATE
+  const [codeFiles, setCodeFiles] = useState(() => {
+    try {
+      const raw = localStorage.getItem('cs_studio_code_files');
+      if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return [{ id: 'cf_' + Date.now(), name: 'main.py', language: 'Python', code: 'print("Hello World")', createdAt: Date.now(), updatedAt: Date.now() }];
+  });
+  const [activeCodeFileId, setActiveCodeFileId] = useState(() => {
+    return localStorage.getItem('cs_studio_active_code_file') || null;
+  });
+  const [codeHistory, setCodeHistory] = useState(() => {
+    try {
+      const raw = localStorage.getItem('cs_studio_code_history');
+      if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return [];
+  });
+  const [notes, setNotes] = useState(() => {
+    try {
+      const raw = localStorage.getItem('cs_studio_notes');
+      if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return [];
+  });
+  const [codeSettings, setCodeSettings] = useState(() => {
+    try {
+      const raw = localStorage.getItem('cs_studio_code_settings');
+      if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return {
+      editor: { fontSize: 14, wordWrap: 'on', tabSize: 4, lineNumbers: 'on', minimap: false },
+      workspace: { restoreSession: true, defaultLanguage: 'Python' }
+    };
+  });
+
   // Derived
   const activeProject = projects.find(p => p.id === activeProjectId) ?? projects[0];
   const files = activeProject?.files ?? [];
@@ -113,10 +149,20 @@ const Workspace = () => {
     if (!activeFile && files.length > 0) setActiveFile(files[0].name);
   }, [activeProjectId, files]);
 
+  // Init code file
+  useEffect(() => {
+    if (!activeCodeFileId && codeFiles.length > 0) setActiveCodeFileId(codeFiles[0].id);
+  }, [activeCodeFileId, codeFiles]);
+
   // Persist
   useEffect(() => { setSearchParams({ tab: activeTab }, { replace: true }); localStorage.setItem('cs_studio_workspace_tab', activeTab); }, [activeTab]);
   useEffect(() => { localStorage.setItem('cs_studio_active_project', activeProjectId); }, [activeProjectId]);
   useEffect(() => { saveProjects(projects); }, [projects]);
+  useEffect(() => { localStorage.setItem('cs_studio_code_files', JSON.stringify(codeFiles)); }, [codeFiles]);
+  useEffect(() => { localStorage.setItem('cs_studio_active_code_file', activeCodeFileId); }, [activeCodeFileId]);
+  useEffect(() => { localStorage.setItem('cs_studio_code_history', JSON.stringify(codeHistory)); }, [codeHistory]);
+  useEffect(() => { localStorage.setItem('cs_studio_notes', JSON.stringify(notes)); }, [notes]);
+  useEffect(() => { localStorage.setItem('cs_studio_code_settings', JSON.stringify(codeSettings)); }, [codeSettings]);
 
   // Fullscreen
   useEffect(() => {
@@ -217,11 +263,32 @@ const Workspace = () => {
           settings={settings}
           onSettingsChange={handleSettingsChange}
           onUseTemplate={handleUseTemplate}
+          
+          codeFiles={codeFiles}
+          setCodeFiles={setCodeFiles}
+          activeCodeFileId={activeCodeFileId}
+          setActiveCodeFileId={setActiveCodeFileId}
+          codeHistory={codeHistory}
+          setCodeHistory={setCodeHistory}
+          notes={notes}
+          setNotes={setNotes}
+          codeSettings={codeSettings}
+          setCodeSettings={setCodeSettings}
         />
 
         {/* Main area */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0" style={{ background: isDark ? '#0d1117' : '#f8fafc' }}>
-          {activeTab === 'code' && <CodeEditorTab />}
+          {activeTab === 'code' && (
+            <CodeEditorTab
+              codeFiles={codeFiles}
+              setCodeFiles={setCodeFiles}
+              activeCodeFileId={activeCodeFileId}
+              setActiveCodeFileId={setActiveCodeFileId}
+              codeHistory={codeHistory}
+              setCodeHistory={setCodeHistory}
+              codeSettings={codeSettings}
+            />
+          )}
           {activeTab === 'web' && (
             <WebStudioTab
               activeFile={activeFile}
