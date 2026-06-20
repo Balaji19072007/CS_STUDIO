@@ -35,9 +35,8 @@ const CodeEditorFloatingIcon = () => {
             className={`fixed bottom-24 right-6 h-10 w-10 md:h-14 md:w-14 rounded-full text-white flex items-center justify-center transition-all duration-300 z-50 hover:shadow-xl ${mobileClasses}`}
             title="CS Studio Workspace"
         >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center w-full h-full">
                 <i data-feather="edit-3" className="h-4 w-4 md:h-5 md:w-5"></i>
-                <span className="font-mono font-bold text-lg md:text-xl ml-0.5 mt-1">_</span>
             </div>
         </Link>
     );
