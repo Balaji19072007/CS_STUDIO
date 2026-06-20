@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
+import SEO from '../components/common/SEO';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -50,7 +51,12 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <>
+            <SEO 
+                title="Forgot Password" 
+                description="Reset your CS Studio password and regain access to your account."
+            />
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
@@ -146,6 +152,7 @@ const ForgotPassword = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

@@ -4,6 +4,7 @@ import { verifyCertificate } from '../api/certificateApi.js';
 import CertificatePreview from '../components/certificates/CertificatePreview.jsx';
 import Loader from '../components/common/Loader';
 import { downloadCertificate, formatCertificateDate } from '../utils/certificateUtils.js';
+import SEO from '../components/common/SEO';
 
 const VerifyCertificate = () => {
   const navigate = useNavigate();
@@ -64,7 +65,12 @@ const VerifyCertificate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <SEO 
+        title="Verify Certificate" 
+        description="Verify the authenticity of a CS Studio certificate."
+      />
+      <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <button
           onClick={() => navigate('/courses')}
@@ -188,6 +194,7 @@ const VerifyCertificate = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

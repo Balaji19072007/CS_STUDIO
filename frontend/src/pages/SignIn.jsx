@@ -6,6 +6,7 @@ import { supabase } from '../config/supabase';
 import { Navbar as SiteNavbar } from '../components/site/Navbar';
 import { Turnstile } from '@marsidev/react-turnstile';
 import api, { setAuthToken } from '../config/api';
+import SEO from '../components/common/SEO';
 
 const SignIn = () => {
   const { isLoggedIn } = useAuth();
@@ -165,6 +166,10 @@ const SignIn = () => {
 
   return (
     <>
+      <SEO 
+        title="Sign In" 
+        description="Access your CS Studio dashboard and continue your learning journey."
+      />
       <SiteNavbar />
       <div className="min-h-screen dark-gradient-secondary flex items-center justify-center p-6 py-12 relative pt-24">
         {/* Back Button */}

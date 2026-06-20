@@ -1,0 +1,17 @@
+# CS Studio
+
+CS Studio is an online learning platform for computer science, offering interactive courses, coding problems, and AI-powered guidance.
+
+## Public Resources
+- [Home](https://cs-studio.in/): Landing page with platform overview.
+- [Sign In](https://cs-studio.in/signin): User login portal.
+- [Sign Up](https://cs-studio.in/signup): Account creation page.
+- [Verify Certificate](https://cs-studio.in/verify-certificate): Public portal to verify the authenticity of certificates issued by CS Studio.
+
+## Platform Features
+- Interactive coding environments
+- AI-assisted learning and problem-solving
+- Structured courses across various computer science topics
+- Progress tracking and skill certificates
+
+For more information, please visit https://cs-studio.in

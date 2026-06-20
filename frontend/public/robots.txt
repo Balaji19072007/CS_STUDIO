@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /courses/
+Disallow: /problems/
+Disallow: /community/
+Disallow: /leaderboard/
+Disallow: /workspace/
+Disallow: /code/
+Disallow: /settings/
+Disallow: /admin/
+Disallow: /my-courses/
+Disallow: /my-progress/
+Disallow: /problem-stats/
+Disallow: /notifications/
+Disallow: /certificates/
+
+Sitemap: https://cs-studio.in/sitemap.xml

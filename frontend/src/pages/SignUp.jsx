@@ -7,6 +7,7 @@ import { supabase } from '../config/supabase';
 import { Navbar as SiteNavbar } from '../components/site/Navbar';
 import { Turnstile } from '@marsidev/react-turnstile';
 import api from '../config/api';
+import SEO from '../components/common/SEO';
 
 const SignUp = () => {
   const { isLoggedIn } = useAuth();
@@ -275,6 +276,10 @@ const SignUp = () => {
 
   return (
     <>
+      <SEO 
+        title="Sign Up" 
+        description="Create an account on CS Studio to start your interactive coding journey."
+      />
       <SiteNavbar />
       <div className="min-h-screen dark-gradient-secondary flex items-center justify-center p-6 py-12 relative pt-24">
         {/* Back Button */}

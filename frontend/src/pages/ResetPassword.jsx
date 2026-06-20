@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
 import { Lock, Check, AlertCircle } from 'lucide-react';
+import SEO from '../components/common/SEO';
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -96,7 +97,12 @@ const ResetPassword = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <>
+            <SEO 
+                title="Set New Password" 
+                description="Set a new secure password for your CS Studio account."
+            />
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
@@ -191,6 +197,7 @@ const ResetPassword = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

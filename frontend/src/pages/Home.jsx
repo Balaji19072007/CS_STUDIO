@@ -15,17 +15,31 @@ import { WhyUs } from "@/components/site/WhyUs";
 import { FinalCTA } from "@/components/site/FinalCTA";
 import { Footer } from "@/components/site/Footer";
 
+import SEO from "@/components/common/SEO";
+
 export default function Home() {
-  useEffect(() => {
-    document.title = "CS Studio — Build. Learn. Compete. Grow.";
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.content = "The all-in-one coding ecosystem: cloud IDE, learning paths, challenges, leaderboards, certificates, and AI tools for developers.";
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CS Studio",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "description": "The all-in-one coding ecosystem: cloud IDE, learning paths, challenges, leaderboards, certificates, and AI tools for developers.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
     }
-  }, []);
+  };
+
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <SEO 
+        title="CS Studio — Build. Learn. Compete. Grow." 
+        description="The all-in-one coding ecosystem: cloud IDE, learning paths, challenges, leaderboards, certificates, and AI tools for developers."
+        schemaData={schemaData}
+      />
       <MouseGlow />
       <Navbar />
       <main className="relative">

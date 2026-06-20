@@ -35,5 +35,26 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 3000,
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-framer-motion';
+            }
+            if (id.includes('@monaco-editor')) {
+              return 'vendor-monaco-editor';
+            }
+            if (id.includes('lucide-react') || id.includes('react-icons') || id.includes('feather-icons')) {
+              return 'vendor-icons';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    }
   },
 })
