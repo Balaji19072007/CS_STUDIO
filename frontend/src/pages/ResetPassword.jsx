@@ -70,7 +70,7 @@ const ResetPassword = () => {
 
     if (sessionChecking) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                     <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-400">Checking your reset link...</p>
@@ -81,7 +81,7 @@ const ResetPassword = () => {
 
     if (!hasValidSession && message.text) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
                         <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4 mb-4">
@@ -102,7 +102,7 @@ const ResetPassword = () => {
                 title="Set New Password" 
                 description="Set a new secure password for your CS Studio account."
             />
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">

@@ -1,7 +1,7 @@
 // src/App.jsx
 
 import React, { useState, useCallback, useRef, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
@@ -114,6 +114,15 @@ function AppContent() {
     initialLoadRef.current = true;
     setShowLoader(false);
   }, []);
+  
+  // Intercept Supabase Auth recovery hash before React Router drops it
+  const navigate = useNavigate();
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      navigate('/reset-password' + hash, { replace: true });
+    }
+  }, [location, navigate]);
 
   // Show the loader while auth is pending OR while re-authenticating after OAuth callback
   if (showLoader || loading) {
