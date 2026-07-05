@@ -32,7 +32,7 @@ const ForgotPassword = () => {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/#/reset-password`,
+                redirectTo: `${window.location.origin}/reset-password`,
             });
 
             if (error) throw error;
@@ -56,26 +56,26 @@ const ForgotPassword = () => {
                 title="Forgot Password" 
                 description="Reset your CS Studio password and regain access to your account."
             />
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                         CS
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
                     Reset your password
                 </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
+                <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
                     Enter your email address and we'll send you a link to reset your password.
                 </p>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
 
                     {message.text && (
-                        <div className={`rounded-md p-4 mb-4 ${message.type === 'success' ? 'bg-green-50' : 'bg-red-50'
+                        <div className={`rounded-md p-4 mb-4 ${message.type === 'success' ? 'bg-green-50 dark:bg-green-900/50' : 'bg-red-50 dark:bg-red-900/50'
                             }`}>
                             <div className="flex">
                                 <div className="flex-shrink-0">
@@ -86,7 +86,7 @@ const ForgotPassword = () => {
                                     )}
                                 </div>
                                 <div className="ml-3">
-                                    <p className={`text-sm font-medium ${message.type === 'success' ? 'text-green-800' : 'text-red-800'
+                                    <p className={`text-sm font-medium ${message.type === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
                                         }`}>
                                         {message.text}
                                     </p>
@@ -97,7 +97,7 @@ const ForgotPassword = () => {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Email address
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -112,7 +112,7 @@ const ForgotPassword = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -133,17 +133,17 @@ const ForgotPassword = () => {
                     <div className="mt-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300" />
+                                <div className="w-full border-t border-gray-300 dark:border-gray-700" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">
+                                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                                     Or
                                 </span>
                             </div>
                         </div>
 
                         <div className="mt-6 text-center">
-                            <Link to="/signin" className="font-medium text-blue-600 hover:text-blue-500 flex items-center justify-center gap-2">
+                            <Link to="/signin" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 flex items-center justify-center gap-2">
                                 <ArrowLeft className="w-4 h-4" />
                                 Back to Sign In
                             </Link>

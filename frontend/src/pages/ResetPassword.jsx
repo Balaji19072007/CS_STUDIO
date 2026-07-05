@@ -57,7 +57,7 @@ const ResetPassword = () => {
 
             showMessage('success', 'Password updated successfully! Redirecting...');
             setTimeout(() => {
-                navigate('/');
+                navigate('/signin');
             }, 2000);
 
         } catch (error) {
@@ -70,10 +70,10 @@ const ResetPassword = () => {
 
     if (sessionChecking) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                     <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-                    <p className="text-gray-600">Checking your reset link...</p>
+                    <p className="text-gray-600 dark:text-gray-400">Checking your reset link...</p>
                 </div>
             </div>
         );
@@ -81,13 +81,13 @@ const ResetPassword = () => {
 
     if (!hasValidSession && message.text) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                    <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
-                        <div className="rounded-md bg-red-50 p-4 mb-4">
-                            <p className="text-sm font-medium text-red-800">{message.text}</p>
+                    <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+                        <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4 mb-4">
+                            <p className="text-sm font-medium text-red-800 dark:text-red-200">{message.text}</p>
                         </div>
-                        <a href="/forgot-password" className="text-blue-600 hover:text-blue-500 font-medium">
+                        <a href="/forgot-password" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium">
                             Request a new reset link
                         </a>
                     </div>
@@ -102,26 +102,26 @@ const ResetPassword = () => {
                 title="Set New Password" 
                 description="Set a new secure password for your CS Studio account."
             />
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                         CS
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
                     Set New Password
                 </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
+                <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
                     Create a new secure password for your account.
                 </p>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
 
                     {message.text && (
-                        <div className={`rounded-md p-4 mb-4 ${message.type === 'success' ? 'bg-green-50' : 'bg-red-50'
+                        <div className={`rounded-md p-4 mb-4 ${message.type === 'success' ? 'bg-green-50 dark:bg-green-900/50' : 'bg-red-50 dark:bg-red-900/50'
                             }`}>
                             <div className="flex">
                                 <div className="flex-shrink-0">
@@ -132,7 +132,7 @@ const ResetPassword = () => {
                                     )}
                                 </div>
                                 <div className="ml-3">
-                                    <p className={`text-sm font-medium ${message.type === 'success' ? 'text-green-800' : 'text-red-800'
+                                    <p className={`text-sm font-medium ${message.type === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
                                         }`}>
                                         {message.text}
                                     </p>
@@ -143,7 +143,7 @@ const ResetPassword = () => {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 New Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -157,14 +157,14 @@ const ResetPassword = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
                                     placeholder="New Password"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Confirm New Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -178,7 +178,7 @@ const ResetPassword = () => {
                                     required
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
                                     placeholder="Confirm Password"
                                 />
                             </div>

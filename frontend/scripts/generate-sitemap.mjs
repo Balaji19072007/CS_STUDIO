@@ -39,11 +39,7 @@ async function generateSitemap() {
     '/',
     '/courses',
     '/problems',
-    '/roadmaps',
-    '/learning-paths',
     '/projects',
-    '/blog',
-    '/docs',
     '/verify-certificate',
     '/about',
     '/contact',
@@ -70,25 +66,9 @@ async function generateSitemap() {
     }
   };
 
-  // 2. Extract Blog Slugs
-  const blogSlugs = getPublishedSlugs('blogs/blog-index.json');
-  blogSlugs.forEach(slug => urls.add(`/blog/${slug}`));
-  
   // 3. Extract Projects Slugs
   const projectSlugs = getPublishedSlugs('projects/projects-index.json');
   projectSlugs.forEach(slug => urls.add(`/projects/${slug}`));
-  
-  // 4. Extract Docs Slugs
-  const docsSlugs = getPublishedSlugs('docs/docs-index.json');
-  docsSlugs.forEach(slug => urls.add(`/docs/${slug}`));
-  
-  // 5. Extract Roadmap Slugs
-  const roadmapSlugs = getPublishedSlugs('roadmaps/roadmaps-index.json');
-  roadmapSlugs.forEach(slug => urls.add(`/roadmaps/${slug}`));
-
-  // 6. Extract Learning Path Slugs
-  const learningPathSlugs = getPublishedSlugs('learning-paths/learning-paths-index.json');
-  learningPathSlugs.forEach(slug => urls.add(`/learning-paths/${slug}`));
 
   // 7. Validate and Build XML
   const protectedRoutes = ['/dashboard', '/settings', '/workspace', '/solve', '/admin'];
@@ -117,11 +97,7 @@ ${validUrls.map(route => `  <url>
   
   console.log('--- SITEMAP VALIDATION SUMMARY ---');
   console.log(`Total URLs generated: ${validUrls.length}`);
-  console.log(`Included Dynamic Blog Posts: ${blogSlugs.length}`);
   console.log(`Included Dynamic Projects: ${projectSlugs.length}`);
-  console.log(`Included Dynamic Docs: ${docsSlugs.length}`);
-  console.log(`Included Dynamic Roadmaps: ${roadmapSlugs.length}`);
-  console.log(`Included Learning Paths: ${learningPathSlugs.length}`);
   console.log('Successfully written to dist/sitemap.xml');
   console.log('----------------------------------');
 }
