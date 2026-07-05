@@ -579,6 +579,8 @@ function AppContent() {
         !location.pathname.startsWith('/verify-certificate') &&
         location.pathname !== '/signin' &&
         location.pathname !== '/signup' &&
+        location.pathname !== '/forgot-password' &&
+        location.pathname !== '/reset-password' &&
         location.pathname !== '/code' &&
         !location.pathname.startsWith('/workspace') &&
         location.pathname !== '/settings' &&

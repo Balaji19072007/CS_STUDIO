@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
 import { supabase } from '../config/supabase';
-import { Lock, Check, AlertCircle } from 'lucide-react';
+import { Lock, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import SEO from '../components/common/SEO';
 
 const ResetPassword = () => {
@@ -102,13 +102,12 @@ const ResetPassword = () => {
                 title="Set New Password" 
                 description="Set a new secure password for your CS Studio account."
             />
-            <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="relative flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <Link to="/signin" className="absolute top-4 left-4 sm:top-8 sm:left-8 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-800 rounded-full shadow-sm transition-colors" title="Back to Sign In">
+                <ArrowLeft className="w-5 h-5" />
+            </Link>
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                        CS
-                    </div>
-                </div>
+
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
                     Set New Password
                 </h2>
@@ -143,7 +142,7 @@ const ResetPassword = () => {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">
                                 New Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -157,14 +156,14 @@ const ResetPassword = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
+                                    className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm dark:text-white dark:placeholder-gray-400 rounded-md py-2 shadow-sm"
                                     placeholder="New Password"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">
                                 Confirm New Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -178,7 +177,7 @@ const ResetPassword = () => {
                                     required
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
+                                    className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm dark:text-white dark:placeholder-gray-400 rounded-md py-2 shadow-sm"
                                     placeholder="Confirm Password"
                                 />
                             </div>

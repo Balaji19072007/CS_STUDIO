@@ -56,13 +56,12 @@ const ForgotPassword = () => {
                 title="Forgot Password" 
                 description="Reset your CS Studio password and regain access to your account."
             />
-            <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="relative flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <Link to="/signin" className="absolute top-4 left-4 sm:top-8 sm:left-8 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-800 rounded-full shadow-sm transition-colors" title="Back to Sign In">
+                <ArrowLeft className="w-5 h-5" />
+            </Link>
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                        CS
-                    </div>
-                </div>
+
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
                     Reset your password
                 </h2>
@@ -97,7 +96,7 @@ const ForgotPassword = () => {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left">
                                 Email address
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
@@ -112,7 +111,7 @@ const ForgotPassword = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md py-2"
+                                    className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm dark:text-white dark:placeholder-gray-400 rounded-md py-2 shadow-sm"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -130,25 +129,7 @@ const ForgotPassword = () => {
                         </div>
                     </form>
 
-                    <div className="mt-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300 dark:border-gray-700" />
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                                    Or
-                                </span>
-                            </div>
-                        </div>
 
-                        <div className="mt-6 text-center">
-                            <Link to="/signin" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 flex items-center justify-center gap-2">
-                                <ArrowLeft className="w-4 h-4" />
-                                Back to Sign In
-                            </Link>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
