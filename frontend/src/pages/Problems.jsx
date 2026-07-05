@@ -7,8 +7,7 @@ import { ProblemManager } from '../utils/problemManager.js';
 import ProblemCard from '../components/problems/ProblemCard.jsx';
 import { ProblemsSkeleton } from '../components/common/SkeletonLoader';
 import { useAuth } from '../hooks/useAuth.jsx';
-
-
+import SEO from '../components/common/SEO';
 
 // ---------- Constants ----------
 const FILTER_OPTIONS = {
@@ -185,6 +184,10 @@ const Problems = () => {
 
     return (
         <div className="w-full min-h-screen dark-gradient-secondary block transition-colors duration-300">
+            <SEO 
+                title="Coding Problems Catalog"
+                description="Tackle our comprehensive collection of language-agnostic coding challenges designed to sharpen your logic and algorithmic skills."
+            />
             {/* Hero Section - Minimal */}
             <div className="pt-24 pb-12 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

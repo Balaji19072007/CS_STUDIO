@@ -35,6 +35,17 @@ const Problems = lazy(() => import('./pages/Problems.jsx'));
 const Courses = lazy(() => import('./pages/Courses.jsx'));
 const CourseDetail = lazy(() => import('./pages/CourseDetail.jsx'));
 const CourseLearning = lazy(() => import('./pages/CourseLearning.jsx'));
+const ProblemDetail = lazy(() => import('./pages/ProblemDetail.jsx'));
+const Roadmaps = lazy(() => import('./pages/Roadmaps.jsx'));
+const RoadmapRouter = lazy(() => import('./pages/RoadmapRouter.jsx'));
+const LearningPaths = lazy(() => import('./pages/LearningPaths.jsx'));
+const LearningPathDetail = lazy(() => import('./pages/LearningPathDetail.jsx'));
+const Projects = lazy(() => import('./pages/Projects.jsx'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail.jsx'));
+const Blog = lazy(() => import('./pages/Blog.jsx'));
+const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
+const Docs = lazy(() => import('./pages/Docs.jsx'));
+const DocDetail = lazy(() => import('./pages/DocDetail.jsx'));
 const PhaseTopics = lazy(() => import('./pages/PhaseTopics.jsx'));
 const TopicContent = lazy(() => import('./pages/TopicContent.jsx'));
 const QuizPage = lazy(() => import('./pages/QuizPage.jsx'));
@@ -147,13 +158,13 @@ function AppContent() {
       <SetUsernameModal />
 
       {/* Main Navbar - Hidden on mobile if logged in (handled via CSS classes in Navbar component) */}
-      {!location.pathname.startsWith('/workspace') && !(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && <Navbar />}
+      {!location.pathname.startsWith('/workspace') && !(location.pathname === '/' && !isLoggedIn) && location.pathname !== '/signin' && location.pathname !== '/signup' && !location.pathname.match(/^\/courses\/[^/]+/) && <Navbar />}
 
       <main
         id="main-content"
         tabIndex={-1}
-        className={`flex-grow ${location.pathname.startsWith('/workspace') ? 'flex flex-col p-0 h-screen overflow-hidden' : (location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname.startsWith('/courses') ? 'pt-0 lg:pt-16 pb-24 sm:pb-0' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0 pb-24 sm:pb-0' : 'pt-14 lg:pt-16 pb-24 sm:pb-0'))}`}
-        style={location.pathname.startsWith('/workspace') ? {} : { minHeight: '60vh' }}
+        className={`flex-grow ${location.pathname.startsWith('/workspace') || location.pathname.match(/^\/courses\/[^/]+\/learn$/) ? 'flex flex-col p-0 h-screen overflow-hidden' : (location.pathname.match(/^\/courses\/[^/]+$/) ? 'flex flex-col p-0' : (location.pathname.startsWith('/solve') || location.pathname.startsWith('/challenge') || location.pathname.startsWith('/course-challenge') || location.pathname.startsWith('/course-project') || location.pathname === '/courses' || location.pathname === '/courses/' ? 'pt-0 lg:pt-16 pb-24 sm:pb-0' : ((location.pathname === '/' && !isLoggedIn) || location.pathname === '/signin' || location.pathname === '/signup' ? 'pt-0 pb-24 sm:pb-0' : 'pt-14 lg:pt-16 pb-24 sm:pb-0')))}`}
+        style={location.pathname.startsWith('/workspace') || location.pathname.match(/^\/courses\/[^/]+/) ? {} : { minHeight: '60vh' }}
       >
 
         <AnimatePresence mode="wait">
@@ -162,9 +173,20 @@ function AppContent() {
             <DashboardErrorBoundary>
             <RouteTransition>
             <Suspense fallback={<SkeletonDashboard />}>
-              {isLoggedIn ? <UserHomePage /> : <Home />}
+              {isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />}
             </Suspense>
             </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/dashboard" element={
+            <DashboardErrorBoundary>
+            <ProtectedRoute>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <UserHomePage />
+              </Suspense>
+              </RouteTransition>
+            </ProtectedRoute>
             </DashboardErrorBoundary>
           } />
           <Route path="/signin" element={
@@ -214,27 +236,49 @@ function AppContent() {
           } />
           <Route path="/problems" element={
             <DashboardErrorBoundary>
-            <ProtectedRoute>
               <RouteTransition>
               <Suspense fallback={<SkeletonDashboard />}>
                 <Problems />
               </Suspense>
               </RouteTransition>
-            </ProtectedRoute>
             </DashboardErrorBoundary>
           } />
           <Route path="/courses" element={
             <DashboardErrorBoundary>
-            <ProtectedRoute>
               <RouteTransition>
               <Suspense fallback={<SkeletonDashboard />}>
                 <Courses />
               </Suspense>
               </RouteTransition>
-            </ProtectedRoute>
             </DashboardErrorBoundary>
           } />
-          <Route path="/courses/:courseId" element={<DashboardErrorBoundary><ProtectedRoute><RouteTransition><Navigate to="learn" replace /></RouteTransition></ProtectedRoute></DashboardErrorBoundary>} />
+          <Route path="/courses/:courseId" element={
+            <DashboardErrorBoundary>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <CourseDetail />
+              </Suspense>
+              </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/projects" element={
+            <DashboardErrorBoundary>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <Projects />
+              </Suspense>
+              </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
+          <Route path="/projects/:projectId" element={
+            <DashboardErrorBoundary>
+              <RouteTransition>
+              <Suspense fallback={<SkeletonDashboard />}>
+                <ProjectDetail />
+              </Suspense>
+              </RouteTransition>
+            </DashboardErrorBoundary>
+          } />
           <Route path="/courses/:courseId/learn" element={
             <CourseErrorBoundary>
             <ProtectedRoute>

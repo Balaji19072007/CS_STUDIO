@@ -1,0 +1,72 @@
+[
+  {
+    "category": "Getting Started",
+    "items": [
+      {
+        "id": "introduction",
+        "slug": "introduction",
+        "title": "Introduction to CS Studio",
+        "description": "Learn what CS Studio is and how it can help you master computer science.",
+        "status": "published",
+        "publishedAt": "2026-10-01T00:00:00Z",
+        "updatedAt": "2026-10-01T00:00:00Z",
+        "tags": ["Getting Started", "CS Studio"],
+        "category": "Getting Started",
+        "seoTitle": "Introduction to CS Studio - Docs",
+        "seoDescription": "Learn what CS Studio is and how it can help you master computer science.",
+        "ogImage": "/images/docs/introduction.jpg",
+        "content": "# Welcome to CS Studio\n\nCS Studio is your all-in-one platform for learning computer science. Unlike traditional platforms that only offer multiple-choice questions or simple algorithmic puzzles, CS Studio provides a full-fledged cloud development environment.\n\n## What can you do here?\n\n- **Follow Curated Roadmaps:** From C Programming to AI/ML, we have structured paths.\n- **Build Real Projects:** Use our web-based VS Code environment to build and compile actual software.\n- **Track Progress:** Earn certificates and monitor your learning journey.\n\nLet's dive in and start building!"
+      },
+      {
+        "id": "quickstart",
+        "slug": "quickstart",
+        "title": "Quickstart Guide",
+        "description": "Get your first piece of code running in under 2 minutes.",
+        "status": "published",
+        "publishedAt": "2026-10-01T00:00:00Z",
+        "updatedAt": "2026-10-01T00:00:00Z",
+        "tags": ["Quickstart", "Guide"],
+        "category": "Getting Started",
+        "seoTitle": "Quickstart Guide - CS Studio Docs",
+        "seoDescription": "Get your first piece of code running in under 2 minutes.",
+        "ogImage": "/images/docs/quickstart.jpg",
+        "content": "# Quickstart Guide\n\nGetting your code running in CS Studio is incredibly simple.\n\n## Step 1: Choose a Course or Roadmap\nNavigate to the [Courses](/courses) or [Roadmaps](/roadmaps) section and select a topic you want to learn.\n\n## Step 2: Open the IDE\nClick on any coding challenge. This will launch the protected CS Studio IDE. \n\n## Step 3: Write & Compile\nWrite your code in the editor. When you are ready, click the **Compile & Run** button. The cloud compiler will execute your code and return the output instantly.\n\nIt's that easy!"
+      }
+    ]
+  },
+  {
+    "category": "Platform Features",
+    "items": [
+      {
+        "id": "cloud-compiler",
+        "slug": "cloud-compiler",
+        "title": "Using the Cloud Compiler",
+        "description": "Understand how our secure cloud compiler executes your code.",
+        "status": "published",
+        "publishedAt": "2026-10-01T00:00:00Z",
+        "updatedAt": "2026-10-01T00:00:00Z",
+        "tags": ["Compiler", "Cloud", "IDE"],
+        "category": "Platform Features",
+        "seoTitle": "Using the Cloud Compiler - CS Studio Docs",
+        "seoDescription": "Understand how our secure cloud compiler executes your code.",
+        "ogImage": "/images/docs/cloud-compiler.jpg",
+        "content": "# Using the Cloud Compiler\n\nThe CS Studio cloud compiler allows you to run complex code without installing anything on your local machine.\n\n## Supported Languages\nCurrently, the compiler supports:\n- C/C++\n- Java\n- Python\n- Node.js\n\n## How it works securely\nWhen you click 'Run', your code is sent to a secure, isolated Docker container in the cloud. It executes with restricted permissions to prevent malicious behavior, and the standard output is streamed directly back to your browser window via WebSockets."
+      },
+      {
+        "id": "certificates",
+        "slug": "certificates",
+        "title": "Earning Certificates",
+        "description": "How to earn and verify your course completion certificates.",
+        "status": "published",
+        "publishedAt": "2026-10-01T00:00:00Z",
+        "updatedAt": "2026-10-01T00:00:00Z",
+        "tags": ["Certificates", "Achievements"],
+        "category": "Platform Features",
+        "seoTitle": "Earning Certificates - CS Studio Docs",
+        "seoDescription": "How to earn and verify your course completion certificates.",
+        "ogImage": "/images/docs/certificates.jpg",
+        "content": "# Earning Certificates\n\nCertificates prove that you have successfully completed a course and its associated capstone projects.\n\n## Requirements\nTo earn a certificate for a specific course, you must:\n1. Complete all theoretical modules.\n2. Successfully pass all coding challenges.\n3. Submit and pass the final capstone project.\n\n## Verification\nEvery certificate comes with a unique cryptographic ID. Employers or peers can verify your certificate's authenticity by visiting the [Verify Certificate](/verify) page and entering your ID."
+      }
+    ]
+  }
+]

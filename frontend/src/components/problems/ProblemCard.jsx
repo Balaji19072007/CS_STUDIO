@@ -37,11 +37,7 @@ const ProblemCard = ({ problem }) => {
             : 'text-red-400';
 
     const handleSolveClick = (e) => {
-        if (!isLoggedIn) {
-            e.preventDefault();
-            // Note: Alerts are generally forbidden in modern UIs; using console log as alternative to prevent crashes
-            console.log('Action blocked: User must be signed in to solve problems.');
-        }
+        // No longer blocking click. Let the user navigate to ProblemDetail.
     };
 
     return (
@@ -95,21 +91,20 @@ const ProblemCard = ({ problem }) => {
 
                     {/* Action Button */}
                     <Link
-                        to={isLoggedIn ? `/solve?problemId=${problemId}` : '/signin'}
-                        onClick={handleSolveClick}
-                        className={`inline-flex items-center justify-center rounded-lg flex-shrink-0 transition-colors ${isLoggedIn ? 'bg-gray-100 text-gray-700 hover:bg-primary-500 hover:text-white dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-primary-600 dark:hover:text-white sm:!bg-green-600 sm:!text-white sm:hover:!bg-green-700 sm:dark:!bg-green-600 sm:dark:!text-white sm:dark:hover:!bg-green-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'}`}
+                        to={`/solve?problemId=${problemId}`}
+                        className={`inline-flex items-center justify-center rounded-lg flex-shrink-0 transition-colors bg-gray-100 text-gray-700 hover:bg-primary-500 hover:text-white dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-primary-600 dark:hover:text-white sm:!bg-gray-200 sm:!text-gray-800 sm:hover:!bg-primary-600 sm:hover:!text-white sm:dark:!bg-gray-700 sm:dark:!text-gray-200 sm:dark:hover:!bg-primary-600 sm:dark:hover:!text-white`}
                     >
                         {/* Desktop: Solve Button */}
                         <span className="hidden sm:flex items-center px-3 py-1.5 text-sm font-medium">
                             {status === 'solved' ? (
                                 <>
-                                    <Check className="w-4 h-4 mr-2" />
+                                    <Check className="w-4 h-4 mr-1.5" />
                                     Solved
                                 </>
                             ) : (
                                 <>
                                     <Code className="w-4 h-4 mr-2" />
-                                    Solve
+                                    View
                                 </>
                             )}
                         </span>

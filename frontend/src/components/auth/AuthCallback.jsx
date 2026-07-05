@@ -43,7 +43,7 @@ const AuthCallback = () => {
             // Dispatch auth-login event so AuthProvider re-fetches session,
             // then soft-navigate to root (no hard redirect to avoid race conditions)
             window.dispatchEvent(new Event('auth-login'));
-            navigate('/', { replace: true });
+            navigate('/dashboard', { replace: true });
 
         } catch (err) {
             console.error('OAuth Callback Error:', err);

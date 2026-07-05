@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Flame, Trophy, Star, Zap, Globe, Code2 } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
+import { Link } from "react-router-dom";
 
 const BOARD = [
   { rank: 1, name: "Aarav Mehta", xp: 28420, badge: "Grandmaster" },
@@ -75,14 +76,23 @@ export function Arena() {
             >
               <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold"><Flame className="h-5 w-5 text-accent" /> Featured Challenges</h3>
               <div className="space-y-3">
-                {CHALLENGES.map((c) => (
-                  <div key={c.title} className="flex items-center justify-between rounded-xl bg-background/40 p-3">
+                {CHALLENGES.map((c, idx) => (
+                  <Link 
+                    to={`/solve?problemId=${idx + 1}`}
+                    key={c.title} 
+                    className="flex items-center justify-between rounded-xl bg-background/40 p-3 hover:bg-background/60 transition group cursor-pointer"
+                  >
                     <div>
-                      <div className="text-sm font-medium">{c.title}</div>
+                      <div className="text-sm font-medium group-hover:text-primary transition-colors">{c.title}</div>
                       <div className={`text-xs ${c.color}`}>{c.diff}</div>
                     </div>
-                    <span className="text-xs text-muted-foreground">+{c.xp} XP</span>
-                  </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">+{c.xp} XP</span>
+                      <div className="bg-primary/10 text-primary p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Code2 className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </motion.div>

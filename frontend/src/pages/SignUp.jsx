@@ -157,7 +157,7 @@ const SignUp = () => {
         setResendTimer(30);
       } else {
         showMessage('success', 'Registration successful!');
-        setTimeout(() => { window.location.href = '/'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       }
 
     } catch (error) {
@@ -211,7 +211,7 @@ const SignUp = () => {
           localStorage.setItem('token', data.token);
         }
         showMessage('success', 'Account verified successfully!');
-        setTimeout(() => { window.location.href = '/'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       } else {
         throw new Error(data.msg || 'Invalid OTP');
       }

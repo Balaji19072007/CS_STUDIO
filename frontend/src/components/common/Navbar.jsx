@@ -499,7 +499,7 @@ const Navbar = () => {
                     {/* 1. LEFT SIDE: LOGO + NAV LINKS */}
                     <div className="flex items-center h-full">
                         <div className="flex-shrink-0 flex items-center">
-                            <Link to="/" className="flex items-center">
+                            <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center">
                                 <div className="h-8 w-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
                                     <i data-feather="code" className="text-white w-4 h-4 logo-icon"></i>
                                 </div>
@@ -519,11 +519,9 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3 h-full">
 
                         {/* Desktop Search Bar */}
-                        {isLoggedIn && (
-                            <div className="hidden sm:block w-48 lg:w-64 mr-4">
-                                {renderSearch()}
-                            </div>
-                        )}
+                        <div className="hidden sm:block w-48 lg:w-64 mr-4">
+                            {renderSearch()}
+                        </div>
 
                         {/* Theme Toggle */}
                         <button

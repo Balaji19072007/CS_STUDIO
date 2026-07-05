@@ -4,7 +4,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { Metrics } from "@/components/site/Metrics";
 import { Showcase } from "@/components/site/Showcase";
-import { Paths } from "@/components/site/Paths";
+import { FeaturedCourses } from "@/components/site/FeaturedCourses";
 import { Arena } from "@/components/site/Arena";
 import { Community } from "@/components/site/Community";
 import { AlgoVisualizer } from "@/components/site/AlgoVisualizer";
@@ -46,7 +46,7 @@ export default function Home() {
         <Hero />
         <Metrics />
         <Showcase />
-        <Paths />
+        <FeaturedCourses />
         <Arena />
         <Community />
         <AlgoVisualizer />

@@ -87,7 +87,7 @@ const SignIn = () => {
 
       showMessage('success', 'Signed in successfully!');
       setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/dashboard';
       }, 500);
 
     } catch (error) {
@@ -127,7 +127,7 @@ const SignIn = () => {
       }
       showMessage('success', 'Signed in successfully!');
       setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/dashboard';
       }, 500);
     } catch (error) {
       showMessage('error', error.response?.data?.msg || error.message || 'MFA verification failed');

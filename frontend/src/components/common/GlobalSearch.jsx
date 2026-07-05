@@ -1,15 +1,23 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Search, X, Loader, ArrowRight } from 'lucide-react';
+import { contentService } from '../../services/contentService';
+import { useAuth } from '../../hooks/useAuth';
 
 const SEARCH_ENDPOINTS = [
   { key: 'courses', label: 'Courses', url: '/api/courses/search?q=' },
   { key: 'problems', label: 'Problems', url: '/api/problems/search?q=' },
+  { key: 'roadmaps', label: 'Roadmaps', url: '/api/roadmaps/search?q=' },
   { key: 'community', label: 'Community', url: '/api/community/search?q=' },
 ];
 
+const flattenedDocs = contentService.getPublishedContent('doc').reduce((acc, section) => {
+    return acc.concat(section.items);
+}, []);
+
 const GlobalSearch = () => {
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState({ courses: [], problems: [], community: [] });
+  const [results, setResults] = useState({ courses: [], problems: [], roadmaps: [], projects: [], blog: [], docs: [], community: [] });
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -19,27 +27,62 @@ const GlobalSearch = () => {
   const flatResults = [
     ...results.courses.map(r => ({ ...r, type: 'course' })),
     ...results.problems.map(r => ({ ...r, type: 'problem' })),
+    ...(results.roadmaps || []).map(r => ({ ...r, type: 'roadmap' })),
+    ...(results.projects || []).map(r => ({ ...r, type: 'project' })),
+    ...(results.blog || []).map(r => ({ ...r, type: 'blog' })),
+    ...(results.docs || []).map(r => ({ ...r, type: 'docs' })),
     ...results.community.map(r => ({ ...r, type: 'community' })),
   ];
 
   const performSearch = useCallback(async (q) => {
     if (!q.trim()) {
-      setResults({ courses: [], problems: [], community: [] });
+      setResults({ courses: [], problems: [], roadmaps: [], projects: [], blog: [], docs: [], community: [] });
       setLoading(false);
       return;
     }
 
     setLoading(true);
+    
+    // 1. Perform Local Search for Static Content
+    const lowerQ = q.toLowerCase();
+    
+    const localProjects = contentService.getPublishedContent('project').filter(p => 
+        p.title.toLowerCase().includes(lowerQ) || p.description.toLowerCase().includes(lowerQ)
+    );
+    
+    const localBlog = contentService.getPublishedContent('blog').filter(p => 
+        p.title.toLowerCase().includes(lowerQ) || (p.description && p.description.toLowerCase().includes(lowerQ))
+    );
+    
+    const localDocs = flattenedDocs.filter(d => 
+        d.title.toLowerCase().includes(lowerQ) || d.description.toLowerCase().includes(lowerQ)
+    );
+
+    // 2. Perform API Search for Dynamic Content
     try {
+      const activeEndpoints = user 
+        ? SEARCH_ENDPOINTS 
+        : SEARCH_ENDPOINTS.filter(ep => ep.key !== 'community');
+
       const responses = await Promise.allSettled(
-        SEARCH_ENDPOINTS.map(ep =>
+        activeEndpoints.map(ep =>
           fetch(ep.url + encodeURIComponent(q), { credentials: 'include' })
-            .then(r => r.json())
+            .then(r => {
+              if (!r.ok) throw new Error('API Error');
+              return r.json();
+            })
             .then(d => ({ key: ep.key, data: d.data || d.results || [] }))
+            .catch(() => ({ key: ep.key, data: [] }))
         )
       );
 
-      const merged = { courses: [], problems: [], community: [] };
+      const merged = { 
+          courses: [], problems: [], roadmaps: [], community: [],
+          projects: localProjects, 
+          blog: localBlog, 
+          docs: localDocs 
+      };
+      
       responses.forEach(r => {
         if (r.status === 'fulfilled') {
           merged[r.value.key] = r.value.data;
@@ -47,7 +90,8 @@ const GlobalSearch = () => {
       });
       setResults(merged);
     } catch {
-      // Silently fail search
+      // Silently fail search but still show local results
+      setResults(prev => ({ ...prev, projects: localProjects, blog: localBlog, docs: localDocs }));
     } finally {
       setLoading(false);
     }
@@ -74,14 +118,16 @@ const GlobalSearch = () => {
     } else if (e.key === 'Escape') {
       setIsOpen(false);
       setQuery('');
-      setResults({ courses: [], problems: [], community: [] });
+      setResults({ courses: [], problems: [], roadmaps: [], projects: [], blog: [], docs: [], community: [] });
     }
   };
 
   const navigateToResult = (item) => {
     const paths = {
       course: `/courses/${item.id || item._id}`,
-      problem: `/problems/${item.id || item._id}`,
+      problem: `/solve?problemId=${item.id || item._id}`,
+      roadmap: `/roadmaps/${item.slug || item.id || item._id}`,
+      project: `/projects/${item.slug || item.id || item._id}`,
       community: `/community/${item.id || item._id}`,
     };
     window.location.href = paths[item.type] || '/';
@@ -90,7 +136,7 @@ const GlobalSearch = () => {
 
   const clearSearch = () => {
     setQuery('');
-    setResults({ courses: [], problems: [], community: [] });
+    setResults({ courses: [], problems: [], roadmaps: [], projects: [], blog: [], docs: [], community: [] });
     setIsOpen(false);
     setSelectedIndex(-1);
     inputRef.current?.focus();
@@ -180,13 +226,23 @@ const GlobalSearch = () => {
                 <span className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs font-medium ${
                   item.type === 'course' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' :
                   item.type === 'problem' ? 'bg-green-100 dark:bg-green-900/30 text-green-600' :
+                  item.type === 'roadmap' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' :
+                  item.type === 'project' ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600' :
+                  item.type === 'blog' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600' :
+                  item.type === 'docs' ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-600' :
                   'bg-orange-100 dark:bg-orange-900/30 text-orange-600'
                 }`}>
-                  {item.type === 'course' ? 'C' : item.type === 'problem' ? 'P' : 'D'}
+                  {item.type === 'course' ? 'C' : 
+                   item.type === 'problem' ? 'P' : 
+                   item.type === 'roadmap' ? 'R' :
+                   item.type === 'project' ? 'Pr' :
+                   item.type === 'blog' ? 'B' :
+                   item.type === 'docs' ? 'D' :
+                   'Co'}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium truncate">{item.title || item.name || 'Untitled'}</div>
-                  <div className="text-xs text-gray-400 truncate">{item.type === 'course' ? 'Course' : item.type === 'problem' ? 'Problem' : 'Discussion'}</div>
+                  <div className="text-xs text-gray-400 truncate capitalize">{item.type}</div>
                 </div>
                 <ArrowRight className="w-4 h-4 flex-shrink-0 text-gray-400" aria-hidden="true" />
               </button>

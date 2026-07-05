@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-// import { useAuth } from '../../hooks/useAuth';
-// import { useTheme } from '../../contexts/ThemeContext';
+import SEO from '../common/SEO';
+import Breadcrumbs from '../common/Breadcrumbs';
 
 // --- Styles for the Roadmap Timeline ---
 
@@ -257,18 +257,20 @@ const RoadmapLayout = ({ data, roadmapId }) => {
 
     return (
         <div className="min-h-screen bg-[#0B1120] text-gray-100 font-sans pb-20">
+            <SEO 
+                title={data.title}
+                description={data.description}
+            />
 
             {/* Header Section */}
             <div className="bg-[#111827] border-b border-gray-800 pt-24 pb-12 mb-12 relative">
-                {/* Back Button */}
-                <div className="absolute top-24 left-4 lg:left-8">
-                    <Link to="/roadmaps" className="inline-flex items-center text-gray-400 hover:text-white transition-colors bg-gray-800/50 p-2 rounded-lg hover:bg-gray-800">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        Back
-                    </Link>
-                </div>
-
                 <div className="max-w-5xl mx-auto px-6">
+                    <div className="mb-6">
+                        <Breadcrumbs items={[
+                            { label: 'Roadmaps', path: '/roadmaps' },
+                            { label: data.title, path: `/roadmaps/${roadmapId}` }
+                        ]} />
+                    </div>
                     <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
                         {data.title}
                     </h1>

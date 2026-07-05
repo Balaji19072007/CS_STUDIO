@@ -17,6 +17,7 @@ import { courseRatingAPI } from '../config/api';
 import CourseRatingModal from '../components/common/CourseRatingModal';
 import { DifficultyBadge } from '../components/learning/LessonNavigation';
 import { useBookmarks } from '../components/learning/LessonBookmarkButton';
+import CourseTopBar from '../components/common/CourseTopBar';
 
 const isProgressCompleted = (entry) =>
     Boolean(entry?.completed === true || entry?.status === 'completed' || entry?.completed_at);
@@ -637,8 +638,8 @@ const CourseLearning = ({ embeddedCourseId }) => {
     }
 
     return (
-        <div className={`${isEmbedded ? 'h-full' : 'h-[100dvh] lg:h-[calc(100dvh-4rem)]'} flex flex-col bg-gray-50 dark:bg-slate-900 overflow-hidden`}>
-
+        <div className={`${isEmbedded ? 'h-full' : 'h-[100dvh]'} flex flex-col bg-gray-50 dark:bg-slate-900 overflow-hidden`}>
+            {!isEmbedded && <CourseTopBar courseTitle={course?.title} />}
 
             <div className="flex-1 flex overflow-hidden relative">
                 {/* Mobile Overlay */}
@@ -892,18 +893,18 @@ const CourseLearning = ({ embeddedCourseId }) => {
                         <div className="min-h-full w-full bg-white dark:bg-[#0B1120]">
                             {/* ── Hero Banner ── */}
                             <div className="relative w-full overflow-hidden" style={{ minHeight: 260 }}>
-                                <div className="absolute inset-0 bg-gradient-to-br from-[#0f1f4b] via-[#1a2f6e] to-[#0B1120]" />
-                                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-                                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-white dark:from-[#0f1f4b] dark:via-[#1a2f6e] dark:to-[#0B1120]" />
+                                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+                                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-300/20 dark:bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
                                 <div className="relative z-10 px-8 md:px-14 lg:px-20 py-12 md:py-16">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-semibold mb-5 tracking-wide">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-5 tracking-wide">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
                                         Interactive Learning Experience
                                     </div>
-                                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
+                                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight tracking-tight">
                                         {course?.title || 'C Programming'}
                                     </h1>
-                                    <p className="text-blue-100/80 text-base md:text-lg leading-relaxed max-w-3xl mb-8 font-medium">
+                                    <p className="text-gray-700 dark:text-blue-100/80 text-base md:text-lg leading-relaxed max-w-3xl mb-8 font-medium">
                                         {course?.overview_description || course?.description || 'Master C Programming from the ground up — write valid C programs, understand why the language still powers operating systems, embedded devices, tooling, and performance-critical software.'}
                                     </p>
                                     <div className="flex flex-wrap gap-4 items-center">
@@ -922,17 +923,17 @@ const CourseLearning = ({ embeddedCourseId }) => {
                                             {courseProgressPercentage > 0 ? 'Continue Learning' : 'Start Learning'}
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                                         </button>
-                                        <div className="flex items-center gap-5 text-sm text-blue-200/70 font-medium">
+                                        <div className="flex items-center gap-5 text-sm text-blue-700 dark:text-blue-200/70 font-medium">
                                             <span className="flex items-center gap-1.5">
-                                                <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                                                 {phases.length} Phases
                                             </span>
                                             <span className="flex items-center gap-1.5">
-                                                <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                                                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                                                 {totalCourseTopics} Topics
                                             </span>
                                             <span className="flex items-center gap-1.5">
-                                                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                                                <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                                                 Certificate at 100%
                                             </span>
                                         </div>

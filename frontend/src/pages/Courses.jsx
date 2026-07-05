@@ -1,167 +1,115 @@
-import React, { useState, useEffect, useRef } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import * as feather from '../util/featherIcons';
-import CourseLearning from './CourseLearning';
+import { getAllCourses } from '../api/courseApi';
+import SEO from '../components/common/SEO';
+import { SkeletonDashboard } from '../components/common/SkeletonLoader';
 
 const Courses = () => {
-    const [activeCourse, setActiveCourse] = useState('c');
-    const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-    const navRef = useRef(null);
-    const activeTabRef = useRef(null);
-    // const navigate = useNavigate();
+    const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const courseList = [
-        { id: 'c', name: 'C', icon: '📘' },
-        { id: 'java', name: 'Java', icon: '☕' },
-        { id: 'python', name: 'Python', icon: '🐍' },
-        { id: 'cpp', name: 'C++', icon: '🚀' },
-        { id: 'csharp', name: 'C#', icon: '#️⃣' }
-        // { id: 'web', name: 'Web Dev', icon: '🌐' },
-        // { id: 'app', name: 'App Dev', icon: '📱' },
-        // { id: 'aiml', name: 'AI & ML', icon: '🧠' }
-    ];
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                // Ensure C and Java are listed by default if database is empty/unavailable
+                let fetchedCourses = [];
+                try {
+                    fetchedCourses = await getAllCourses();
+                } catch (e) {
+                    console.warn("Failed to fetch courses from DB, using fallbacks.", e);
+                }
+                
+                // Merge fallbacks if they are missing
+                const hasC = fetchedCourses.find(c => c.id === 'c-lang' || c.id === 'c-programming');
+                const hasJava = fetchedCourses.find(c => c.id === 'java-programming');
+                
+                if (!hasC) fetchedCourses.push({ id: 'c-lang', title: 'C Programming', description: 'Master C programming from basics to advanced concepts.', difficulty: 'Beginner to Advanced' });
+                if (!hasJava) fetchedCourses.push({ id: 'java-programming', title: 'Java Programming', description: 'Master Java programming from basics to advanced concepts.', difficulty: 'Beginner to Advanced' });
 
-    // Initialize feather icons on mount and when active course changes
+                setCourses(fetchedCourses);
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
     useEffect(() => {
         if (typeof feather !== 'undefined' && feather.replace) {
             feather.replace();
         }
-    }, [activeCourse]);
+    }, [courses]);
 
-    // Update sliding indicator position
-    useEffect(() => {
-        // We use setTimeout to ensure fonts/layout have rendered before calculating widths
-        const updateIndicator = () => {
-            if (activeTabRef.current && navRef.current) {
-                const activeTab = activeTabRef.current;
-                setIndicatorStyle({
-                    left: activeTab.offsetLeft,
-                    width: activeTab.offsetWidth
-                });
-
-                // Optional: scroll the active tab into view if it's off-screen on mobile
-                activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-        };
-
-        const timer = setTimeout(updateIndicator, 50);
-        return () => clearTimeout(timer);
-    }, [activeCourse]);
-
-    // recalculate on window resize
-    useEffect(() => {
-        const handleResize = () => {
-            if (activeTabRef.current) {
-                setIndicatorStyle({
-                    left: activeTabRef.current.offsetLeft,
-                    width: activeTabRef.current.offsetWidth
-                });
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const activeCourseData = courseList.find(c => c.id === activeCourse);
+    if (loading) return <SkeletonDashboard />;
 
     return (
-        <div className="w-full pt-14 lg:pt-0 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 h-[100dvh] lg:h-[calc(100dvh-4rem)] overflow-hidden flex flex-col">
-            {/* Course Navbar (Internal) - Moved to top, added border, smaller height */}
-            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-30 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="relative">
-                        {/* Horizontal scroll container */}
-                        <div
-                            ref={navRef}
-                            className="flex overflow-x-auto hide-scrollbar justify-start xl:justify-center relative"
-                        >
-                            {courseList.map((course) => {
-                                const isActive = activeCourse === course.id;
-                                return (
-                                    <button
-                                        key={course.id}
-                                        ref={isActive ? activeTabRef : null}
-                                        onClick={() => {
-                                            if (activeCourse === course.id && (course.id === 'c' || course.id === 'java')) {
-                                                sessionStorage.removeItem('cs_embedded_topic');
-                                                sessionStorage.removeItem('cs_embedded_quiz');
-                                                window.dispatchEvent(new Event('reset-course-learning'));
-                                            } else {
-                                                setActiveCourse(course.id);
-                                            }
-                                        }}
-                                        className={`flex items-center whitespace-nowrap px-6 py-4 text-sm md:text-base font-semibold tracking-wide transition-colors duration-300 relative z-10 ${isActive
-                                            ? 'text-primary-600 dark:text-primary-400'
-                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/30'
-                                            }`}
-                                    >
-                                        {course.name}
-                                    </button>
-                                );
-                            })}
-
-                            {/* Sliding Indicator Line */}
-                            <div
-                                className="absolute bottom-0 h-[3px] bg-primary-500 dark:bg-primary-400 transition-all duration-300 ease-out rounded-t-full z-20"
-                                style={{
-                                    left: `${indicatorStyle.left}px`,
-                                    width: `${indicatorStyle.width}px`
-                                }}
-                            />
-                        </div>
-                    </div>
+        <div className="w-full min-h-screen dark-gradient-secondary transition-colors duration-300">
+            <SEO 
+                title="Course Catalog" 
+                description="Browse our collection of comprehensive computer science and programming courses."
+            />
+            
+            {/* Hero Section */}
+            <div className="pt-24 pb-12 relative z-10 border-b border-gray-200 dark:border-gray-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+                        Explore Our <span className="text-primary-600 dark:text-primary-500">Curriculum</span>
+                    </h1>
+                    <p className="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400 mb-4">
+                        Comprehensive learning paths designed to take you from beginner to industry-ready.
+                    </p>
                 </div>
             </div>
-            {/* Dynamic Content Area */}
-            {activeCourse === 'c' || activeCourse === 'java' ? (
-                <div className="flex-1 w-full overflow-hidden">
-                    <CourseLearning embeddedCourseId={activeCourse === 'c' ? 'c-lang' : 'java-programming'} />
-                </div>
-            ) : (
-                <div className="flex-1 w-full overflow-y-auto px-4 sm:px-6 lg:px-8 pb-20">
-                    <div className="max-w-5xl mx-auto mt-6 lg:mt-12">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-3xl p-12 md:p-20 text-center shadow-xl dark:shadow-2xl transition-all duration-300 relative overflow-hidden">
-                            {/* Decorative background glow for dark mode */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-2xl pointer-events-none opacity-0 dark:opacity-20 transition-opacity duration-300">
-                                <div className="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary-500 rounded-full blur-[100px]"></div>
+
+            {/* Course Grid */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {courses.map((course) => (
+                        <Link 
+                            to={`/courses/${course.id}`} 
+                            key={course.id}
+                            className="flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden group hover:-translate-y-1"
+                        >
+                            <div className="h-48 bg-gray-100 dark:bg-gray-900 relative overflow-hidden flex items-center justify-center">
+                                <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-purple-500/10 dark:from-primary-500/20 dark:to-purple-500/20 group-hover:opacity-100 transition-opacity"></div>
+                                {/* Icon representation */}
+                                <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-md flex items-center justify-center text-3xl font-bold text-gray-900 dark:text-white border border-gray-100 dark:border-gray-700 z-10 group-hover:scale-110 transition-transform duration-300">
+                                    {course.title.charAt(0)}
+                                </div>
                             </div>
-
-                            <div className="relative z-10 flex flex-col items-center">
-                                <div className="text-7xl md:text-8xl mb-8 transform hover:scale-110 transition-transform duration-500 drop-shadow-md">
-                                    {activeCourseData?.icon}
+                            
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-3 py-1 rounded-full">
+                                        {course.difficulty || 'Guided'}
+                                    </span>
                                 </div>
-
-                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
-                                    {activeCourseData?.name} Course
-                                </h2>
-
-                                <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold text-sm tracking-wide mb-8 transition-colors duration-300 border border-primary-200 dark:border-primary-500/20 shadow-sm">
-                                    <i data-feather="clock" className="w-4 h-4 mr-2 animate-pulse"></i>
-                                    COMING SOON
-                                </div>
-
-                                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 transition-colors duration-300 max-w-xl mx-auto leading-relaxed">
-                                    We are working hard to build the most comprehensive and engaging curriculum for <span className="font-semibold text-gray-900 dark:text-white">{activeCourseData?.name}</span>. Check back soon for updates!
+                                
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    {course.title}
+                                </h3>
+                                
+                                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-6 flex-1">
+                                    {course.description || course.overview_description || `Learn ${course.title} from scratch.`}
                                 </p>
+                                
+                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                        View Details
+                                    </span>
+                                    <i data-feather="arrow-right" className="w-4 h-4 text-gray-400 group-hover:text-primary-500 transition-colors transform group-hover:translate-x-1"></i>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </Link>
+                    ))}
                 </div>
-            )}
-
-            {/* Custom scrollbar hiding style just for this component */}
-            <style>{`
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .hide-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
+            </div>
         </div>
     );
 };
 
 export default Courses;
-

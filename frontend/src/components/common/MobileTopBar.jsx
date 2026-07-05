@@ -6,7 +6,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useNotifications } from '../../hooks/useNotifications';
 
 const MobileTopBar = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, isLoggedIn } = useAuth();
     const { toggleTheme, isDark } = useTheme();
     const { unreadCount } = useNotifications();
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ const MobileTopBar = () => {
         <>
             <div className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#101827]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 h-14 px-4 flex items-center justify-between sm:hidden transition-colors duration-300 transform-gpu shadow-sm dark:shadow-[0_4px_25px_rgba(0,0,0,0.1)]">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2">
+                <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-inner">
                         CS
                     </div>

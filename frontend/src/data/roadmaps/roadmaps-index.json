@@ -1,0 +1,636 @@
+[
+  {
+    "id": "c-lang",
+    "slug": "c-programming",
+    "title": "C Language",
+    "description": "Low-level procedural language — great for learning memory, pointers, and fundamentals of computing.",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "C Language Roadmap - CS Studio",
+    "seoDescription": "Low-level procedural language — great for learning memory, pointers, and fundamentals of computing.",
+    "ogImage": "/images/roadmaps/c-lang.jpg",
+    "prerequisites": [
+      "Basic computer literacy"
+    ],
+    "estimatedHours": 80,
+    "learningPathId": "prog-langs"
+  },
+  {
+    "id": "java-lang",
+    "slug": "java-programming",
+    "title": "Java Language",
+    "description": "Object-oriented language suited for backend, enterprise apps, and Android foundations.",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Java Language Roadmap - CS Studio",
+    "seoDescription": "Object-oriented language suited for backend, enterprise apps, and Android foundations.",
+    "ogImage": "/images/roadmaps/java-lang.jpg",
+    "prerequisites": [
+      "Basic programming concepts (recommended)"
+    ],
+    "estimatedHours": 100,
+    "learningPathId": "prog-langs"
+  },
+  {
+    "id": "python-lang",
+    "slug": "python-programming",
+    "title": "Python Language",
+    "description": "High-level, beginner-friendly language used in web, automation, data science, and AI.",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Python Language Roadmap - CS Studio",
+    "seoDescription": "High-level, beginner-friendly language used in web, automation, data science, and AI.",
+    "ogImage": "/images/roadmaps/python-lang.jpg",
+    "prerequisites": [
+      "Basic computer literacy"
+    ],
+    "estimatedHours": 90,
+    "learningPathId": "prog-langs"
+  },
+  {
+    "id": "frontend-dev",
+    "slug": "frontend-development",
+    "title": "Frontend",
+    "description": "HTML, CSS, JavaScript, React/Vue.js, responsive design - Weeks 1–6",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Frontend Roadmap - CS Studio",
+    "seoDescription": "HTML, CSS, JavaScript, React/Vue.js, responsive design - Weeks 1–6",
+    "ogImage": "/images/roadmaps/frontend-dev.jpg",
+    "prerequisites": [
+      "HTML basics",
+      "Basic JavaScript recommended"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "fullstack"
+  },
+  {
+    "id": "backend-dev",
+    "slug": "backend-development",
+    "title": "Backend",
+    "description": "Node.js/Python, Express/Django, REST APIs, authentication - Weeks 6–12",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Backend Roadmap - CS Studio",
+    "seoDescription": "Node.js/Python, Express/Django, REST APIs, authentication - Weeks 6–12",
+    "ogImage": "/images/roadmaps/backend-dev.jpg",
+    "prerequisites": [
+      "Basic programming",
+      "Understanding of web concepts"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "fullstack"
+  },
+  {
+    "id": "database-dev",
+    "slug": "database-development",
+    "title": "Database & Data Modeling",
+    "description": "SQL, MongoDB, database design, ORM/ODM - Weeks 8–14",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Database & Data Modeling Roadmap - CS Studio",
+    "seoDescription": "SQL, MongoDB, database design, ORM/ODM - Weeks 8–14",
+    "ogImage": "/images/roadmaps/database-dev.jpg",
+    "prerequisites": [
+      "Backend basics"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "fullstack"
+  },
+  {
+    "id": "deployment-dev",
+    "slug": "deployment-development",
+    "title": "Deployment & DevOps Essentials",
+    "description": "Docker, AWS, CI/CD, performance optimization - Weeks 12–16",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Deployment & DevOps Essentials Roadmap - CS Studio",
+    "seoDescription": "Docker, AWS, CI/CD, performance optimization - Weeks 12–16",
+    "ogImage": "/images/roadmaps/deployment-dev.jpg",
+    "prerequisites": [
+      "Frontend & Backend knowledge"
+    ],
+    "estimatedHours": 80,
+    "learningPathId": "fullstack"
+  },
+  {
+    "id": "fullstack-dev",
+    "slug": "fullstack-development",
+    "title": "Full Stack Putting It Together",
+    "description": "Capstone project, testing, best practices - Weeks 16–20",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Full Stack Putting It Together Roadmap - CS Studio",
+    "seoDescription": "Capstone project, testing, best practices - Weeks 16–20",
+    "ogImage": "/images/roadmaps/fullstack-dev.jpg",
+    "prerequisites": [
+      "All previous modules"
+    ],
+    "estimatedHours": 80,
+    "learningPathId": "fullstack"
+  },
+  {
+    "id": "android-dev",
+    "slug": "android-development",
+    "title": "Native Android",
+    "description": "Kotlin, Android Studio, Material Design, Jetpack - Weeks 1–8",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Native Android Roadmap - CS Studio",
+    "seoDescription": "Kotlin, Android Studio, Material Design, Jetpack - Weeks 1–8",
+    "ogImage": "/images/roadmaps/android-dev.jpg",
+    "prerequisites": [
+      "Basic programming concepts"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "mobile"
+  },
+  {
+    "id": "ios-dev",
+    "slug": "ios-development",
+    "title": "Native iOS",
+    "description": "Swift, Xcode, UIKit, SwiftUI - Weeks 1–8",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Native iOS Roadmap - CS Studio",
+    "seoDescription": "Swift, Xcode, UIKit, SwiftUI - Weeks 1–8",
+    "ogImage": "/images/roadmaps/ios-dev.jpg",
+    "prerequisites": [
+      "Basic programming concepts"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "mobile"
+  },
+  {
+    "id": "crossplatform-dev",
+    "slug": "cross-development",
+    "title": "Cross-Platform",
+    "description": "React Native/Flutter, shared codebase, platform APIs - Weeks 6–12",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Cross-Platform Roadmap - CS Studio",
+    "seoDescription": "React Native/Flutter, shared codebase, platform APIs - Weeks 6–12",
+    "ogImage": "/images/roadmaps/crossplatform-dev.jpg",
+    "prerequisites": [
+      "JavaScript or Dart knowledge recommended"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "mobile"
+  },
+  {
+    "id": "backend-mobile",
+    "slug": "backend-apis-mobile-development",
+    "title": "Backend & APIs for Mobile",
+    "description": "REST APIs, GraphQL, offline sync, push notifications - Weeks 10–14",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Backend & APIs for Mobile Roadmap - CS Studio",
+    "seoDescription": "REST APIs, GraphQL, offline sync, push notifications - Weeks 10–14",
+    "ogImage": "/images/roadmaps/backend-mobile.jpg",
+    "prerequisites": [
+      "Mobile development basics"
+    ],
+    "estimatedHours": 80,
+    "learningPathId": "mobile"
+  },
+  {
+    "id": "publishing-mobile",
+    "slug": "publishing-mobile-development",
+    "title": "Publishing & Maintenance",
+    "description": "App Store/Play Store, updates, analytics, monitoring - Weeks 14–18",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Publishing & Maintenance Roadmap - CS Studio",
+    "seoDescription": "App Store/Play Store, updates, analytics, monitoring - Weeks 14–18",
+    "ogImage": "/images/roadmaps/publishing-mobile.jpg",
+    "prerequisites": [
+      "Complete mobile app development"
+    ],
+    "estimatedHours": 80,
+    "learningPathId": "mobile"
+  },
+  {
+    "id": "foundations-sec",
+    "slug": "cyber-security-foundations",
+    "title": "Foundations & Networking",
+    "description": "Security concepts, TCP/IP, network protocols, tools - Weeks 1–6",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Foundations & Networking Roadmap - CS Studio",
+    "seoDescription": "Security concepts, TCP/IP, network protocols, tools - Weeks 1–6",
+    "ogImage": "/images/roadmaps/foundations-sec.jpg",
+    "prerequisites": [
+      "Basic networking knowledge"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "cybersec"
+  },
+  {
+    "id": "defensive-sec",
+    "slug": "cyber-security-defensive",
+    "title": "Defensive Security",
+    "description": "Firewalls, IDS/IPS, access control, security policies - Weeks 6–12",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Defensive Security Roadmap - CS Studio",
+    "seoDescription": "Firewalls, IDS/IPS, access control, security policies - Weeks 6–12",
+    "ogImage": "/images/roadmaps/defensive-sec.jpg",
+    "prerequisites": [
+      "Networking fundamentals"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "cybersec"
+  },
+  {
+    "id": "webapp-sec",
+    "slug": "cyber-security-webapp",
+    "title": "Web & App Security",
+    "description": "OWASP Top 10, penetration testing, secure coding - Weeks 8–14",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Web & App Security Roadmap - CS Studio",
+    "seoDescription": "OWASP Top 10, penetration testing, secure coding - Weeks 8–14",
+    "ogImage": "/images/roadmaps/webapp-sec.jpg",
+    "prerequisites": [
+      "System administration basics"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "cybersec"
+  },
+  {
+    "id": "offensive-sec",
+    "slug": "cyber-security-offensive",
+    "title": "Offensive Security & Red Teaming",
+    "description": "Ethical hacking, vulnerability assessment, exploitation - Weeks 12–20",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Offensive Security & Red Teaming Roadmap - CS Studio",
+    "seoDescription": "Ethical hacking, vulnerability assessment, exploitation - Weeks 12–20",
+    "ogImage": "/images/roadmaps/offensive-sec.jpg",
+    "prerequisites": [
+      "Security fundamentals"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "cybersec"
+  },
+  {
+    "id": "forensics-sec",
+    "slug": "cyber-security-forensics",
+    "title": "Forensics & Incident Response",
+    "description": "Digital forensics, malware analysis, incident handling - Weeks 16–22",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Forensics & Incident Response Roadmap - CS Studio",
+    "seoDescription": "Digital forensics, malware analysis, incident handling - Weeks 16–22",
+    "ogImage": "/images/roadmaps/forensics-sec.jpg",
+    "prerequisites": [
+      "All security modules"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "cybersec"
+  },
+  {
+    "id": "fundamentals-devops",
+    "slug": "devops-fundamentals",
+    "title": "DevOps Fundamentals & CI/CD",
+    "description": "Version control, Jenkins/GitLab CI, automation basics - Weeks 1–6",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "DevOps Fundamentals & CI/CD Roadmap - CS Studio",
+    "seoDescription": "Version control, Jenkins/GitLab CI, automation basics - Weeks 1–6",
+    "ogImage": "/images/roadmaps/fundamentals-devops.jpg",
+    "prerequisites": [
+      "Comfort with command line"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "devops"
+  },
+  {
+    "id": "container-devops",
+    "slug": "devops-container",
+    "title": "Containerization",
+    "description": "Docker, container orchestration, best practices - Weeks 4–10",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Containerization Roadmap - CS Studio",
+    "seoDescription": "Docker, container orchestration, best practices - Weeks 4–10",
+    "ogImage": "/images/roadmaps/container-devops.jpg",
+    "prerequisites": [
+      "Basic system administration"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "devops"
+  },
+  {
+    "id": "orchestration-devops",
+    "slug": "devops-orchestration",
+    "title": "Orchestration & Infrastructure",
+    "description": "Kubernetes, Terraform, cloud platforms, IaC - Weeks 8–16",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Orchestration & Infrastructure Roadmap - CS Studio",
+    "seoDescription": "Kubernetes, Terraform, cloud platforms, IaC - Weeks 8–16",
+    "ogImage": "/images/roadmaps/orchestration-devops.jpg",
+    "prerequisites": [
+      "Networking basics"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "devops"
+  },
+  {
+    "id": "observability-devops",
+    "slug": "devops-observability",
+    "title": "Observability & Reliability",
+    "description": "Monitoring, logging, alerting, SRE practices - Weeks 12–20",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Observability & Reliability Roadmap - CS Studio",
+    "seoDescription": "Monitoring, logging, alerting, SRE practices - Weeks 12–20",
+    "ogImage": "/images/roadmaps/observability-devops.jpg",
+    "prerequisites": [
+      "Infrastructure knowledge"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "devops"
+  },
+  {
+    "id": "math-ai",
+    "slug": "ai-ml-math",
+    "title": "Math & Fundamentals",
+    "description": "Linear algebra, calculus, statistics, Python for ML - Weeks 1–6",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Math & Fundamentals Roadmap - CS Studio",
+    "seoDescription": "Linear algebra, calculus, statistics, Python for ML - Weeks 1–6",
+    "ogImage": "/images/roadmaps/math-ai.jpg",
+    "prerequisites": [
+      "Python basics",
+      "High-school level math"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "ai-ml"
+  },
+  {
+    "id": "coreml-ai",
+    "slug": "ai-ml-core",
+    "title": "Core ML Algorithms",
+    "description": "Supervised/unsupervised learning, model evaluation - Weeks 6–12",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Core ML Algorithms Roadmap - CS Studio",
+    "seoDescription": "Supervised/unsupervised learning, model evaluation - Weeks 6–12",
+    "ogImage": "/images/roadmaps/coreml-ai.jpg",
+    "prerequisites": [
+      "Machine learning fundamentals"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "ai-ml"
+  },
+  {
+    "id": "deeplearning-ai",
+    "slug": "ai-ml-deeplearning",
+    "title": "Deep Learning",
+    "description": "Neural networks, TensorFlow/PyTorch, CNN, RNN - Weeks 10–18",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Deep Learning Roadmap - CS Studio",
+    "seoDescription": "Neural networks, TensorFlow/PyTorch, CNN, RNN - Weeks 10–18",
+    "ogImage": "/images/roadmaps/deeplearning-ai.jpg",
+    "prerequisites": [
+      "ML/DL fundamentals"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "ai-ml"
+  },
+  {
+    "id": "production-ai",
+    "slug": "ai-ml-production",
+    "title": "Production & MLOps",
+    "description": "Model deployment, monitoring, pipelines, scaling - Weeks 16–24",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Production & MLOps Roadmap - CS Studio",
+    "seoDescription": "Model deployment, monitoring, pipelines, scaling - Weeks 16–24",
+    "ogImage": "/images/roadmaps/production-ai.jpg",
+    "prerequisites": [
+      "Deep learning knowledge"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "ai-ml"
+  },
+  {
+    "id": "python-ds",
+    "slug": "data-science-python",
+    "title": "Python & Statistics",
+    "description": "Pandas, NumPy, statistical analysis, probability - Weeks 1–6",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Python & Statistics Roadmap - CS Studio",
+    "seoDescription": "Pandas, NumPy, statistical analysis, probability - Weeks 1–6",
+    "ogImage": "/images/roadmaps/python-ds.jpg",
+    "prerequisites": [
+      "Python basics",
+      "Basic statistics"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "data-science"
+  },
+  {
+    "id": "wrangling-ds",
+    "slug": "data-science-wrangling",
+    "title": "Data Wrangling & Visualization",
+    "description": "Data cleaning, Matplotlib/Seaborn, EDA techniques - Weeks 4–10",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Data Wrangling & Visualization Roadmap - CS Studio",
+    "seoDescription": "Data cleaning, Matplotlib/Seaborn, EDA techniques - Weeks 4–10",
+    "ogImage": "/images/roadmaps/wrangling-ds.jpg",
+    "prerequisites": [
+      "Data analytics fundamentals"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "data-science"
+  },
+  {
+    "id": "modeling-ds",
+    "slug": "data-science-modeling",
+    "title": "Modeling & Evaluation",
+    "description": "Machine learning models, feature engineering, validation - Weeks 8–14",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Modeling & Evaluation Roadmap - CS Studio",
+    "seoDescription": "Machine learning models, feature engineering, validation - Weeks 8–14",
+    "ogImage": "/images/roadmaps/modeling-ds.jpg",
+    "prerequisites": [
+      "Data modeling experience"
+    ],
+    "estimatedHours": 120,
+    "learningPathId": "data-science"
+  },
+  {
+    "id": "bigdata-ds",
+    "slug": "data-science-bigdata",
+    "title": "Big Data & Pipelines",
+    "description": "Spark, data pipelines, cloud platforms, deployment - Weeks 12–20",
+    "status": "published",
+    "publishedAt": "2026-10-01T00:00:00Z",
+    "updatedAt": "2026-10-01T00:00:00Z",
+    "tags": [
+      "Roadmap",
+      null
+    ],
+    "seoTitle": "Big Data & Pipelines Roadmap - CS Studio",
+    "seoDescription": "Spark, data pipelines, cloud platforms, deployment - Weeks 12–20",
+    "ogImage": "/images/roadmaps/bigdata-ds.jpg",
+    "prerequisites": [
+      "Data science fundamentals"
+    ],
+    "estimatedHours": 160,
+    "learningPathId": "data-science"
+  }
+]
